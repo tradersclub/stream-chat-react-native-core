@@ -4,7 +4,7 @@ sync:
 	git checkout -b gsupdate
 	make revert-tc-commits
 	git checkout -b tcreverted
-	git revert HEAD -m "Re-revert last tc"	
+	git revert HEAD --no-edit
 	git checkout main
 	rm -rf ./target
 	mkdir ./target
