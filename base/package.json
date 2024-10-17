@@ -6,6 +6,6 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "stream-chat-react-native-core": "^5.39.0"
+    "stream-chat-react-native-core": "5.29.0"
   }
 }
