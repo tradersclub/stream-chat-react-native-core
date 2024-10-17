@@ -1,32 +1,30 @@
 sync:
-	make delete-branchs
 	git pull
-	git checkout -b gsupdate
 	make revert-tc-commits
-	git checkout -b tcreverted
-	git revert HEAD --no-edit
-	git checkout main
-	rm -rf ./target
-	mkdir ./target
-	cd ./base && yarn install --force && cd ..
-	cp -R ./base/node_modules/stream-chat-react-native-core/* ./target
-	git merge gsupdate --no-edit
-	git merge tcreverted --no-commit --no-ff
+	make clear
+	make update-lib
+	make copy-to-target
+	make rerevert-tc-commits
 
-delete-branchs:
-	@if git show-ref --verify --quiet refs/heads/gsupdate; then \
-		git branch -D gsupdate; \
-	else \
-		echo "Branch 'gsupdate' not found."; \
-	fi
-	@if git show-ref --verify --quiet refs/heads/tcreverted; then \
-		git branch -D tcreverted; \
-	else \
-		echo "Branch 'tcreverted' not found."; \
-	fi
+clear:
+	rm -rf ./target && mkdir ./target
+
+update-lib:
+	cd ./base && yarn install --force && cd ..
+
+copy-to-target:
+	cp -R ./base/node_modules/stream-chat-react-native-core/* ./target
 
 revert-tc-commits:
+	@timestamp=$$(date +%Y%m%d%H); \
 	for commit in $$(git log --grep="tccommit" --pretty=format:"%H"); do \
 		git revert --no-commit $$commit; \
 	done; \
-	git commit -m "Revert commits with title: 'tccommit'"
+	git commit -m "Revert commits with title: 'tccommit' at $$timestamp"
+
+rerevert-tc-commits:
+	@timestamp=$$(date +%Y%m%d%H); \
+	for commit in $$(git log --grep="Revert commits with title: 'tccommit' at $$timestamp" --pretty=format:"%H"); do \
+		git revert --no-commit $$commit; \
+	done; \
+	git commit -m "Revert tc commits: at $$timestamp"
