@@ -4,4 +4,5 @@ export default () => {
   setupURLPolyfill();
   //changed
   // 1
+  // 2
 };
