@@ -11,7 +11,7 @@ sync:
 	mkdir ./target
 	cd ./base && yarn install --force && cd ..
 	cp -R ./base/node_modules/stream-chat-react-native-core/* ./target
-	git merge gsupdate
+	git merge gsupdate --no-edit
 	git merge tcreverted --no-commit --no-ff
 
 delete-branchs:
