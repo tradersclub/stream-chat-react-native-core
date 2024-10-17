@@ -10,7 +10,7 @@ export * from './emoji-data';
 export * from './icons';
 
 export * from './types/types';
- //changed
+
 export * from './utils/patchMessageTextCommand';
 export * from './utils/i18n/Streami18n';
 export * from './utils/utils';
