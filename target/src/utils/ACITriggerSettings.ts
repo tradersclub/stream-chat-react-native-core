@@ -12,6 +12,7 @@ import type {
 import type {
   SuggestionCommand,
   SuggestionComponentType,
+  SuggestionCustom,
   SuggestionUser,
 } from '../contexts/suggestionsContext/SuggestionsContext';
 import { Emoji } from '../emoji-data';
@@ -73,6 +74,24 @@ export type TriggerSettings<
     ) => SuggestionUser<StreamChatGenerics>[] | Promise<void> | void;
     output: (entity: SuggestionUser<StreamChatGenerics>) => TriggerSettingsOutputType;
     type: SuggestionComponentType;
+  };
+  customs?: {
+    [trigger: string]: {
+      dataProvider: (
+        query: string,
+        text: string,
+        onReady?: (data: SuggestionCustom[], q: string) => void,
+        options?: {
+          limit?: number;
+        },
+      ) => Promise<void> | void;
+      output: (entity: SuggestionCustom) => {
+        caretPosition: string;
+        key: string;
+        text: string;
+      };
+      type: SuggestionComponentType;
+    };
   };
 };
 
@@ -221,6 +240,7 @@ export const ACITriggerSettings = <
         if (Object.values(channel.state.members).length < 100) {
           const users = getMembersAndWatchers(channel);
 
+          //Check if the query is present in the name or username of the user
           const matchingUsers = users.filter((user) => {
             if (!query) return true;
             // Don't show current authenticated user in the list
@@ -228,6 +248,9 @@ export const ACITriggerSettings = <
               return false;
             }
             if (user.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
+              return true;
+            }
+            if (user.username?.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
               return true;
             }
             if (user.id.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
@@ -266,7 +289,7 @@ export const ACITriggerSettings = <
     output: (entity) => ({
       caretPosition: 'next',
       key: entity.id,
-      text: `@${entity.name || entity.id}`,
+      text: `@${entity.name || entity.username || entity.id}`
     }),
     type: 'mention',
   },

@@ -135,9 +135,11 @@ const MessageFooterWithContext = <
         {otherAttachments.length && otherAttachments[0].actions ? (
           <OnlyVisibleToYouComponent alignment={alignment} />
         ) : null}
-        {Object.keys(members).length > 2 && alignment === 'left' && message.user?.name ? (
+
+        {/* hidden user name with patch */}
+        {/* {Object.keys(members).length > 2 && alignment === 'left' && message.user?.name ? (
           <Text style={[styles.text, { color: grey }, messageUser]}>{message.user.name}</Text>
-        ) : null}
+        ) : null} */}
         {showMessageStatus && <MessageStatus />}
         <MessageTimestamp formattedDate={formattedDate} timestamp={date} />
 
