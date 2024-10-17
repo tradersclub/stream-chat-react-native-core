@@ -20,11 +20,11 @@ revert-tc-commits:
 	for commit in $$(git log --grep="tccommit" --pretty=format:"%H"); do \
 		git revert --no-commit $$commit; \
 	done; \
-	git commit -m "Revert commits with title: 'tccommit' at $$timestamp"
+	git commit -m "Revert commits tc: at $$timestamp"
 
 rerevert-tc-commits:
 	@timestamp=$$(date +%Y%m%d%H); \
-	for commit in $$(git log --grep="Revert commits with title: 'tccommit' at $$timestamp" --pretty=format:"%H"); do \
+	for commit in $$(git log --grep="Revert commits tc: at $$timestamp" --pretty=format:"%H"); do \
 		git revert --no-commit $$commit; \
 	done; \
-	git commit -m "Revert tc commits: at $$timestamp"
+	git commit -m "Re-revert commits tc: at $$timestamp"
