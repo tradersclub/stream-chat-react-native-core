@@ -71,13 +71,12 @@ export type ReactionListPropsWithContext<
     reactionSize?: number;
     stroke?: string;
     strokeSize?: number; // not recommended to change this
-    reactionCounterColor?: string;
   };
 
 const ReactionListWithContext = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 >(
-  props: ReactionListPropsWithContext<StreamChatGenerics> & { isMyMessage?: boolean },
+  props: ReactionListPropsWithContext<StreamChatGenerics>,
 ) => {
   const {
     alignment,
@@ -96,8 +95,6 @@ const ReactionListWithContext = <
     strokeSize: propStrokeSize,
     supportedReactions,
     targetedMessage,
-    reactionCounterColor = 'white',
-    isMyMessage,
   } = props;
 
   const {
@@ -164,7 +161,6 @@ const ReactionListWithContext = <
   const insideLeftBound = x2 - (reactionSize * reactions.length) / 2 > screenPadding;
   const insideRightBound =
     x2 + strokeSize + (reactionSize * reactions.length) / 2 < width - screenPadding * 2;
-    
   const left =
     reactions.length === 1
       ? x1 + (alignmentLeft ? -radius : radius - reactionSize)
@@ -174,35 +170,13 @@ const ReactionListWithContext = <
       ? width - screenPadding * 2 - reactionSize * reactions.length - strokeSize
       : x2 - (reactionSize * reactions.length) / 2 - strokeSize;
 
-  const reactionsData = reactions.reduce((acc, reaction) => {
-    const hasMoreThanOneReaction = !!message?.reaction_counts?.[reaction.type] && message.reaction_counts[reaction.type] > 1;
-
-    if (hasMoreThanOneReaction) {
-      acc.extraSpace += 15;
-    }
-
-    acc.reactionData.push( <>
-      <Icon
-        key={reaction.type}
-        pathFill={reaction.own ? accent_blue : grey}
-        size={reactionSize / 2}
-        style={middleIcon}
-        supportedReactions={supportedReactions}
-        type={reaction.type}
-      />
-        {hasMoreThanOneReaction && <Text key={`${reaction.type}_counter`} style={{color: reactionCounterColor, marginRight: 4}}>{message.reaction_counts?.[reaction.type]}</Text>}
-      </>);
-    return acc;
-  }, {extraSpace: 0, reactionData: [] as React.ReactElement[]});
-
   return (
     <View
       pointerEvents='box-none'
       style={[
         styles.container,
         {
-          // height: reactionSize + radius * 5, -- original
-          height: reactionSize -2, // Corrige o gap entre emoji e próximo conteúdo
+          height: reactionSize + radius * 5,
           width,
         },
         container,
@@ -257,19 +231,39 @@ const ReactionListWithContext = <
               {
                 backgroundColor: alignmentLeft ? fill : white,
                 borderColor: fill,
-                borderRadius: reactionsData.extraSpace ? 5 : reactionSize,
+                borderRadius: reactionSize,
                 borderWidth: strokeSize,
                 height: reactionSize - strokeSize * 2,
-                // left: left + strokeSize,
-                // top: strokeSize,
-                left: isMyMessage ? undefined : 0,
-                top: 0,
-                right: isMyMessage ? 0 : undefined
+                left: left + strokeSize,
+                top: strokeSize,
               },
               reactionBubble,
             ]}
           >
-            {reactionsData.reactionData}
+            {reactions.map((reaction, index) => (
+              <View
+                key={reaction.type}
+                style={[
+                  styles.reactionContainer,
+                  {
+                    marginRight: index < reactions.length - 1 ? 5 : 0,
+                  },
+                  reactionContainer,
+                ]}
+              >
+                <Icon
+                  key={reaction.type}
+                  pathFill={reaction.own ? iconFillColor || accent_blue : grey}
+                  size={reactionSize / 2}
+                  style={middleIcon}
+                  supportedReactions={supportedReactions}
+                  type={reaction.type}
+                />
+                <Text style={[styles.reactionCount, { color: black }, reactionCount]}>
+                  {reaction.count}
+                </Text>
+              </View>
+            ))}
           </TouchableOpacity>
         </View>
       ) : null}
@@ -286,14 +280,12 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
     messageContentWidth: prevMessageContentWidth,
     reactions: prevReactions,
     targetedMessage: prevTargetedMessage,
-    reactionCounterColor: prevReactionCounterColor,
   } = prevProps;
   const {
     message: nextMessage,
     messageContentWidth: nextMessageContentWidth,
     reactions: nextReactions,
     targetedMessage: nextTargetedMessage,
-    reactionCounterColor: nextReactionCounterColor,
   } = nextProps;
 
   const messageContentWidthEqual = prevMessageContentWidth === nextMessageContentWidth;
@@ -307,10 +299,6 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
 
   if (!targetedMessageEqual) return false;
 
-  const reactionCounterColorEqual = prevReactionCounterColor === nextReactionCounterColor;
-
-  if (!reactionCounterColorEqual) return false;
-  
   const latestReactionsEqual =
     Array.isArray(prevMessage.latest_reactions) && Array.isArray(nextMessage.latest_reactions)
       ? prevMessage.latest_reactions.length === nextMessage.latest_reactions.length &&
@@ -343,7 +331,7 @@ const MemoizedReactionList = React.memo(
 export type ReactionListProps<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 > = Partial<ReactionListPropsWithContext<StreamChatGenerics>> &
-  Pick<ReactionListPropsWithContext<StreamChatGenerics>, 'messageContentWidth'> & { isMyMessage?: boolean };
+  Pick<ReactionListPropsWithContext<StreamChatGenerics>, 'messageContentWidth'>;
 
 /**
  * ReactionList - A high level component which implements all the logic required for a message reaction list
@@ -351,7 +339,7 @@ export type ReactionListProps<
 export const ReactionList = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 >(
-  props: ReactionListProps<StreamChatGenerics> & { isMyMessage?: boolean },
+  props: ReactionListProps<StreamChatGenerics>,
 ) => {
   const {
     alignment,
@@ -386,9 +374,9 @@ export const ReactionList = <
 
 const styles = StyleSheet.create({
   container: {
-    // left: 0,
-    // position: 'absolute',
-    // top: 0,
+    left: 0,
+    position: 'absolute',
+    top: 0,
   },
   reactionBubble: {
     alignItems: 'center',

@@ -87,21 +87,6 @@ const MessageSimpleWithContext = <
   ];
   const messageGroupedTopStyles = [styles.messageGroupedTopContainer, messageGroupedTopContainer];
 
-  // const getMarginBottom = () => {
-  //   if(messageGroupedSingleOrBottom){
-  //     if(showReactions){ 
-  //       return 0
-  //     }
-  //   }
-  //   if(showReactions){
-  //     return -10
-  //   }
-  //   return 0
-  // }
-
-  // const marginBottom = getMarginBottom()
-  // console.log(Object.values(message.reaction_counts))
-
   return (
     <>
       <View
@@ -117,18 +102,12 @@ const MessageSimpleWithContext = <
             marginTop: showReactions ? 2 : 0,
           },
           container,
-          // { marginBottom: marginBottom }
         ]}
         testID='message-simple-wrapper'
       >
         {alignment === 'left' && <MessageAvatar />}
-        <View style={{position: 'relative'}}>
-          <MessageContent setMessageContentWidth={setMessageContentWidth} 
-          // MessageReactionsList={showReactions ? <ReactionList messageContentWidth={messageContentWidth} /> : null} 
-          />
-          {/* {showReactions && <View style={{position: 'absolute', right: 40, bottom: -16}}><ReactionList messageContentWidth={messageContentWidth} /></View>} */}
-        </View>
-        {/* {showReactions && <ReactionList messageContentWidth={messageContentWidth} />} */}
+        <MessageContent setMessageContentWidth={setMessageContentWidth} />
+        {showReactions && <ReactionList messageContentWidth={messageContentWidth} />}
       </View>
     </>
   );

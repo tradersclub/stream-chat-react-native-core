@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import React from 'react';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
 import { renderText, RenderTextParams } from './utils/renderText';
 
@@ -20,14 +20,6 @@ import type { MessageType } from '../../MessageList/hooks/useMessageList';
 
 const styles = StyleSheet.create({
   textContainer: { maxWidth: 250, paddingHorizontal: 16 },
-  textUserName: {
-    lineHeight: 17.5,
-    fontSize: 14, 
-    fontWeight: 500,
-  },
-  textUserNameContainer: {
-    paddingTop: 12
-  }
 });
 
 export type MessageTextProps<
@@ -58,7 +50,7 @@ export type MessageTextContainerPropsWithContext<
 const MessageTextContainerWithContext = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 >(
-  props: MessageTextContainerPropsWithContext<StreamChatGenerics> & { isGroup?: boolean; isMyMessage?: boolean },
+  props: MessageTextContainerPropsWithContext<StreamChatGenerics>,
 ) => {
   const theme = useTheme();
 
@@ -73,8 +65,6 @@ const MessageTextContainerWithContext = <
     onlyEmojis,
     onPress,
     preventPress,
-    isGroup,
-    isMyMessage,
     styles: stylesProp = {},
   } = props;
 
@@ -98,61 +88,13 @@ const MessageTextContainerWithContext = <
 
   const markdownStyles = { ...markdown, ...markdownStylesProp };
 
-  const stringToColor = useCallback((str: string): string => {
-    const MIN_BRIGHTNESS = 500; // Ajuste para controlar a escuridão mínima
-  
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-  
-    let r, g, b;
-  
-    const adjustHash = () => {
-      hash = (hash * 9301 + 49297) % 233280; // Embaralha o hash para evitar loops
-    };
-  
-    do {
-      r = (hash >> 16) & 0xFF;  // Vermelho
-      g = (hash >> 8) & 0xFF;   // Verde
-      b = hash & 0xFF;          // Azul
-  
-      adjustHash(); // Ajusta o hash para recalcular a cor, se necessário
-  
-    } while (
-      (r < 30 && g < 30 && b < 30) ||  // Evita preto ou quase preto
-      (Math.abs(r - g) < 15 && Math.abs(g - b) < 15) || // Evita cinza
-      (r + g + b < MIN_BRIGHTNESS) // Garante brilho mínimo
-    );
-  
-    // Converte os valores RGB para hexadecimal
-    const color = `#${((1 << 24) + (r << 16) + (g << 8) + b)
-      .toString(16)
-      .slice(1)
-      .toUpperCase()}`;
-  
-    return color;
-  }, []);
-  
-
-  const showUserName = ['single', 'top'].includes(message.groupStyles?.[0] || '') && isGroup && !isMyMessage;
-
   return (
     <View
       style={[styles.textContainer, textContainer, stylesProp.textContainer]}
       testID='message-text-container'
     >
       {MessageText ? (
-        <View>
-          {showUserName ? (
-            <View style={[styles.textUserNameContainer]}>
-              <Text style={[styles.textUserName, {color: stringToColor(message?.user?.id || '')}]}>
-                {message?.user?.name}
-              </Text>
-            </View>
-          ) : null}
-          <MessageText {...props} renderText={renderText} theme={theme} />
-        </View>
+        <MessageText {...props} renderText={renderText} theme={theme} />
       ) : (
         renderText<StreamChatGenerics>({
           colors,
@@ -237,9 +179,9 @@ export type MessageTextContainerProps<
 export const MessageTextContainer = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 >(
-  props: MessageTextContainerProps<StreamChatGenerics> & { isGroup?: boolean; isMyMessage?: boolean },
+  props: MessageTextContainerProps<StreamChatGenerics>,
 ) => {
-  const { message, onLongPress, onlyEmojis, onPress, preventPress} =
+  const { message, onLongPress, onlyEmojis, onPress, preventPress } =
     useMessageContext<StreamChatGenerics>();
   const { markdownRules, MessageText, myMessageTheme } = useMessagesContext<StreamChatGenerics>();
   const { messageTextNumberOfLines } = props;

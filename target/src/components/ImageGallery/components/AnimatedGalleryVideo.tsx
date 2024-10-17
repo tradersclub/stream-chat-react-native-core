@@ -188,7 +188,7 @@ export const AnimatedGalleryVideo = React.memo(
           style,
         ]}
       >
-        {isVideoPackageAvailable() && !!source.uri && (
+        {isVideoPackageAvailable() && (
           <Video
             onBuffer={onBuffer}
             onEnd={onEnd}

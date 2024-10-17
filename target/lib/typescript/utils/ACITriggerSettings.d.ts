@@ -1,6 +1,6 @@
 import type { Channel, CommandResponse, StreamChat } from 'stream-chat';
 import type { EmojiSearchIndex, MentionAllAppUsersQuery } from '../contexts/messageInputContext/MessageInputContext';
-import type { SuggestionCommand, SuggestionComponentType, SuggestionCustom, SuggestionUser } from '../contexts/suggestionsContext/SuggestionsContext';
+import type { SuggestionCommand, SuggestionComponentType, SuggestionUser } from '../contexts/suggestionsContext/SuggestionsContext';
 import { Emoji } from '../emoji-data';
 import type { DefaultStreamChatGenerics } from '../types/types';
 export type TriggerSettingsOutputType = {
@@ -30,24 +30,6 @@ export type TriggerSettings<StreamChatGenerics extends DefaultStreamChatGenerics
         }) => SuggestionUser<StreamChatGenerics>[] | Promise<void> | void;
         output: (entity: SuggestionUser<StreamChatGenerics>) => TriggerSettingsOutputType;
         type: SuggestionComponentType;
-    };
-    customs?: {
-        [trigger: string]: {
-            dataProvider: (
-            query: string,
-            text: string,
-            onReady?: (data: SuggestionCustom[], q: string) => void,
-            options?: {
-                limit?: number;
-            },
-            ) => Promise<void> | void;
-            output: (entity: SuggestionCustom) => {
-            caretPosition: string;
-            key: string;
-            text: string;
-            };
-            type: SuggestionComponentType;
-        };
     };
 };
 export type ACITriggerSettingsParams<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = {

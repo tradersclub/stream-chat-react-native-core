@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   AnimatableNumericValue,
   LayoutChangeEvent,
@@ -109,10 +109,7 @@ export type MessageContentPropsWithContext<
 const MessageContentWithContext = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 >(
-  props: MessageContentPropsWithContext<StreamChatGenerics> &
-  Pick<
-    MessagesContextValue<StreamChatGenerics>, 'ReactionList'
-  >,
+  props: MessageContentPropsWithContext<StreamChatGenerics>,
 ) => {
   const {
     additionalTouchableProps,
@@ -144,7 +141,6 @@ const MessageContentWithContext = <
     setMessageContentWidth,
     showMessageStatus,
     threadList,
-    ReactionList
   } = props;
 
   const {
@@ -176,15 +172,12 @@ const MessageContentWithContext = <
   } = useTheme();
   const { vw } = useViewport();
 
-    const [messageContentWidth, setNewMessageContentWidth] = useState(0);
-
   const onLayout: (event: LayoutChangeEvent) => void = ({
     nativeEvent: {
       layout: { width },
     },
   }) => {
-    setNewMessageContentWidth(width)
-    // setMessageContentWidth(width);
+    setMessageContentWidth(width);
   };
 
   const error = message.type === 'error' || message.status === MessageStatusTypes.FAILED;
@@ -237,63 +230,6 @@ const MessageContentWithContext = <
     const groupPosition = groupStyles?.[0];
 
     const isBottomOrSingle = groupPosition === 'single' || groupPosition === 'bottom';
-    const isTopOrSingle = groupPosition === 'single' || groupPosition === 'top';
-    const isMiddle = groupPosition === 'middle';
-
-    if(isMyMessage) {
-      if(isMiddle) {
-        return {
-          borderTopLeftRadius: 16,
-          borderTopRightRadius: 4,
-          borderBottomRightRadius: 4,
-          borderBottomLeftRadius: 16,
-        }
-      }
-      if(isTopOrSingle) {
-        return {
-          borderTopLeftRadius: 16,
-          borderTopRightRadius: 16,
-          borderBottomRightRadius: 4,
-          borderBottomLeftRadius: 16,
-        }
-      }
-      if(isBottomOrSingle) {
-        return {
-          borderTopLeftRadius: 16,
-          borderTopRightRadius: 4,
-          borderBottomRightRadius: 16,
-          borderBottomLeftRadius: 16,
-        }
-      }
-    }
-
-
-      if(isMiddle) {
-        return {
-          borderTopLeftRadius: 4,
-          borderTopRightRadius: 16,
-          borderBottomRightRadius: 16,
-          borderBottomLeftRadius: 4,
-        }
-      }
-      if(isTopOrSingle) {
-        return {
-          borderTopLeftRadius: 16,
-          borderTopRightRadius: 16,
-          borderBottomRightRadius: 16,
-          borderBottomLeftRadius: 4,
-        }
-      }
-      if(isBottomOrSingle) {
-        return {
-          borderTopLeftRadius: 4,
-          borderTopRightRadius: 16,
-          borderBottomRightRadius: 16,
-          borderBottomLeftRadius: 16,
-        }
-      }
-    
-
     let borderBottomLeftRadius = borderRadiusL;
     let borderBottomRightRadius = borderRadiusL;
 
@@ -330,8 +266,6 @@ const MessageContentWithContext = <
 
     return bordersFromTheme;
   };
-
-  const showReactions = message.type !== 'deleted' && hasReactions && ReactionList;
 
   return (
     <TouchableOpacity
@@ -405,7 +339,7 @@ const MessageContentWithContext = <
         )}
         <View
           style={[
-            // styles.containerInner,
+            styles.containerInner,
             {
               backgroundColor,
               borderColor: isMessageReceivedOrErrorType ? grey_whisper : backgroundColor,
@@ -414,7 +348,6 @@ const MessageContentWithContext = <
             },
             noBorder ? { borderWidth: 0 } : {},
             containerInner,
-            {position: 'relative'}
           ]}
           testID='message-content-wrapper'
         >
@@ -449,19 +382,13 @@ const MessageContentWithContext = <
                 return otherAttachments.length && otherAttachments[0].actions ? null : (
                   <MessageTextContainer<StreamChatGenerics>
                     key={`message_text_container_${messageContentOrderIndex}`}
-                    isGroup={Object.keys(members).length > 2}
-                    isMyMessage={isMyMessage}
                   />
                 );
             }
           })}
-  
-          
         </View>
         {error && <MessageError />}
       </View>
-      
-      {showReactions && <ReactionList messageContentWidth={messageContentWidth} isMyMessage={isMyMessage} />}
       <MessageReplies noBorder={noBorder} repliesCurveColor={repliesCurveColor} />
       <MessageFooter date={message.created_at} isDeleted={!!isMessageTypeDeleted} />
     </TouchableOpacity>
@@ -654,7 +581,6 @@ export const MessageContent = <
     MessageStatus,
     myMessageTheme,
     Reply,
-    ReactionList
   } = useMessagesContext<StreamChatGenerics>();
   const { t } = useTranslationContext();
 
@@ -695,7 +621,6 @@ export const MessageContent = <
         showMessageStatus,
         t,
         threadList,
-        ReactionList
       }}
       {...props}
     />
