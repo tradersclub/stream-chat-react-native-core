@@ -1,7 +1,8 @@
 import { setupURLPolyfill } from 'react-native-url-polyfill';
 
 export default () => {
-  setupURLPolyfill();
+  // setupURLPo
+  // lyfill();
   //changed
   // 1
   // 2
