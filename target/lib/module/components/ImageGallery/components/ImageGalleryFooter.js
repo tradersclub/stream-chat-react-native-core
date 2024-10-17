@@ -154,9 +154,9 @@ var ImageGalleryFooterWithContext = function ImageGalleryFooterWithContext(props
     pointerEvents: 'box-none',
     style: styles.wrapper,
     children: (0, _jsxRuntime.jsxs)(ReanimatedSafeAreaView, {
-      style: [container, {
+      style: [{
         backgroundColor: white
-      }, footerStyle],
+      }, footerStyle, container],
       children: [photo.type === _types.FileTypes.Video ? videoControlElement ? videoControlElement({
         duration: duration,
         onPlayPause: onPlayPause,

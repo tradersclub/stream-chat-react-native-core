@@ -26,13 +26,45 @@ export type MessageContextValue<StreamChatGenerics extends DefaultStreamChatGene
     groupStyles: GroupType[];
     /** Handler for actions. Actions in combination with attachments can be used to build [commands](https://getstream.io/chat/docs/#channel_commands). */
     handleAction: ActionHandler;
+    /**
+     * @deprecated
+     * @returns Promise<void>
+     */
     handleCopyMessage: () => void;
+    /**
+     * @deprecated
+     * @returns Promise<void>
+     */
     handleDeleteMessage: () => void;
+    /**
+     * @deprecated
+     * @returns Promise<void>
+     */
     handleEditMessage: () => void;
+    /**
+     * @deprecated
+     * @returns Promise<void>
+     */
     handleFlagMessage: () => void;
+    /**
+     * @deprecated
+     * @returns Promise<void>
+     */
     handleQuotedReplyMessage: () => void;
+    /**
+     * @deprecated
+     * @returns Promise<void>
+     */
     handleResendMessage: () => Promise<void>;
+    /**
+     * @deprecated
+     * @returns Promise<void>
+     */
     handleToggleBanUser: () => Promise<void>;
+    /**
+     * @deprecated
+     * @returns Promise<void>
+     */
     handleToggleMuteUser: () => Promise<void>;
     handleToggleReaction: (reactionType: string) => Promise<void>;
     /** Whether or not message has reactions */
@@ -113,5 +145,5 @@ export declare const useMessageContext: <StreamChatGenerics extends DefaultStrea
  * typing is desired while using the HOC withMessageContext the Props for the
  * wrapped component must be provided as the first generic.
  */
-export declare const withMessageContext: <P extends UnknownType, StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(Component: React.ComponentType<P>) => React.ComponentType<Omit<P, "onPress" | "onPressIn" | "onLongPress" | "channel" | "message" | "messageContentOrder" | "myMessageTheme" | "members" | "threadList" | "reactions" | "images" | "preventPress" | "actionsEnabled" | "alignment" | "files" | "groupStyles" | "handleAction" | "handleCopyMessage" | "handleDeleteMessage" | "handleEditMessage" | "handleFlagMessage" | "handleQuotedReplyMessage" | "handleResendMessage" | "handleToggleBanUser" | "handleToggleMuteUser" | "handleToggleReaction" | "hasReactions" | "isEditedMessageOpen" | "isMyMessage" | "lastGroupMessage" | "onlyEmojis" | "onOpenThread" | "otherAttachments" | "setIsEditedMessageOpen" | "showMessageOverlay" | "showMessageStatus" | "videos" | "goToMessage" | "lastReceivedId" | "showAvatar">>;
+export declare const withMessageContext: <P extends UnknownType, StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(Component: React.ComponentType<P>) => React.ComponentType<Omit<P, "onPress" | "onPressIn" | "onLongPress" | "channel" | "message" | "messageContentOrder" | "myMessageTheme" | "members" | "threadList" | "reactions" | "groupStyles" | "images" | "preventPress" | "actionsEnabled" | "alignment" | "files" | "handleAction" | "handleCopyMessage" | "handleDeleteMessage" | "handleEditMessage" | "handleFlagMessage" | "handleQuotedReplyMessage" | "handleResendMessage" | "handleToggleBanUser" | "handleToggleMuteUser" | "handleToggleReaction" | "hasReactions" | "isEditedMessageOpen" | "isMyMessage" | "lastGroupMessage" | "onlyEmojis" | "onOpenThread" | "otherAttachments" | "setIsEditedMessageOpen" | "showMessageOverlay" | "showMessageStatus" | "videos" | "goToMessage" | "lastReceivedId" | "showAvatar">>;
 //# sourceMappingURL=MessageContext.d.ts.map

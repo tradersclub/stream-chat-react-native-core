@@ -44,7 +44,7 @@ var useMessageDetailsForState = function useMessageDetailsForState(message, init
       setShowMoreOptions(false);
     }
   }, [text, imageUploads.length, fileUploads.length]);
-  var messageValue = message === undefined ? '' : "".concat(message.id).concat(message.text).concat(message.updated_at);
+  var messageValue = message ? (0, _utils.stringifyMessage)(message) : '';
   (0, _react.useEffect)(function () {
     if (message && Array.isArray(message == null ? void 0 : message.mentioned_users)) {
       var _mentionedUsers = message.mentioned_users.map(function (user) {
@@ -71,9 +71,11 @@ var useMessageDetailsForState = function useMessageDetailsForState(message, init
     } else if (attachment.type === _types.FileTypes.Video) {
       return {
         file: {
+          duration: attachment.duration,
           mimeType: attachment.mime_type,
           name: attachment.title || '',
-          size: attachment.file_size
+          size: attachment.file_size,
+          uri: attachment.asset_url
         },
         id: id,
         state: 'finished',
@@ -99,7 +101,8 @@ var useMessageDetailsForState = function useMessageDetailsForState(message, init
         file: {
           mimeType: attachment.mime_type,
           name: attachment.title || '',
-          size: attachment.file_size
+          size: attachment.file_size,
+          uri: attachment.asset_url
         },
         id: id,
         state: 'finished',
@@ -110,7 +113,8 @@ var useMessageDetailsForState = function useMessageDetailsForState(message, init
         file: {
           mimeType: attachment.mime_type,
           name: attachment.title || '',
-          size: attachment.file_size
+          size: attachment.file_size,
+          uri: attachment.asset_url
         },
         id: id,
         state: 'finished',
@@ -133,9 +137,11 @@ var useMessageDetailsForState = function useMessageDetailsForState(message, init
             var id = (0, _utils.generateRandomId)();
             newImageUploads.push({
               file: {
+                height: attachment.original_height,
                 name: attachment.fallback,
                 size: attachment.file_size,
-                type: attachment.type
+                type: attachment.type,
+                width: attachment.original_width
               },
               id: id,
               state: 'finished',

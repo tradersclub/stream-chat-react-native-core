@@ -159,5 +159,11 @@ export declare const getFileNameFromPath: (path: string) => string;
  * @returns string
  */
 export declare const getDurationLabelFromDuration: (duration: number) => string;
+/**
+ * Utility to escape special characters in a string.
+ * @param text
+ * @returns string
+ */
+export declare function escapeRegExp(text: string): string;
 export {};
 //# sourceMappingURL=utils.d.ts.map

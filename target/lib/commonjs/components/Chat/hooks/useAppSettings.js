@@ -19,62 +19,115 @@ var useAppSettings = function useAppSettings(client, isOnline, enableOfflineSupp
     setAppSettings = _useState2[1];
   var isMounted = (0, _useIsMountedRef.useIsMountedRef)();
   (0, _react.useEffect)(function () {
+    var enforceAppSettingsWithoutOfflineSupport = function () {
+      var _ref = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee() {
+        var _appSettings;
+        return _regenerator["default"].wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              _context.prev = 0;
+              _context.next = 3;
+              return client.getAppSettings();
+            case 3:
+              _appSettings = _context.sent;
+              if (isMounted.current) {
+                setAppSettings(_appSettings);
+              }
+              _context.next = 10;
+              break;
+            case 7:
+              _context.prev = 7;
+              _context.t0 = _context["catch"](0);
+              if (_context.t0 instanceof Error) {
+                console.error("An error occurred while getting app settings: ".concat(_context.t0));
+              }
+            case 10:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, null, [[0, 7]]);
+      }));
+      return function enforceAppSettingsWithoutOfflineSupport() {
+        return _ref.apply(this, arguments);
+      };
+    }();
+    var enforceAppSettingsWithOfflineSupport = function () {
+      var _ref2 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee2() {
+        var _appSettings2, _appSettings3;
+        return _regenerator["default"].wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              if (client.userID) {
+                _context2.next = 2;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 2:
+              if (isOnline) {
+                _context2.next = 6;
+                break;
+              }
+              _appSettings2 = dbApi.getAppSettings({
+                currentUserId: client.userID
+              });
+              setAppSettings(_appSettings2);
+              return _context2.abrupt("return");
+            case 6:
+              _context2.prev = 6;
+              _context2.next = 9;
+              return client.getAppSettings();
+            case 9:
+              _appSettings3 = _context2.sent;
+              if (isMounted.current) {
+                setAppSettings(_appSettings3);
+                dbApi.upsertAppSettings({
+                  appSettings: _appSettings3,
+                  currentUserId: client.userID
+                });
+              }
+              _context2.next = 16;
+              break;
+            case 13:
+              _context2.prev = 13;
+              _context2.t0 = _context2["catch"](6);
+              if (_context2.t0 instanceof Error) {
+                console.error("An error occurred while getting app settings: ".concat(_context2.t0));
+              }
+            case 16:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, null, [[6, 13]]);
+      }));
+      return function enforceAppSettingsWithOfflineSupport() {
+        return _ref2.apply(this, arguments);
+      };
+    }();
     function enforeAppSettings() {
       return _enforeAppSettings.apply(this, arguments);
     }
     function _enforeAppSettings() {
-      _enforeAppSettings = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee() {
-        var _appSettings, _appSettings2;
-        return _regenerator["default"].wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
+      _enforeAppSettings = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee3() {
+        return _regenerator["default"].wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              if (client.userID) {
-                _context.next = 2;
+              if (!enableOfflineSupport) {
+                _context3.next = 5;
                 break;
               }
-              return _context.abrupt("return");
-            case 2:
-              if (!(enableOfflineSupport && !initialisedDatabase)) {
-                _context.next = 4;
-                break;
-              }
-              return _context.abrupt("return");
-            case 4:
-              if (!(!isOnline && enableOfflineSupport)) {
-                _context.next = 8;
-                break;
-              }
-              _appSettings = dbApi.getAppSettings({
-                currentUserId: client.userID
-              });
-              setAppSettings(_appSettings);
-              return _context.abrupt("return");
-            case 8:
-              _context.prev = 8;
-              _context.next = 11;
-              return client.getAppSettings();
-            case 11:
-              _appSettings2 = _context.sent;
-              if (isMounted.current) {
-                setAppSettings(_appSettings2);
-                enableOfflineSupport && dbApi.upsertAppSettings({
-                  appSettings: _appSettings2,
-                  currentUserId: client.userID
-                });
-              }
-              _context.next = 18;
+              _context3.next = 3;
+              return enforceAppSettingsWithOfflineSupport();
+            case 3:
+              _context3.next = 7;
               break;
-            case 15:
-              _context.prev = 15;
-              _context.t0 = _context["catch"](8);
-              if (_context.t0 instanceof Error) {
-                console.error("An error occurred while getting app settings: ".concat(_context.t0));
-              }
-            case 18:
+            case 5:
+              _context3.next = 7;
+              return enforceAppSettingsWithoutOfflineSupport();
+            case 7:
             case "end":
-              return _context.stop();
+              return _context3.stop();
           }
-        }, _callee, null, [[8, 15]]);
+        }, _callee3);
       }));
       return _enforeAppSettings.apply(this, arguments);
     }

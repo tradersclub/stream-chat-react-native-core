@@ -5,8 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.MessageInput = void 0;
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
-var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
+var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
 var _react = _interopRequireWildcard(require("react"));
 var _reactNative = require("react-native");
@@ -78,6 +78,7 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
     asyncIds = props.asyncIds,
     asyncMessagesLockDistance = props.asyncMessagesLockDistance,
     asyncMessagesMinimumPressDuration = props.asyncMessagesMinimumPressDuration,
+    asyncMessagesMultiSendEnabled = props.asyncMessagesMultiSendEnabled,
     asyncMessagesSlideToCancelDistance = props.asyncMessagesSlideToCancelDistance,
     asyncUploads = props.asyncUploads,
     AttachmentPickerSelectionBar = props.AttachmentPickerSelectionBar,
@@ -94,7 +95,6 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
     FileUploadPreview = props.FileUploadPreview,
     fileUploads = props.fileUploads,
     giphyActive = props.giphyActive,
-    hasImagePicker = props.hasImagePicker,
     ImageUploadPreview = props.ImageUploadPreview,
     imageUploads = props.imageUploads,
     Input = props.Input,
@@ -243,37 +243,109 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
       return removeImage(image.id);
     });
   };
+  var uploadFilesHandler = function () {
+    var _ref = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee() {
+      var fileToUpload;
+      return _regenerator["default"].wrap(function _callee$(_context) {
+        while (1) switch (_context.prev = _context.next) {
+          case 0:
+            fileToUpload = selectedFiles.find(function (selectedFile) {
+              var uploadedFile = fileUploads.find(function (fileUpload) {
+                return fileUpload.file.uri === selectedFile.uri || fileUpload.url === selectedFile.uri;
+              });
+              return !uploadedFile;
+            });
+            if (!fileToUpload) {
+              _context.next = 4;
+              break;
+            }
+            _context.next = 4;
+            return uploadNewFile(fileToUpload);
+          case 4:
+          case "end":
+            return _context.stop();
+        }
+      }, _callee);
+    }));
+    return function uploadFilesHandler() {
+      return _ref.apply(this, arguments);
+    };
+  }();
+  var removeFilesHandler = function removeFilesHandler() {
+    var filesToRemove = fileUploads.filter(function (fileUpload) {
+      return !selectedFiles.find(function (selectedFile) {
+        return selectedFile.uri === fileUpload.file.uri || selectedFile.uri === fileUpload.url;
+      });
+    });
+    filesToRemove.forEach(function (file) {
+      return removeFile(file.id);
+    });
+  };
   (0, _react.useEffect)(function () {
-    if (imagesForInput) {
-      if (selectedImagesLength > imageUploadsLength) {
-        uploadImagesHandler();
-      } else {
-        removeImagesHandler();
-      }
-    }
+    var uploadOrRemoveImage = function () {
+      var _ref2 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee2() {
+        return _regenerator["default"].wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              if (!imagesForInput) {
+                _context2.next = 7;
+                break;
+              }
+              if (!(selectedImagesLength > imageUploadsLength)) {
+                _context2.next = 6;
+                break;
+              }
+              _context2.next = 4;
+              return uploadImagesHandler();
+            case 4:
+              _context2.next = 7;
+              break;
+            case 6:
+              removeImagesHandler();
+            case 7:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2);
+      }));
+      return function uploadOrRemoveImage() {
+        return _ref2.apply(this, arguments);
+      };
+    }();
+    if (!(0, _native.isImageMediaLibraryAvailable)()) return;
+    uploadOrRemoveImage();
   }, [selectedImagesLength]);
   (0, _react.useEffect)(function () {
-    if (selectedFilesLength > fileUploadsLength) {
-      var fileToUpload = selectedFiles.find(function (selectedFile) {
-        var uploadedFile = fileUploads.find(function (fileUpload) {
-          return fileUpload.file.uri === selectedFile.uri || fileUpload.url === selectedFile.uri;
-        });
-        return !uploadedFile;
-      });
-      if (fileToUpload) uploadNewFile(fileToUpload);
-    } else {
-      var filesToRemove = fileUploads.filter(function (fileUpload) {
-        return !selectedFiles.find(function (selectedFile) {
-          return selectedFile.uri === fileUpload.file.uri || selectedFile.uri === fileUpload.url;
-        });
-      });
-      filesToRemove.forEach(function (file) {
-        return removeFile(file.id);
-      });
-    }
+    var uploadOrRemoveFile = function () {
+      var _ref3 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee3() {
+        return _regenerator["default"].wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
+            case 0:
+              if (!(selectedFilesLength > fileUploadsLength)) {
+                _context3.next = 5;
+                break;
+              }
+              _context3.next = 3;
+              return uploadFilesHandler();
+            case 3:
+              _context3.next = 6;
+              break;
+            case 5:
+              removeFilesHandler();
+            case 6:
+            case "end":
+              return _context3.stop();
+          }
+        }, _callee3);
+      }));
+      return function uploadOrRemoveFile() {
+        return _ref3.apply(this, arguments);
+      };
+    }();
+    uploadOrRemoveFile();
   }, [selectedFilesLength]);
   (0, _react.useEffect)(function () {
-    if (imagesForInput && hasImagePicker) {
+    if (imagesForInput && (0, _native.isImageMediaLibraryAvailable)()) {
       if (imageUploadsLength < selectedImagesLength) {
         var updatedSelectedImages = selectedImages.filter(function (selectedImage) {
           var uploadedImage = imageUploads.find(function (imageUpload) {
@@ -293,9 +365,9 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
         }).filter(Boolean));
       }
     }
-  }, [imageUploadsLength, hasImagePicker]);
+  }, [imageUploadsLength]);
   (0, _react.useEffect)(function () {
-    if (hasImagePicker) {
+    if ((0, _native.isImageMediaLibraryAvailable)()) {
       if (fileUploadsLength < selectedFilesLength) {
         var updatedSelectedFiles = selectedFiles.filter(function (selectedFile) {
           var uploadedFile = fileUploads.find(function (fileUpload) {
@@ -316,7 +388,7 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
         }));
       }
     }
-  }, [fileUploadsLength, hasImagePicker]);
+  }, [fileUploadsLength]);
   var editingExists = !!editing;
   (0, _react.useEffect)(function () {
     if (editing && inputBoxRef.current) {
@@ -327,9 +399,9 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
     }
   }, [editingExists]);
   var asyncIdsString = asyncIds.join();
-  var asyncUploadsString = Object.values(asyncUploads).map(function (_ref) {
-    var state = _ref.state,
-      url = _ref.url;
+  var asyncUploadsString = Object.values(asyncUploads).map(function (_ref4) {
+    var state = _ref4.state,
+      url = _ref4.url;
     return "".concat(state).concat(url);
   }).join();
   (0, _react.useEffect)(function () {
@@ -431,59 +503,60 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
   var X_AXIS_POSITION = -asyncMessagesSlideToCancelDistance;
   var Y_AXIS_POSITION = -asyncMessagesLockDistance;
   var resetAudioRecording = function () {
-    var _ref2 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee() {
-      return _regenerator["default"].wrap(function _callee$(_context) {
-        while (1) switch (_context.prev = _context.next) {
+    var _ref5 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee4() {
+      return _regenerator["default"].wrap(function _callee4$(_context4) {
+        while (1) switch (_context4.prev = _context4.next) {
           case 0:
-            _context.next = 2;
+            _context4.next = 2;
             return deleteVoiceRecording();
           case 2:
-            micPositionX.value = 0;
-          case 3:
           case "end":
-            return _context.stop();
+            return _context4.stop();
         }
-      }, _callee);
+      }, _callee4);
     }));
     return function resetAudioRecording() {
-      return _ref2.apply(this, arguments);
+      return _ref5.apply(this, arguments);
     };
   }();
   var micLockHandler = function micLockHandler() {
     setMicLocked(true);
-    micPositionY.value = 0;
     (0, _native.triggerHaptic)('impactMedium');
   };
-  var handleMicGestureEvent = (0, _reactNativeReanimated.useAnimatedGestureHandler)({
-    onActive: function onActive(event) {
-      var newPositionX = event.translationX;
-      var newPositionY = event.translationY;
-      if (newPositionX <= 0 && newPositionX >= X_AXIS_POSITION) {
-        micPositionX.value = newPositionX;
-      }
-      if (newPositionY <= 0 && newPositionY >= Y_AXIS_POSITION) {
-        micPositionY.value = newPositionY;
-      }
-    },
-    onFinish: function onFinish() {
-      if (micPositionY.value > Y_AXIS_POSITION / 2) {
-        micPositionY.value = (0, _reactNativeReanimated.withSpring)(0);
-      } else {
-        micPositionY.value = (0, _reactNativeReanimated.withSpring)(Y_AXIS_POSITION);
-        (0, _reactNativeReanimated.runOnJS)(micLockHandler)();
-      }
-      if (micPositionX.value > X_AXIS_POSITION / 2) {
-        micPositionX.value = (0, _reactNativeReanimated.withSpring)(0);
-      } else {
-        micPositionX.value = (0, _reactNativeReanimated.withSpring)(X_AXIS_POSITION);
-        (0, _reactNativeReanimated.runOnJS)(resetAudioRecording)();
-      }
-    },
-    onStart: function onStart() {
-      micPositionX.value = 0;
-      micPositionY.value = 0;
-      (0, _reactNativeReanimated.runOnJS)(setMicLocked)(false);
+  var panGestureMic = _reactNativeGestureHandler.Gesture.Pan().activateAfterLongPress(asyncMessagesMinimumPressDuration + 100).onChange(function (event) {
+    var newPositionX = event.translationX;
+    var newPositionY = event.translationY;
+    if (newPositionX <= 0 && newPositionX >= X_AXIS_POSITION) {
+      micPositionX.value = newPositionX;
     }
+    if (newPositionY <= 0 && newPositionY >= Y_AXIS_POSITION) {
+      micPositionY.value = newPositionY;
+    }
+  }).onEnd(function () {
+    var belowThresholdY = micPositionY.value > Y_AXIS_POSITION / 2;
+    var belowThresholdX = micPositionX.value > X_AXIS_POSITION / 2;
+    if (belowThresholdY && belowThresholdX) {
+      micPositionY.value = (0, _reactNativeReanimated.withSpring)(0);
+      micPositionX.value = (0, _reactNativeReanimated.withSpring)(0);
+      if (recordingStatus === 'recording') {
+        (0, _reactNativeReanimated.runOnJS)(uploadVoiceRecording)(asyncMessagesMultiSendEnabled);
+      }
+      return;
+    }
+    if (!belowThresholdY) {
+      micPositionY.value = (0, _reactNativeReanimated.withSpring)(Y_AXIS_POSITION);
+      (0, _reactNativeReanimated.runOnJS)(micLockHandler)();
+    }
+    if (!belowThresholdX) {
+      micPositionX.value = (0, _reactNativeReanimated.withSpring)(X_AXIS_POSITION);
+      (0, _reactNativeReanimated.runOnJS)(resetAudioRecording)();
+    }
+    micPositionX.value = 0;
+    micPositionY.value = 0;
+  }).onStart(function () {
+    micPositionX.value = 0;
+    micPositionY.value = 0;
+    (0, _reactNativeReanimated.runOnJS)(setMicLocked)(false);
   });
   var animatedStyles = {
     lockIndicator: (0, _reactNativeReanimated.useAnimatedStyle)(function () {
@@ -515,8 +588,8 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
   };
   return (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
     children: [(0, _jsxRuntime.jsxs)(_reactNative.View, {
-      onLayout: function onLayout(_ref3) {
-        var newHeight = _ref3.nativeEvent.layout.height;
+      onLayout: function onLayout(_ref6) {
+        var newHeight = _ref6.nativeEvent.layout.height;
         return setHeight(newHeight);
       },
       style: [styles.container, {
@@ -528,16 +601,16 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
           messageInputHeight: height,
           micLocked: micLocked,
           style: animatedStyles.lockIndicator
-        }), micLocked && (recordingStatus === 'stopped' ? (0, _jsxRuntime.jsx)(AudioRecordingPreview, {
+        }), recordingStatus === 'stopped' ? (0, _jsxRuntime.jsx)(AudioRecordingPreview, {
           onVoicePlayerPlayPause: onVoicePlayerPlayPause,
           paused: paused,
           position: position,
           progress: progress,
           waveformData: waveformData
-        }) : (0, _jsxRuntime.jsx)(AudioRecordingInProgress, {
+        }) : micLocked ? (0, _jsxRuntime.jsx)(AudioRecordingInProgress, {
           recordingDuration: recordingDuration,
           waveformData: waveformData
-        }))]
+        }) : null]
       }), (0, _jsxRuntime.jsx)(_reactNative.View, {
         style: [styles.composerContainer, composerContainer],
         children: Input ? (0, _jsxRuntime.jsx)(Input, {
@@ -587,9 +660,8 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
             children: (0, _jsxRuntime.jsx)(SendButton, {
               disabled: sending.current || !isValidMessage() || giphyActive && !isOnline
             })
-          })), audioRecordingEnabled && !micLocked && (0, _jsxRuntime.jsx)(_reactNativeGestureHandler.PanGestureHandler, {
-            activateAfterLongPress: asyncMessagesMinimumPressDuration + 100,
-            onGestureEvent: handleMicGestureEvent,
+          })), audioRecordingEnabled && !micLocked && (0, _jsxRuntime.jsx)(_reactNativeGestureHandler.GestureDetector, {
+            gesture: panGestureMic,
             children: (0, _jsxRuntime.jsx)(_reactNativeReanimated["default"].View, {
               style: [styles.micButtonContainer, animatedStyles.micButton, micButtonContainer],
               children: (0, _jsxRuntime.jsx)(StartAudioRecordingButton, {
@@ -700,8 +772,8 @@ var areEqual = function areEqual(prevProps, nextProps) {
   if (!fileUploadsEqual) return false;
   var mentionedUsersEqual = prevMentionedUsers.length === nextMentionedUsers.length;
   if (!mentionedUsersEqual) return false;
-  var suggestionsEqual = !!(prevSuggestions != null && prevSuggestions.data) && !!(nextSuggestions != null && nextSuggestions.data) ? prevSuggestions.data.length === nextSuggestions.data.length && prevSuggestions.data.every(function (_ref4, index) {
-    var name = _ref4.name;
+  var suggestionsEqual = !!(prevSuggestions != null && prevSuggestions.data) && !!(nextSuggestions != null && nextSuggestions.data) ? prevSuggestions.data.length === nextSuggestions.data.length && prevSuggestions.data.every(function (_ref7, index) {
+    var name = _ref7.name;
     return name === nextSuggestions.data[index].name;
   }) : !!prevSuggestions === !!nextSuggestions;
   if (!suggestionsEqual) return false;
@@ -728,6 +800,7 @@ var MessageInput = function MessageInput(props) {
     asyncIds = _useMessageInputConte.asyncIds,
     asyncMessagesLockDistance = _useMessageInputConte.asyncMessagesLockDistance,
     asyncMessagesMinimumPressDuration = _useMessageInputConte.asyncMessagesMinimumPressDuration,
+    asyncMessagesMultiSendEnabled = _useMessageInputConte.asyncMessagesMultiSendEnabled,
     asyncMessagesSlideToCancelDistance = _useMessageInputConte.asyncMessagesSlideToCancelDistance,
     asyncUploads = _useMessageInputConte.asyncUploads,
     AudioRecorder = _useMessageInputConte.AudioRecorder,
@@ -745,7 +818,6 @@ var MessageInput = function MessageInput(props) {
     FileUploadPreview = _useMessageInputConte.FileUploadPreview,
     fileUploads = _useMessageInputConte.fileUploads,
     giphyActive = _useMessageInputConte.giphyActive,
-    hasImagePicker = _useMessageInputConte.hasImagePicker,
     ImageUploadPreview = _useMessageInputConte.ImageUploadPreview,
     imageUploads = _useMessageInputConte.imageUploads,
     Input = _useMessageInputConte.Input,
@@ -794,6 +866,7 @@ var MessageInput = function MessageInput(props) {
     asyncIds: asyncIds,
     asyncMessagesLockDistance: asyncMessagesLockDistance,
     asyncMessagesMinimumPressDuration: asyncMessagesMinimumPressDuration,
+    asyncMessagesMultiSendEnabled: asyncMessagesMultiSendEnabled,
     asyncMessagesSlideToCancelDistance: asyncMessagesSlideToCancelDistance,
     asyncUploads: asyncUploads,
     AttachmentPickerSelectionBar: AttachmentPickerSelectionBar,
@@ -815,7 +888,6 @@ var MessageInput = function MessageInput(props) {
     FileUploadPreview: FileUploadPreview,
     fileUploads: fileUploads,
     giphyActive: giphyActive,
-    hasImagePicker: hasImagePicker,
     ImageUploadPreview: ImageUploadPreview,
     imageUploads: imageUploads,
     Input: Input,

@@ -131,6 +131,7 @@ export declare class Streami18n {
                 "Also send to channel": string;
                 "Are you sure you want to permanently delete this message?": string;
                 "Are you sure?": string;
+                "Ban User": string;
                 "Block User": string;
                 Cancel: string;
                 "Cannot Flag Message": string;
@@ -192,6 +193,7 @@ export declare class Streami18n {
                 "Slow mode ON": string;
                 "The message has been reported to a moderator.": string;
                 "Thread Reply": string;
+                "Unban User": string;
                 "Unblock User": string;
                 "Unknown User": string;
                 "Unmute User": string;

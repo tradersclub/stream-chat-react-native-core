@@ -30,7 +30,7 @@ var useCreateChatContext = function useCreateChatContext(_ref) {
       resizableCDNHosts: resizableCDNHosts,
       setActiveChannel: setActiveChannel
     };
-  }, [channelId, clientValues, connectionRecovering, isOnline, mutedUsersLength]);
+  }, [appSettings, channelId, clientValues, connectionRecovering, isOnline, mutedUsersLength]);
   return chatContext;
 };
 exports.useCreateChatContext = useCreateChatContext;

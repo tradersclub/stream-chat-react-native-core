@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleProp, TextStyle } from 'react-native';
 import type { DefaultStreamChatGenerics } from '../../types/types';
 import type { MessageOverlayPropsWithContext } from '../MessageOverlay/MessageOverlay';
-export type ActionType = 'blockUser' | 'copyMessage' | 'deleteMessage' | 'editMessage' | 'flagMessage' | 'muteUser' | 'pinMessage' | 'selectReaction' | 'reply' | 'retry' | 'quotedReply' | 'threadReply' | 'unpinMessage';
+export type ActionType = 'banUser' | 'blockUser' | 'copyMessage' | 'deleteMessage' | 'editMessage' | 'flagMessage' | 'muteUser' | 'pinMessage' | 'selectReaction' | 'reply' | 'retry' | 'quotedReply' | 'threadReply' | 'unpinMessage';
 export type MessageActionType = {
     /**
      * Callback when user presses the action button.
@@ -10,9 +10,9 @@ export type MessageActionType = {
     action: () => void;
     /**
      * Type of the action performed.
-     * Eg: 'blockUser', 'copyMessage', 'deleteMessage', 'editMessage', 'flagMessage', 'muteUser', 'pinMessage', 'selectReaction', 'reply', 'retry', 'quotedReply', 'threadReply', 'unpinMessage'
+     * Eg: 'banUser', 'blockUser', 'copyMessage', 'deleteMessage', 'editMessage', 'flagMessage', 'muteUser', 'pinMessage', 'selectReaction', 'reply', 'retry', 'quotedReply', 'threadReply', 'unpinMessage'
      */
-    actionType: ActionType;
+    actionType: ActionType | string;
     /**
      * Title for action button.
      */

@@ -30,6 +30,7 @@ exports.DBSyncManager = DBSyncManager;
 DBSyncManager.syncStatus = false;
 DBSyncManager.listeners = [];
 DBSyncManager.client = null;
+DBSyncManager.connectionChangedListener = null;
 DBSyncManager.getSyncStatus = function () {
   return DBSyncManager.syncStatus;
 };
@@ -52,7 +53,10 @@ DBSyncManager.init = function () {
             return l(true);
           });
         case 6:
-          DBSyncManager.client.on('connection.changed', function () {
+          if (DBSyncManager.connectionChangedListener) {
+            DBSyncManager.connectionChangedListener.unsubscribe();
+          }
+          DBSyncManager.connectionChangedListener = DBSyncManager.client.on('connection.changed', function () {
             var _ref2 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee(event) {
               return _regenerator["default"].wrap(function _callee$(_context) {
                 while (1) switch (_context.prev = _context.next) {
@@ -85,7 +89,7 @@ DBSyncManager.init = function () {
               return _ref2.apply(this, arguments);
             };
           }());
-        case 7:
+        case 8:
         case "end":
           return _context2.stop();
       }

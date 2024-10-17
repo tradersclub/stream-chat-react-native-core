@@ -3,7 +3,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.messageActions = void 0;
 var messageActions = function messageActions(_ref) {
-  var blockUser = _ref.blockUser,
+  var banUser = _ref.banUser,
+    blockUser = _ref.blockUser,
     copyMessage = _ref.copyMessage,
     deleteMessage = _ref.deleteMessage,
     editMessage = _ref.editMessage,
@@ -48,7 +49,7 @@ var messageActions = function messageActions(_ref) {
     actions.push(unpinMessage);
   }
   if (!isMyMessage && ownCapabilities.banChannelMembers) {
-    actions.push(blockUser);
+    actions.push(banUser || blockUser);
   }
   if (isMyMessage && ownCapabilities.deleteOwnMessage || !isMyMessage && ownCapabilities.deleteAnyMessage) {
     actions.push(deleteMessage);

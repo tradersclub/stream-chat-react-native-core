@@ -60,6 +60,7 @@ var MessageWithContext = function MessageWithContext(props) {
     goToMessage = props.goToMessage,
     _props$groupStyles = props.groupStyles,
     groupStyles = _props$groupStyles === void 0 ? ['bottom'] : _props$groupStyles,
+    handleBan = props.handleBan,
     handleBlock = props.handleBlock,
     handleCopy = props.handleCopy,
     handleDelete = props.handleDelete,
@@ -287,6 +288,7 @@ var MessageWithContext = function MessageWithContext(props) {
       deleteMessage: deleteMessageFromContext,
       deleteReaction: deleteReaction,
       enforceUniqueReaction: enforceUniqueReaction,
+      handleBan: handleBan,
       handleBlock: handleBlock,
       handleCopy: handleCopy,
       handleDelete: handleDelete,
@@ -312,6 +314,7 @@ var MessageWithContext = function MessageWithContext(props) {
       t: t,
       updateMessage: updateMessage
     }),
+    banUser = _useMessageActions.banUser,
     blockUser = _useMessageActions.blockUser,
     copyMessage = _useMessageActions.copyMessage,
     deleteMessage = _useMessageActions.deleteMessage,
@@ -347,6 +350,7 @@ var MessageWithContext = function MessageWithContext(props) {
               return setOverlay('none');
             };
             messageActions = typeof messageActionsProp !== 'function' ? messageActionsProp : messageActionsProp({
+              banUser: banUser,
               blockUser: blockUser,
               copyMessage: copyMessage,
               deleteMessage: deleteMessage,

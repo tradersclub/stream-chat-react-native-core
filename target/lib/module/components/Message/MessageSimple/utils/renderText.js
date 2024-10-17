@@ -9,6 +9,7 @@ var _reactNative = require("react-native");
 var _reactNativeMarkdownPackage = _interopRequireDefault(require("react-native-markdown-package"));
 var _simpleMarkdown = require("simple-markdown");
 var _generateMarkdownText = require("./generateMarkdownText");
+var _utils = require("../../../../utils/utils");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/Message/MessageSimple/utils/renderText.tsx";
@@ -154,15 +155,12 @@ var renderText = function renderText(params) {
       children: output(node.content, state)
     }, state.key);
   };
-  function escapeRegExp(text) {
-    return text.replace(/[-[\]{}()*+?.,/\\^$|#]/g, '\\$&');
-  }
   var mentioned_users = message.mentioned_users;
   var mentionedUsernames = (mentioned_users || []).map(function (user) {
     return user.name || user.id;
   }).filter(Boolean).sort(function (a, b) {
     return b.length - a.length;
-  }).map(escapeRegExp);
+  }).map(_utils.escapeRegExp);
   var mentionedUsers = mentionedUsernames.map(function (username) {
     return "@".concat(username);
   }).join('|');

@@ -13,7 +13,6 @@ var _OverlayContext = require("../../contexts/overlayContext/OverlayContext");
 var _ThemeContext = require("../../contexts/themeContext/ThemeContext");
 var _useLoadingImage2 = require("../../hooks/useLoadingImage");
 var _icons = require("../../icons");
-var _Lightning = require("../../icons/Lightning");
 var _utils = require("../../utils/utils");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
@@ -359,7 +358,7 @@ var GiphyWithContext = function GiphyWithContext(props) {
           style: [styles.giphyContainer, {
             backgroundColor: label_bg_transparent
           }, giphyContainer],
-          children: [(0, _jsxRuntime.jsx)(_Lightning.Lightning, {
+          children: [(0, _jsxRuntime.jsx)(_icons.GiphyLightning, {
             fill: white,
             size: 16
           }), (0, _jsxRuntime.jsx)(_reactNative.Text, {

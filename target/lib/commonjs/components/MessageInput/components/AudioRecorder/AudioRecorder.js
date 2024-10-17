@@ -128,6 +128,7 @@ var AudioRecorderWithContext = function AudioRecorderWithContext(props) {
     return (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
       children: [(0, _jsxRuntime.jsxs)(_reactNative.View, {
         style: [styles.micContainer, micContainer],
+        testID: "recording-active-container",
         children: [(0, _jsxRuntime.jsx)(_icons.Mic, Object.assign({
           fill: recordingDuration !== 0 ? accent_red : grey_dark,
           size: 32

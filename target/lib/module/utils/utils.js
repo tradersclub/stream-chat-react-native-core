@@ -2,7 +2,9 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.stringifyMessage = exports.reduceMessagesToString = exports.queryUsersDebounced = exports.queryMembersDebounced = exports.makeImageCompatibleUrl = exports.isMentionTrigger = exports.isLocalUrl = exports.isEmojiTrigger = exports.isEditedMessage = exports.isCommandTrigger = exports.isBouncedMessage = exports.isBlockedMessage = exports.hasOnlyEmojis = exports.getUrlWithoutParams = exports.getIndicatorTypeForFileState = exports.getFileNameFromPath = exports.getDurationLabelFromDuration = exports.generateRandomId = exports.defaultEmojiSearchIndex = exports.ProgressIndicatorTypes = exports.MessageStatusTypes = exports.FileState = exports.ACITriggerSettings = void 0;
+exports.defaultEmojiSearchIndex = exports.ProgressIndicatorTypes = exports.MessageStatusTypes = exports.FileState = exports.ACITriggerSettings = void 0;
+exports.escapeRegExp = escapeRegExp;
+exports.stringifyMessage = exports.reduceMessagesToString = exports.queryUsersDebounced = exports.queryMembersDebounced = exports.makeImageCompatibleUrl = exports.isMentionTrigger = exports.isLocalUrl = exports.isEmojiTrigger = exports.isEditedMessage = exports.isCommandTrigger = exports.isBouncedMessage = exports.isBlockedMessage = exports.hasOnlyEmojis = exports.getUrlWithoutParams = exports.getIndicatorTypeForFileState = exports.getFileNameFromPath = exports.getDurationLabelFromDuration = exports.generateRandomId = void 0;
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
 var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
@@ -495,4 +497,7 @@ var getDurationLabelFromDuration = function getDurationLabelFromDuration(duratio
   return durationLabel;
 };
 exports.getDurationLabelFromDuration = getDurationLabelFromDuration;
+function escapeRegExp(text) {
+  return text.replace(/[-[\]{}()*+?.,/\\^$|#]/g, '\\$&');
+}
 //# sourceMappingURL=utils.js.map

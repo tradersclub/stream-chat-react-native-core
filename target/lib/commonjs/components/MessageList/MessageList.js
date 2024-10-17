@@ -632,6 +632,9 @@ var MessageListWithContext = function MessageListWithContext(props) {
           viewPosition: 0.5
         });
       }
+      loadChannelAroundMessage({
+        messageId: messageIdToScroll
+      });
     }, 50);
   }, [targetedMessage, initialScrollToFirstUnreadMessage]);
   var messagesWithImages = legacyImageViewerSwipeBehaviour && processedMessageList.filter(function (message) {

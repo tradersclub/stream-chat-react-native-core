@@ -128,11 +128,6 @@ var ChannelListMessengerWithContext = function ChannelListMessengerWithContext(p
       onEndReachedCalledDuringCurrentScrollRef.current = true;
     }
   };
-  if (loadingChannels) {
-    return (0, _jsxRuntime.jsx)(LoadingIndicator, {
-      listType: "channel"
-    });
-  }
   return (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
     children: [(0, _jsxRuntime.jsx)(_reactNative.FlatList, Object.assign({
       contentContainerStyle: [styles.flatListContentContainer, {

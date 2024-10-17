@@ -16,12 +16,13 @@ var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/Message/hooks/useMessageActions.tsx";
 var useMessageActions = function useMessageActions(_ref) {
-  var _message$user3;
+  var _message$user3, _message$user5;
   var channel = _ref.channel,
     client = _ref.client,
     deleteMessageFromContext = _ref.deleteMessage,
     deleteReaction = _ref.deleteReaction,
     enforceUniqueReaction = _ref.enforceUniqueReaction,
+    handleBan = _ref.handleBan,
     handleBlock = _ref.handleBlock,
     handleCopy = _ref.handleCopy,
     handleDelete = _ref.handleDelete,
@@ -84,7 +85,7 @@ var useMessageActions = function useMessageActions(_ref) {
     var _message$user;
     return mute.user.id === client.userID && mute.target.id === ((_message$user = message.user) == null ? void 0 : _message$user.id);
   });
-  var blockUser = {
+  var banUser = {
     action: function () {
       var _action = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee() {
         var _message$user2;
@@ -96,8 +97,8 @@ var useMessageActions = function useMessageActions(_ref) {
                 _context.next = 5;
                 break;
               }
-              if (handleBlock) {
-                handleBlock(message);
+              if (handleBan) {
+                handleBan(message);
               }
               _context.next = 5;
               return handleToggleBanUser();
@@ -112,11 +113,45 @@ var useMessageActions = function useMessageActions(_ref) {
       }
       return action;
     }(),
+    actionType: 'banUser',
+    icon: (0, _jsxRuntime.jsx)(_icons.UserDelete, {
+      pathFill: grey
+    }),
+    title: (_message$user3 = message.user) != null && _message$user3.banned ? t('Unban User') : t('Ban User')
+  };
+  var blockUser = {
+    action: function () {
+      var _action2 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee2() {
+        var _message$user4;
+        return _regenerator["default"].wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              setOverlay('none');
+              if (!((_message$user4 = message.user) != null && _message$user4.id)) {
+                _context2.next = 5;
+                break;
+              }
+              if (handleBlock) {
+                handleBlock(message);
+              }
+              _context2.next = 5;
+              return handleToggleBanUser();
+            case 5:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2);
+      }));
+      function action() {
+        return _action2.apply(this, arguments);
+      }
+      return action;
+    }(),
     actionType: 'blockUser',
     icon: (0, _jsxRuntime.jsx)(_icons.UserDelete, {
       pathFill: grey
     }),
-    title: (_message$user3 = message.user) != null && _message$user3.banned ? t('Unblock User') : t('Block User')
+    title: (_message$user5 = message.user) != null && _message$user5.banned ? t('Unblock User') : t('Block User')
   };
   var copyMessage = _native.setClipboardString !== null ? {
     action: function action() {
@@ -208,20 +243,20 @@ var useMessageActions = function useMessageActions(_ref) {
     title: t('Flag Message')
   };
   var handleReaction = !error ? selectReaction ? selectReaction(message) : (function () {
-    var _ref2 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee2(reactionType) {
-      return _regenerator["default"].wrap(function _callee2$(_context2) {
-        while (1) switch (_context2.prev = _context2.next) {
+    var _ref2 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee3(reactionType) {
+      return _regenerator["default"].wrap(function _callee3$(_context3) {
+        while (1) switch (_context3.prev = _context3.next) {
           case 0:
             if (handleReactionProp) {
               handleReactionProp(message, reactionType);
             }
-            _context2.next = 3;
+            _context3.next = 3;
             return handleToggleReaction(reactionType);
           case 3:
           case "end":
-            return _context2.stop();
+            return _context3.stop();
         }
-      }, _callee2);
+      }, _callee3);
     }));
     return function (_x) {
       return _ref2.apply(this, arguments);
@@ -229,29 +264,29 @@ var useMessageActions = function useMessageActions(_ref) {
   }()) : undefined;
   var muteUser = {
     action: function () {
-      var _action2 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee3() {
-        var _message$user4;
-        return _regenerator["default"].wrap(function _callee3$(_context3) {
-          while (1) switch (_context3.prev = _context3.next) {
+      var _action3 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee4() {
+        var _message$user6;
+        return _regenerator["default"].wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
             case 0:
               setOverlay('none');
-              if (!((_message$user4 = message.user) != null && _message$user4.id)) {
-                _context3.next = 5;
+              if (!((_message$user6 = message.user) != null && _message$user6.id)) {
+                _context4.next = 5;
                 break;
               }
               if (handleMute) {
                 handleMute(message);
               }
-              _context3.next = 5;
+              _context4.next = 5;
               return handleToggleMuteUser();
             case 5:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
-        }, _callee3);
+        }, _callee4);
       }));
       function action() {
-        return _action2.apply(this, arguments);
+        return _action3.apply(this, arguments);
       }
       return action;
     }(),
@@ -277,26 +312,26 @@ var useMessageActions = function useMessageActions(_ref) {
   };
   var retry = {
     action: function () {
-      var _action3 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee4() {
+      var _action4 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee5() {
         var messageWithoutReservedFields;
-        return _regenerator["default"].wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
+        return _regenerator["default"].wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
             case 0:
               setOverlay('none');
               messageWithoutReservedFields = (0, _removeReservedFields.removeReservedFields)(message);
               if (handleRetry) {
                 handleRetry(messageWithoutReservedFields);
               }
-              _context4.next = 5;
+              _context5.next = 5;
               return handleResendMessage();
             case 5:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
-        }, _callee4);
+        }, _callee5);
       }));
       function action() {
-        return _action3.apply(this, arguments);
+        return _action4.apply(this, arguments);
       }
       return action;
     }(),
@@ -321,6 +356,7 @@ var useMessageActions = function useMessageActions(_ref) {
     title: t('Thread Reply')
   };
   return {
+    banUser: banUser,
     blockUser: blockUser,
     copyMessage: copyMessage,
     deleteMessage: deleteMessage,

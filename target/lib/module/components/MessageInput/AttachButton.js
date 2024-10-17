@@ -49,7 +49,9 @@ var AttachButtonWithContext = function AttachButtonWithContext(props) {
     });
   };
   var attachButtonHandler = function attachButtonHandler() {
-    setShowAttachButtonPicker(true);
+    setShowAttachButtonPicker(function (prevShowAttachButtonPicker) {
+      return !prevShowAttachButtonPicker;
+    });
   };
   var onPressHandler = function onPressHandler() {
     if (handleOnPress) {

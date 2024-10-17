@@ -31,6 +31,7 @@ var styles = _reactNative.StyleSheet.create({
   dismiss: {
     borderRadius: 24,
     height: 24,
+    marginRight: 4,
     position: 'absolute',
     right: 8,
     top: 8,
@@ -193,8 +194,8 @@ var FileUploadPreviewWithContext = function FileUploadPreviewWithContext(props) 
     var _item$file$mimeType;
     var item = _ref2.item;
     var indicatorType = (0, _utils.getIndicatorTypeForFileState)(item.state, enableOfflineSupport);
-    return (0, _jsxRuntime.jsx)(_jsxRuntime.Fragment, {
-      children: (0, _jsxRuntime.jsxs)(_UploadProgressIndicator.UploadProgressIndicator, {
+    return (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
+      children: [(0, _jsxRuntime.jsx)(_UploadProgressIndicator.UploadProgressIndicator, {
         action: function action() {
           uploadFile({
             newFile: item
@@ -202,7 +203,7 @@ var FileUploadPreviewWithContext = function FileUploadPreviewWithContext(props) 
         },
         style: styles.overlay,
         type: indicatorType,
-        children: [(_item$file$mimeType = item.file.mimeType) != null && _item$file$mimeType.startsWith('audio/') && (0, _native.isAudioPackageAvailable)() ? (0, _jsxRuntime.jsx)(AudioAttachmentUploadPreview, {
+        children: (_item$file$mimeType = item.file.mimeType) != null && _item$file$mimeType.startsWith('audio/') && (0, _native.isAudioPackageAvailable)() ? (0, _jsxRuntime.jsx)(AudioAttachmentUploadPreview, {
           hideProgressBar: true,
           item: item,
           onLoad: onLoad,
@@ -236,19 +237,19 @@ var FileUploadPreviewWithContext = function FileUploadPreviewWithContext(props) 
               item: item
             })]
           })]
-        }), (0, _jsxRuntime.jsx)(_reactNative.TouchableOpacity, {
-          onPress: function onPress() {
-            removeFile(item.id);
-          },
-          style: [styles.dismiss, {
-            backgroundColor: grey_gainsboro
-          }, dismiss],
-          testID: "remove-file-upload-preview",
-          children: (0, _jsxRuntime.jsx)(_Close.Close, {
-            pathFill: grey_dark
-          })
-        })]
-      })
+        })
+      }), (0, _jsxRuntime.jsx)(_reactNative.TouchableOpacity, {
+        onPress: function onPress() {
+          removeFile(item.id);
+        },
+        style: [styles.dismiss, {
+          backgroundColor: grey_gainsboro
+        }, dismiss],
+        testID: "remove-file-upload-preview",
+        children: (0, _jsxRuntime.jsx)(_Close.Close, {
+          pathFill: grey_dark
+        })
+      })]
     });
   };
   var fileUploadsLength = fileUploads.length;

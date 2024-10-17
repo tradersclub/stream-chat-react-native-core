@@ -1,5 +1,4 @@
-import type { LegacyRef } from 'react';
-import React, { PropsWithChildren } from 'react';
+import React, { LegacyRef, PropsWithChildren } from 'react';
 import { TextInput, TextInputProps } from 'react-native';
 import { Attachment, Message, SendFileAPIResponse, StreamChat, Message as StreamMessage, UserFilters, UserOptions, UserResponse, UserSort } from 'stream-chat';
 import { AudioAttachmentProps } from '../../components/Attachment/AudioAttachment';
