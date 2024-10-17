@@ -4,7 +4,15 @@ sync:
 	make clear
 	make update-lib
 	make copy-to-target
+	make commit-updated
 	make rerevert-tc-commits
+
+revert-tc-commits:
+	@timestamp=$$(date +%Y%m%d%H); \
+	for commit in $$(git log --grep="tccommit" --pretty=format:"%H"); do \
+		git revert --no-commit $$commit; \
+	done; \
+	git commit -m "Revert commits tc: at $$timestamp"
 
 clear:
 	rm -rf ./target && mkdir ./target
@@ -15,12 +23,8 @@ update-lib:
 copy-to-target:
 	cp -R ./base/node_modules/stream-chat-react-native-core/* ./target
 
-revert-tc-commits:
-	@timestamp=$$(date +%Y%m%d%H); \
-	for commit in $$(git log --grep="tccommit" --pretty=format:"%H"); do \
-		git revert --no-commit $$commit; \
-	done; \
-	git commit -m "Revert commits tc: at $$timestamp"
+commit-updated:
+	git add . && git commit -m "Lib updated"
 
 rerevert-tc-commits:
 	@timestamp=$$(date +%Y%m%d%H); \
