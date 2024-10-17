@@ -15,3 +15,9 @@ delete-branch:
 	else \
 		echo "Branch 'aux' not found."; \
 	fi
+
+revert-tc-commits:
+	for commit in $$(git log --grep="título comum" --pretty=format:"%H"); do \
+		git revert --no-commit $$commit; \
+	done; \
+	git commit -m "Revertendo commits com título 'título comum'"
