@@ -30,5 +30,4 @@ rerevert-tc-commits:
 	@timestamp=$$(date +%Y%m%d%H); \
 	for commit in $$(git log --grep="Revert commits tc: at $$timestamp" --pretty=format:"%H"); do \
 		git revert --no-commit $$commit; \
-	done; \
-	git commit -m "Re-revert commits tc: at $$timestamp"
+	done;
