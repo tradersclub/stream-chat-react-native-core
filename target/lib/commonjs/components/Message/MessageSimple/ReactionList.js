@@ -170,7 +170,7 @@ var ReactionListWithContext = function ReactionListWithContext(props) {
           if (_onPress) {
             _onPress({
               defaultHandler: function defaultHandler() {
-                return showMessageOverlay(true);
+                return showMessageOverlay(false);
               },
               emitter: 'reactionList',
               event: event
@@ -181,7 +181,7 @@ var ReactionListWithContext = function ReactionListWithContext(props) {
           if (_onPressIn) {
             _onPressIn({
               defaultHandler: function defaultHandler() {
-                return showMessageOverlay(true);
+                return showMessageOverlay(false);
               },
               emitter: 'reactionList',
               event: event

@@ -13,6 +13,7 @@ import {
 } from '../../contexts/messageInputContext/MessageInputContext';
 import {
   isSuggestionCommand,
+  isSuggestionCustom,
   isSuggestionEmoji,
   isSuggestionUser,
   Suggestion,
@@ -28,9 +29,12 @@ import {
 } from '../../contexts/translationContext/TranslationContext';
 import type { Emoji } from '../../emoji-data';
 import type { DefaultStreamChatGenerics } from '../../types/types';
-import { isCommandTrigger, isEmojiTrigger, isMentionTrigger } from '../../utils/utils';
-
-import type { Trigger } from '../../utils/utils';
+import {
+  isCommandTrigger,
+  isEmojiTrigger,
+  isMentionTrigger,
+  Trigger,
+} from '../../utils/ACITriggerSettings';
 
 const styles = StyleSheet.create({
   inputBox: {
@@ -133,7 +137,7 @@ const AutoCompleteInputWithContext = <
   }, [text]);
 
   const startTracking = (trigger: Trigger) => {
-    const triggerSetting = triggerSettings[trigger];
+    const triggerSetting = triggerSettings[trigger] ?? triggerSettings?.customs?.[trigger];
     if (triggerSetting) {
       isTrackingStarted.current = true;
       const { type } = triggerSetting;
@@ -197,7 +201,7 @@ const AutoCompleteInputWithContext = <
           },
         );
       }
-    } else {
+    } else if (isEmojiTrigger(trigger)) {
       const triggerSetting = triggerSettings[trigger];
       if (triggerSetting) {
         await triggerSetting.dataProvider(query as Emoji['name'], text, (data, queryCallback) => {
@@ -211,6 +215,28 @@ const AutoCompleteInputWithContext = <
             queryText: query,
           });
         });
+      }
+    } else {
+      const triggerSetting = triggerSettings?.customs?.[trigger];
+      if (triggerSetting) {
+        await triggerSetting.dataProvider(
+          query as string,
+          text,
+          (data, queryCallback) => {
+            if (query !== queryCallback) {
+              return;
+            }
+
+            updateSuggestionsContext({
+              data,
+              onSelect: (item) => onSelectSuggestion({ item, trigger }),
+              queryText: query,
+            });
+          },
+          {
+            limit: autoCompleteSuggestionsLimit,
+          },
+        );
       }
     }
   };
@@ -230,7 +256,7 @@ const AutoCompleteInputWithContext = <
     item: Suggestion<StreamChatGenerics>;
     trigger: Trigger;
   }) => {
-    if (!trigger || !triggerSettings[trigger]) {
+    if (!trigger || (!triggerSettings[trigger] && !triggerSettings?.customs?.[trigger])) {
       return;
     }
 
@@ -240,15 +266,23 @@ const AutoCompleteInputWithContext = <
       if (triggerSetting) {
         newTokenString = `${triggerSetting.output(item).text} `;
       }
-    }
-    if (isEmojiTrigger(trigger) && isSuggestionEmoji(item)) {
+    } else if (isEmojiTrigger(trigger) && isSuggestionEmoji(item)) {
       const triggerSetting = triggerSettings[trigger];
       if (triggerSetting) {
         newTokenString = `${triggerSetting.output(item).text} `;
       }
-    }
-    if (isMentionTrigger(trigger) && isSuggestionUser(item)) {
+    } else if (isMentionTrigger(trigger) && isSuggestionUser(item)) {
       const triggerSetting = triggerSettings[trigger];
+      if (triggerSetting) {
+        newTokenString = `${triggerSetting.output(item).text} `;
+      }
+    } else if (
+      !isCommandTrigger(trigger) &&
+      !isEmojiTrigger(trigger) &&
+      !isMentionTrigger(trigger) &&
+      isSuggestionCustom(item)
+    ) {
+      const triggerSetting = triggerSettings?.customs?.[trigger];
       if (triggerSetting) {
         newTokenString = `${triggerSetting.output(item).text} `;
       }
@@ -355,6 +389,37 @@ const AutoCompleteInputWithContext = <
     await updateSuggestions({ query: actualToken, trigger: ':' });
   };
 
+  const handleCustom = ({ tokenMatch }: { tokenMatch: RegExpMatchArray | null }): boolean => {
+    const lastToken = tokenMatch?.[tokenMatch.length - 1].trim();
+    const handleCustomTrigger =
+      (lastToken && Object.keys(triggerSettings?.customs ?? {}).find((trigger) => trigger === lastToken[0])) ||
+      null;
+
+    /*
+      if we lost the trigger token or there is no following character we want to close
+      the autocomplete
+    */
+    if (!lastToken || lastToken.length <= 0) {
+      stopTracking();
+      return false;
+    }
+
+    const actualToken = lastToken.slice(1);
+
+    // if trigger is not configured step out from the function, otherwise proceed
+    if (!handleCustomTrigger) {
+      return false;
+    }
+
+    if (!isTrackingStarted.current) {
+      startTracking(handleCustomTrigger as Trigger);
+    }
+
+    updateSuggestions({ query: actualToken, trigger: handleCustomTrigger as Trigger });
+
+    return true;
+  };
+
   const handleSuggestions = async (text: string) => {
     if (text === undefined) return;
     if (
@@ -363,16 +428,24 @@ const AutoCompleteInputWithContext = <
     ) {
       stopTracking();
     } else if (!(await handleCommand(text))) {
-      const mentionTokenMatch = text
-        .slice(0, selectionEnd.current)
-        .match(/(?!^|\W)?@[^\s@]*\s?[^\s@]*$/g);
+      const token = text.slice(0, selectionEnd.current);
+
+      const mentionTokenMatch = token.match(/(?!^|\W)?@[^\s@]*\s?[^\s@]*$/g);
       if (mentionTokenMatch) {
         await handleMentions({ tokenMatch: mentionTokenMatch });
       } else {
-        const emojiTokenMatch = text
-          .slice(0, selectionEnd.current)
-          .match(/(?!^|\W)?:\w{2,}[^\s]*\s?[^\s]*$/g);
-        await handleEmojis({ tokenMatch: emojiTokenMatch });
+        const emojiTokenMatch = token.match(/(?!^|\W)?:\w{2,}[^\s]*\s?[^\s]*$/g);
+        if (emojiTokenMatch) {
+          handleEmojis({ tokenMatch: emojiTokenMatch });
+        } else {
+          const triggers = Object.keys(triggerSettings?.customs ?? {});
+          for (const trigger of triggers) {
+            const customTokenMatch = token.match(new RegExp(`\\${trigger}\\w*$`, 'g'));
+            if (handleCustom({ tokenMatch: customTokenMatch })) {
+              break;
+            }
+          }
+        }
       }
     }
   };

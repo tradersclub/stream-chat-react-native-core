@@ -12,32 +12,6 @@ var _icons = require("../../icons");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/Indicators/EmptyStateIndicator.tsx";
-var styles = _reactNative.StyleSheet.create({
-  channelContainer: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center'
-  },
-  channelDetails: {
-    fontSize: 14,
-    textAlign: 'center'
-  },
-  channelTitle: {
-    fontSize: 16,
-    paddingBottom: 8,
-    paddingTop: 16
-  },
-  messageContainer: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center'
-  },
-  messageTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    paddingBottom: 8
-  }
-});
 var EmptyStateIndicator = function EmptyStateIndicator(_ref) {
   var listType = _ref.listType;
   var _useTheme = (0, _ThemeContext.useTheme)(),
@@ -49,7 +23,9 @@ var EmptyStateIndicator = function EmptyStateIndicator(_ref) {
     _useTheme$theme$empty = _useTheme$theme.emptyStateIndicator,
     channelContainer = _useTheme$theme$empty.channelContainer,
     channelDetails = _useTheme$theme$empty.channelDetails,
-    channelTitle = _useTheme$theme$empty.channelTitle;
+    channelTitle = _useTheme$theme$empty.channelTitle,
+    messageContainer = _useTheme$theme$empty.messageContainer,
+    messageTitle = _useTheme$theme$empty.messageTitle;
   var _useViewport = (0, _useViewport2.useViewport)(),
     vw = _useViewport.vw;
   var width = vw(33);
@@ -58,7 +34,7 @@ var EmptyStateIndicator = function EmptyStateIndicator(_ref) {
   switch (listType) {
     case 'channel':
       return (0, _jsxRuntime.jsxs)(_reactNative.View, {
-        style: [styles.channelContainer, channelContainer],
+        style: [styles.container, channelContainer],
         children: [(0, _jsxRuntime.jsx)(_icons.MessageIcon, {
           height: width,
           pathFill: grey_gainsboro,
@@ -80,7 +56,7 @@ var EmptyStateIndicator = function EmptyStateIndicator(_ref) {
       });
     case 'message':
       return (0, _jsxRuntime.jsxs)(_reactNative.View, {
-        style: [styles.messageContainer],
+        style: [styles.container, messageContainer],
         children: [(0, _jsxRuntime.jsx)(_icons.ChatIcon, {
           height: width,
           pathFill: grey_gainsboro,
@@ -88,18 +64,39 @@ var EmptyStateIndicator = function EmptyStateIndicator(_ref) {
         }), (0, _jsxRuntime.jsx)(_reactNative.Text, {
           style: [styles.messageTitle, {
             color: grey_gainsboro
-          }],
+          }, messageTitle],
           children: t('No chats here yet…')
         })]
       });
     default:
       return (0, _jsxRuntime.jsx)(_reactNative.Text, {
-        style: {
+        style: [{
           color: black
-        },
+        }, messageContainer],
         children: "No items exist"
       });
   }
 };
 exports.EmptyStateIndicator = EmptyStateIndicator;
+var styles = _reactNative.StyleSheet.create({
+  channelDetails: {
+    fontSize: 14,
+    textAlign: 'center'
+  },
+  channelTitle: {
+    fontSize: 16,
+    paddingBottom: 8,
+    paddingTop: 16
+  },
+  container: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center'
+  },
+  messageTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    paddingBottom: 8
+  }
+});
 //# sourceMappingURL=EmptyStateIndicator.js.map

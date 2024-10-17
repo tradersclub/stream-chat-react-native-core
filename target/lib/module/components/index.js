@@ -705,6 +705,17 @@ Object.keys(_Chat).forEach(function (key) {
     }
   });
 });
+var _useCreateChatClient = require("./Chat/hooks/useCreateChatClient");
+Object.keys(_useCreateChatClient).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _useCreateChatClient[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _useCreateChatClient[key];
+    }
+  });
+});
 var _useCreateChatContext = require("./Chat/hooks/useCreateChatContext");
 Object.keys(_useCreateChatContext).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;

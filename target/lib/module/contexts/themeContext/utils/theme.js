@@ -137,7 +137,9 @@ var defaultTheme = {
   emptyStateIndicator: {
     channelContainer: {},
     channelDetails: {},
-    channelTitle: {}
+    channelTitle: {},
+    messageContainer: {},
+    messageTitle: {}
   },
   groupAvatar: {
     container: {},

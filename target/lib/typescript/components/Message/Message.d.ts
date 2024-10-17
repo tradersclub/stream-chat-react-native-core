@@ -59,6 +59,10 @@ export type MessageActionHandlers<StreamChatGenerics extends DefaultStreamChatGe
     pinMessage: () => Promise<void>;
     quotedReply: () => void;
     resendMessage: () => Promise<void>;
+    /**
+     * @deprecated
+     * TODO: This seems useless for the action handlers here so can be removed.
+     */
     showMessageOverlay: () => void;
     toggleBanUser: () => Promise<void>;
     toggleMuteUser: () => Promise<void>;

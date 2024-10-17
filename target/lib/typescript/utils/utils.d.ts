@@ -1,11 +1,8 @@
 import type React from 'react';
-import type { DebouncedFunc } from 'lodash';
-import type { Channel, CommandResponse, FormatMessageResponse, MessageResponse, StreamChat } from 'stream-chat';
+import type { FormatMessageResponse, MessageResponse } from 'stream-chat';
 import { IconProps } from '../../src/icons/utils/base';
 import { MessageType } from '../components/MessageList/hooks/useMessageList';
-import type { EmojiSearchIndex, MentionAllAppUsersQuery } from '../contexts/messageInputContext/MessageInputContext';
-import type { SuggestionCommand, SuggestionComponentType, SuggestionUser } from '../contexts/suggestionsContext/SuggestionsContext';
-import { Emoji } from '../emoji-data';
+import type { EmojiSearchIndex } from '../contexts/messageInputContext/MessageInputContext';
 import type { TableRowJoinedUser } from '../store/types';
 import type { DefaultStreamChatGenerics, ValueOf } from '../types/types';
 export type ReactionData = {
@@ -51,82 +48,10 @@ export declare const isBouncedMessage: <StreamChatGenerics extends DefaultStream
  * @returns boolean
  */
 export declare const isEditedMessage: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(message: MessageType<StreamChatGenerics>) => boolean;
-export declare const queryMembersDebounced: DebouncedFunc<(<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(channel: Channel<StreamChatGenerics>, query: SuggestionUser<StreamChatGenerics>["name"], onReady?: ((users: SuggestionUser<StreamChatGenerics>[]) => void) | undefined, options?: {
-    limit?: number;
-}) => Promise<void>)>;
-export declare const queryUsersDebounced: DebouncedFunc<(<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(client: StreamChat<StreamChatGenerics>, query: SuggestionUser<StreamChatGenerics>["name"], onReady?: ((users: SuggestionUser<StreamChatGenerics>[]) => void) | undefined, options?: {
-    limit?: number | undefined;
-    mentionAllAppUsersQuery?: MentionAllAppUsersQuery<StreamChatGenerics> | undefined;
-}) => Promise<void>)>;
-export declare const isCommandTrigger: (trigger: Trigger) => trigger is "/";
-export declare const isEmojiTrigger: (trigger: Trigger) => trigger is ":";
-export declare const isMentionTrigger: (trigger: Trigger) => trigger is "@";
-export type Trigger = '/' | '@' | ':';
-export type TriggerSettings<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = {
-    '/'?: {
-        dataProvider: (query: CommandResponse<StreamChatGenerics>['name'], text: string, onReady?: (data: CommandResponse<StreamChatGenerics>[], q: CommandResponse<StreamChatGenerics>['name']) => void, options?: {
-            limit?: number;
-        }) => SuggestionCommand<StreamChatGenerics>[];
-        output: (entity: CommandResponse<StreamChatGenerics>) => {
-            caretPosition: string;
-            key: string;
-            text: string;
-        };
-        type: SuggestionComponentType;
-    };
-    ':'?: {
-        dataProvider: (query: Emoji['name'], _: string, onReady?: (data: Emoji[], q: Emoji['name']) => void) => Emoji[] | Promise<Emoji[]>;
-        output: (entity: Emoji) => {
-            caretPosition: string;
-            key: string;
-            text: string;
-        };
-        type: SuggestionComponentType;
-    };
-    '@'?: {
-        callback: (item: SuggestionUser<StreamChatGenerics>) => void;
-        dataProvider: (query: SuggestionUser<StreamChatGenerics>['name'], _: string, onReady?: (data: SuggestionUser<StreamChatGenerics>[], q: SuggestionUser<StreamChatGenerics>['name']) => void, options?: {
-            limit?: number;
-            mentionAllAppUsersEnabled?: boolean;
-            mentionAllAppUsersQuery?: MentionAllAppUsersQuery<StreamChatGenerics>;
-        }) => SuggestionUser<StreamChatGenerics>[] | Promise<void> | void;
-        output: (entity: SuggestionUser<StreamChatGenerics>) => {
-            caretPosition: string;
-            key: string;
-            text: string;
-        };
-        type: SuggestionComponentType;
-    };
-};
-export type ACITriggerSettingsParams<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = {
-    channel: Channel<StreamChatGenerics>;
-    client: StreamChat<StreamChatGenerics>;
-    onMentionSelectItem: (item: SuggestionUser<StreamChatGenerics>) => void;
-    emojiSearchIndex?: EmojiSearchIndex;
-};
-export type QueryUsersFunction<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = (client: StreamChat<StreamChatGenerics>, query: SuggestionUser<StreamChatGenerics>['name'], onReady?: (users: SuggestionUser<StreamChatGenerics>[]) => void, options?: {
-    limit?: number;
-    mentionAllAppUsersQuery?: MentionAllAppUsersQuery<StreamChatGenerics>;
-}) => Promise<void>;
-export type QueryMembersFunction<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = (channel: Channel<StreamChatGenerics>, query: SuggestionUser<StreamChatGenerics>['name'], onReady?: (users: SuggestionUser<StreamChatGenerics>[]) => void, options?: {
-    limit?: number;
-}) => Promise<void>;
 /**
  * Default emoji search index for auto complete text input
  */
 export declare const defaultEmojiSearchIndex: EmojiSearchIndex;
-/**
- * ACI = AutoCompleteInput
- *
- * DataProvider accepts `onReady` function, which will execute once the data is ready.
- * Another approach would have been to simply return the data from dataProvider and let the
- * component await for it and then execute the required logic. We are going for callback instead
- * of async-await since we have debounce function in dataProvider. Which will delay the execution
- * of api call on trailing end of debounce (lets call it a1) but will return with result of
- * previous call without waiting for a1. So in this case, we want to execute onReady, when trailing
- * end of debounce executes.
- */
-export declare const ACITriggerSettings: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>({ channel, client, emojiSearchIndex, onMentionSelectItem, }: ACITriggerSettingsParams<StreamChatGenerics>) => TriggerSettings<StreamChatGenerics>;
 export declare const makeImageCompatibleUrl: (url: string) => string;
 export declare const getUrlWithoutParams: (url?: string) => string | undefined;
 export declare const isLocalUrl: (url: string) => boolean;

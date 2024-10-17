@@ -32,6 +32,13 @@ export type OverlayProviderProps<StreamChatGenerics extends DefaultStreamChatGen
     isMyMessage?: boolean;
     isThreadMessage?: boolean;
     message?: MessageType<StreamChatGenerics>;
+    /**
+     * @deprecated use the following instead:
+     *  messageActions={(params) => {
+     *    const actions = messageActions({ ...params, isMessageActionsVisible: false });
+     *    return actions;
+     *  }}
+     */
     messageReactions?: boolean;
     messageTextNumberOfLines?: number;
     numberOfImageGalleryGridColumns?: number;

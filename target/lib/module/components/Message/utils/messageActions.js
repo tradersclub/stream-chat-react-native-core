@@ -10,6 +10,7 @@ var messageActions = function messageActions(_ref) {
     editMessage = _ref.editMessage,
     error = _ref.error,
     flagMessage = _ref.flagMessage,
+    isMessageActionsVisible = _ref.isMessageActionsVisible,
     isMyMessage = _ref.isMyMessage,
     isThreadMessage = _ref.isThreadMessage,
     message = _ref.message,
@@ -20,8 +21,8 @@ var messageActions = function messageActions(_ref) {
     retry = _ref.retry,
     threadReply = _ref.threadReply,
     unpinMessage = _ref.unpinMessage;
-  if (messageReactions) {
-    return undefined;
+  if (messageReactions || !isMessageActionsVisible) {
+    return [];
   }
   var actions = [];
   if (error && isMyMessage) {

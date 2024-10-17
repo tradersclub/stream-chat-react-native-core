@@ -945,7 +945,11 @@ var ChannelWithContext = function ChannelWithContext(props) {
     channel.state.messageSets.push({
       isCurrent: false,
       isLatest: true,
-      messages: []
+      messages: [],
+      pagination: {
+        hasNext: true,
+        hasPrev: true
+      }
     });
   });
   var mergeOverlappingMessageSetsRef = (0, _react.useRef)(function () {
@@ -2230,6 +2234,8 @@ var ChannelWithContext = function ChannelWithContext(props) {
     watcherCount: watcherCount,
     watchers: watchers
   });
+  var sendMessageRef = (0, _react.useRef)(sendMessage);
+  sendMessageRef.current = sendMessage;
   var inputMessageInputContext = (0, _useCreateInputMessageInputContext.useCreateInputMessageInputContext)({
     additionalTextInputProps: additionalTextInputProps,
     asyncMessagesLockDistance: asyncMessagesLockDistance,
@@ -2280,7 +2286,9 @@ var ChannelWithContext = function ChannelWithContext(props) {
     quotedMessage: quotedMessage,
     SendButton: SendButton,
     sendImageAsync: sendImageAsync,
-    sendMessage: sendMessage,
+    sendMessage: function sendMessage() {
+      return sendMessageRef.current.apply(sendMessageRef, arguments);
+    },
     SendMessageDisallowedIndicator: SendMessageDisallowedIndicator,
     setInputRef: setInputRef,
     setQuotedMessageState: setQuotedMessageState,

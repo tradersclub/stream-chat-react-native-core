@@ -172,6 +172,18 @@ Object.keys(_types).forEach(function (key) {
     }
   });
 });
+var _ACITriggerSettings = require("./utils/ACITriggerSettings");
+Object.keys(_ACITriggerSettings).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _ACITriggerSettings[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _ACITriggerSettings[key];
+    }
+  });
+});
 var _patchMessageTextCommand = require("./utils/patchMessageTextCommand");
 Object.keys(_patchMessageTextCommand).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -193,6 +205,30 @@ Object.keys(_Streami18n).forEach(function (key) {
     enumerable: true,
     get: function get() {
       return _Streami18n[key];
+    }
+  });
+});
+var _queryMembers = require("./utils/queryMembers");
+Object.keys(_queryMembers).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _queryMembers[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _queryMembers[key];
+    }
+  });
+});
+var _queryUsers = require("./utils/queryUsers");
+Object.keys(_queryUsers).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _queryUsers[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _queryUsers[key];
     }
   });
 });

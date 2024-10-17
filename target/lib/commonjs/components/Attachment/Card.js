@@ -171,7 +171,7 @@ var CardWithContext = function CardWithContext(props) {
         source: {
           uri: (0, _utils.makeImageCompatibleUrl)(uri)
         },
-        style: [styles.cardCover, cover, stylesProp.cardCover],
+        style: [styles.cardCover, stylesProp.cardCover, cover],
         children: isVideoCard ? (0, _jsxRuntime.jsx)(_reactNative.View, {
           style: [styles.playButtonStyle, roundedView, {
             backgroundColor: static_white

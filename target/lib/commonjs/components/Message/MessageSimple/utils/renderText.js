@@ -84,10 +84,6 @@ var renderText = function renderText(params) {
     }, markdownStyles == null ? void 0 : markdownStyles.text)
   });
   var onLink = function onLink(url) {
-    var pattern = new RegExp(/^\S+:\/\//);
-    if (!pattern.test(url)) {
-      url = 'http://' + url;
-    }
     return onLinkParams ? onLinkParams(url) : _reactNative.Linking.canOpenURL(url).then(function (canOpenUrl) {
       return canOpenUrl && _reactNative.Linking.openURL(url);
     });

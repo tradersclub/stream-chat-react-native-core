@@ -24,7 +24,7 @@ import type { UploadProgressIndicatorProps } from '../../components/MessageInput
 import type { MessageType } from '../../components/MessageList/hooks/useMessageList';
 import type { Emoji } from '../../emoji-data';
 import { Asset, DefaultStreamChatGenerics, File, FileUpload, ImageUpload, UnknownType } from '../../types/types';
-import { ACITriggerSettingsParams, TriggerSettings } from '../../utils/utils';
+import { ACITriggerSettingsParams, TriggerSettings } from '../../utils/ACITriggerSettings';
 import { ChannelContextValue } from '../channelContext/ChannelContext';
 export type EmojiSearchIndex = {
     search: (query: string) => PromiseLike<Array<Emoji>> | Array<Emoji> | null;

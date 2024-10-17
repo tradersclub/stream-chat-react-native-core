@@ -11,6 +11,8 @@ import {
 
 import type { FormatMessageResponse } from 'stream-chat';
 
+import LinearGradient from 'react-native-linear-gradient';
+
 import {
   isMessageWithStylesReadByAndDateSeparator,
   MessageType,
@@ -664,6 +666,7 @@ const MessageListWithContext = <
         threadList={threadList}
       />
     );
+
     return wrapMessageInTheme ? (
       <>
         {shouldApplyAndroidWorkaround && renderDateSeperator}
@@ -1113,54 +1116,63 @@ const MessageListWithContext = <
           {EmptyStateIndicator ? <EmptyStateIndicator listType='message' /> : null}
         </View>
       ) : (
-        <FlatList
-          CellRendererComponent={
-            shouldApplyAndroidWorkaround ? InvertedCellRendererComponent : undefined
-          }
-          contentContainerStyle={[
-            styles.contentContainer,
-            additionalFlatListProps?.contentContainerStyle,
-            contentContainer,
-          ]}
-          /** Disables the MessageList UI. Which means, message actions, reactions won't work. */
-          data={processedMessageList}
-          extraData={disabled || !hasNoMoreRecentMessagesToLoad}
-          inverted={shouldApplyAndroidWorkaround ? false : inverted}
-          keyboardShouldPersistTaps='handled'
-          keyExtractor={keyExtractor}
-          ListFooterComponent={ListFooterComponent}
-          /**
-          if autoscrollToTopThreshold is 10, we scroll to recent if before new list update it was already at the bottom (10 offset or below)
-          minIndexForVisible = 1 means that beyond item at index 1 will not change position on list updates
-          minIndexForVisible is not used when autoscrollToTopThreshold = 10
-        */
-          ListHeaderComponent={ListHeaderComponent}
-          maintainVisibleContentPosition={{
-            autoscrollToTopThreshold: autoscrollToRecent ? 10 : undefined,
-            minIndexForVisible: 1,
-          }}
-          maxToRenderPerBatch={30}
-          onMomentumScrollEnd={onUserScrollEvent}
-          onScroll={handleScroll}
-          onScrollBeginDrag={onScrollBeginDrag}
-          onScrollEndDrag={onScrollEndDrag}
-          onScrollToIndexFailed={onScrollToIndexFailedRef.current}
-          onTouchEnd={dismissImagePicker}
-          onViewableItemsChanged={onViewableItemsChanged.current}
-          ref={refCallback}
-          renderItem={renderItem}
-          scrollEnabled={overlay === 'none'}
-          showsVerticalScrollIndicator={!shouldApplyAndroidWorkaround}
+        <LinearGradient
+          colors={['#111C00', '#000000']}
           style={[
             styles.listContainer,
-            listContainer,
-            additionalFlatListProps?.style,
-            shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined,
-          ]}
-          testID='message-flat-list'
-          viewabilityConfig={flatListViewabilityConfig}
-          {...additionalFlatListPropsExcludingStyle}
-        />
+          ]} // Garantir que o gradiente cubra todo o espaço
+          start={{ x: 0.5, y: 1 }} // Começando de baixo (y=1)
+          end={{ x: 0.5, y: 0 }}   // Indo até o topo (y=0)
+        >
+          <FlatList
+            CellRendererComponent={
+              shouldApplyAndroidWorkaround ? InvertedCellRendererComponent : undefined
+            }
+            contentContainerStyle={[
+              styles.contentContainer,
+              additionalFlatListProps?.contentContainerStyle,
+              contentContainer,
+            ]}
+            /** Disables the MessageList UI. Which means, message actions, reactions won't work. */
+            data={processedMessageList}
+            extraData={disabled || !hasNoMoreRecentMessagesToLoad}
+            inverted={shouldApplyAndroidWorkaround ? false : inverted}
+            keyboardShouldPersistTaps='handled'
+            keyExtractor={keyExtractor}
+            ListFooterComponent={ListFooterComponent}
+            /**
+            if autoscrollToTopThreshold is 10, we scroll to recent if before new list update it was already at the bottom (10 offset or below)
+            minIndexForVisible = 1 means that beyond item at index 1 will not change position on list updates
+            minIndexForVisible is not used when autoscrollToTopThreshold = 10
+          */
+            ListHeaderComponent={ListHeaderComponent}
+            maintainVisibleContentPosition={{
+              autoscrollToTopThreshold: autoscrollToRecent ? 10 : undefined,
+              minIndexForVisible: 1,
+            }}
+            maxToRenderPerBatch={30}
+            onMomentumScrollEnd={onUserScrollEvent}
+            onScroll={handleScroll}
+            onScrollBeginDrag={onScrollBeginDrag}
+            onScrollEndDrag={onScrollEndDrag}
+            onScrollToIndexFailed={onScrollToIndexFailedRef.current}
+            onTouchEnd={dismissImagePicker}
+            onViewableItemsChanged={onViewableItemsChanged.current}
+            ref={refCallback}
+            renderItem={renderItem}
+            scrollEnabled={overlay === 'none'}
+            showsVerticalScrollIndicator={!shouldApplyAndroidWorkaround}
+            style={[
+              styles.listContainer,
+              listContainer,
+              additionalFlatListProps?.style,
+              shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined,
+            ]}
+            testID='message-flat-list'
+            viewabilityConfig={flatListViewabilityConfig}
+            {...additionalFlatListPropsExcludingStyle}
+          />
+        </LinearGradient>
       )}
 
       {!loading && (

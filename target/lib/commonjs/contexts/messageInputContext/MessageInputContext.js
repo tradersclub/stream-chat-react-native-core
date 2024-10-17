@@ -21,6 +21,7 @@ var _parseLinks = require("../../components/Message/MessageSimple/utils/parseLin
 var _useCooldown2 = require("../../components/MessageInput/hooks/useCooldown");
 var _native = require("../../native");
 var _types = require("../../types/types");
+var _ACITriggerSettings = require("../../utils/ACITriggerSettings");
 var _compressImage = require("../../utils/compressImage");
 var _removeReservedFields = require("../../utils/removeReservedFields");
 var _utils2 = require("../../utils/utils");
@@ -783,25 +784,30 @@ var MessageInputProvider = function MessageInputProvider(_ref) {
     }
   };
   var getTriggerSettings = function getTriggerSettings() {
-    var triggerSettings = {};
-    if (channel) {
-      if (value.autoCompleteTriggerSettings) {
-        triggerSettings = value.autoCompleteTriggerSettings({
-          channel: channel,
-          client: client,
-          emojiSearchIndex: value.emojiSearchIndex,
-          onMentionSelectItem: onSelectItem
-        });
-      } else {
-        triggerSettings = (0, _utils2.ACITriggerSettings)({
-          channel: channel,
-          client: client,
-          emojiSearchIndex: value.emojiSearchIndex,
-          onMentionSelectItem: onSelectItem
-        });
+    try {
+      var _triggerSettings = {};
+      if (channel) {
+        if (value.autoCompleteTriggerSettings) {
+          _triggerSettings = value.autoCompleteTriggerSettings({
+            channel: channel,
+            client: client,
+            emojiSearchIndex: value.emojiSearchIndex,
+            onMentionSelectItem: onSelectItem
+          });
+        } else {
+          _triggerSettings = (0, _ACITriggerSettings.ACITriggerSettings)({
+            channel: channel,
+            client: client,
+            emojiSearchIndex: value.emojiSearchIndex,
+            onMentionSelectItem: onSelectItem
+          });
+        }
       }
+      return _triggerSettings;
+    } catch (error) {
+      console.warn('Error in getting trigger settings', error);
+      throw error;
     }
-    return triggerSettings;
   };
   var triggerSettings = getTriggerSettings();
   var updateMessage = function () {

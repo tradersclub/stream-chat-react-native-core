@@ -49,7 +49,7 @@ var LoadingDot = function LoadingDot(props) {
       borderRadius: diameter / 2,
       height: diameter,
       width: diameter
-    }, style, loadingDot, dotStyle]
+    }, style, dotStyle, loadingDot]
   });
 };
 exports.LoadingDot = LoadingDot;

@@ -5,13 +5,18 @@ import type { AutoCompleteSuggestionItemProps } from '../../components/AutoCompl
 import type { AutoCompleteSuggestionListProps } from '../../components/AutoCompleteInput/AutoCompleteSuggestionList';
 import type { Emoji } from '../../emoji-data';
 import type { DefaultStreamChatGenerics, UnknownType } from '../../types/types';
-export type SuggestionComponentType = 'command' | 'emoji' | 'mention';
+export type SuggestionComponentType = 'command' | 'emoji' | 'mention' | 'custom';
 export declare const isSuggestionCommand: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(suggestion: Suggestion<StreamChatGenerics>) => suggestion is SuggestionCommand<StreamChatGenerics>;
 export declare const isSuggestionEmoji: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(suggestion: Suggestion<StreamChatGenerics>) => suggestion is Emoji;
 export declare const isSuggestionUser: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(suggestion: Suggestion<StreamChatGenerics>) => suggestion is SuggestionUser<StreamChatGenerics>;
-export type Suggestion<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Emoji | SuggestionCommand<StreamChatGenerics> | SuggestionUser<StreamChatGenerics>;
+export declare const isSuggestionCustom: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(suggestion: Suggestion<StreamChatGenerics>) => suggestion is SuggestionCustom;
+export declare type Suggestion<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Emoji | SuggestionCommand<StreamChatGenerics> | SuggestionUser<StreamChatGenerics> | SuggestionCustom;
 export type SuggestionCommand<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = CommandResponse<StreamChatGenerics>;
 export type SuggestionUser<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = UserResponse<StreamChatGenerics>;
+export declare type SuggestionCustom = {
+    [key: string]: unknown;
+    name: string;
+};
 export type Suggestions<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = {
     data: Suggestion<StreamChatGenerics>[];
     onSelect: (item: Suggestion<StreamChatGenerics>) => void;

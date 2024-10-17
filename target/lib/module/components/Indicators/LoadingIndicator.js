@@ -11,18 +11,6 @@ var _Spinner = require("../Spinner/Spinner");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/Indicators/LoadingIndicator.tsx";
-var styles = _reactNative.StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center'
-  },
-  loadingText: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginTop: 20
-  }
-});
 var LoadingIndicatorWrapper = function LoadingIndicatorWrapper(_ref) {
   var text = _ref.text;
   var _useTheme = (0, _ThemeContext.useTheme)(),
@@ -76,4 +64,16 @@ var LoadingIndicator = function LoadingIndicator(props) {
 };
 exports.LoadingIndicator = LoadingIndicator;
 LoadingIndicator.displayName = 'LoadingIndicator{loadingIndicator}';
+var styles = _reactNative.StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center'
+  },
+  loadingText: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginTop: 20
+  }
+});
 //# sourceMappingURL=LoadingIndicator.js.map

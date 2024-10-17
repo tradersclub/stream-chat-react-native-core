@@ -176,7 +176,7 @@ var MessageWithContext = function MessageWithContext(props) {
         setIsBounceDialogOpen(true);
         return;
       }
-      showMessageOverlay(false, true);
+      showMessageOverlay(true, true);
     } else if (quotedMessage) {
       onPressQuotedMessage(quotedMessage);
     }
@@ -331,7 +331,7 @@ var MessageWithContext = function MessageWithContext(props) {
     userLanguage = _useTranslationContex.userLanguage;
   var showMessageOverlay = function () {
     var _ref2 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee2() {
-      var messageReactions,
+      var isMessageActionsVisible,
         error,
         isThreadMessage,
         dismissOverlay,
@@ -340,7 +340,7 @@ var MessageWithContext = function MessageWithContext(props) {
       return _regenerator["default"].wrap(function _callee2$(_context2) {
         while (1) switch (_context2.prev = _context2.next) {
           case 0:
-            messageReactions = _args2.length > 0 && _args2[0] !== undefined ? _args2[0] : false;
+            isMessageActionsVisible = _args2.length > 0 && _args2[0] !== undefined ? _args2[0] : true;
             error = _args2.length > 1 && _args2[1] !== undefined ? _args2[1] : errorOrFailed;
             _context2.next = 4;
             return dismissKeyboard();
@@ -358,10 +358,11 @@ var MessageWithContext = function MessageWithContext(props) {
               editMessage: editMessage,
               error: error,
               flagMessage: flagMessage,
+              isMessageActionsVisible: isMessageActionsVisible,
               isMyMessage: isMyMessage,
               isThreadMessage: isThreadMessage,
               message: message,
-              messageReactions: messageReactions,
+              messageReactions: isMessageActionsVisible === false,
               muteUser: muteUser,
               ownCapabilities: ownCapabilities,
               pinMessage: pinMessage,
@@ -383,7 +384,7 @@ var MessageWithContext = function MessageWithContext(props) {
               messageContext: Object.assign({}, messageContext, {
                 preventPress: true
               }),
-              messageReactionTitle: !error && messageReactions ? t('Message Reactions') : undefined,
+              messageReactionTitle: !error && !isMessageActionsVisible ? t('Message Reactions') : undefined,
               messagesContext: Object.assign({}, messagesContext, {
                 messageContentOrder: messageContentOrder
               }),
@@ -445,7 +446,7 @@ var MessageWithContext = function MessageWithContext(props) {
       return;
     }
     (0, _native.triggerHaptic)('impactMedium');
-    showMessageOverlay(false);
+    showMessageOverlay(true);
   } : function () {
     return null;
   };

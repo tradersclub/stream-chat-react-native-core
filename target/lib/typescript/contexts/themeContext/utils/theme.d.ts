@@ -164,6 +164,8 @@ export type Theme = {
         channelContainer: ViewStyle;
         channelDetails: TextStyle;
         channelTitle: TextStyle;
+        messageContainer: ViewStyle;
+        messageTitle: TextStyle;
     };
     groupAvatar: {
         container: ViewStyle;
