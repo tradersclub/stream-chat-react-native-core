@@ -1,9 +1,7 @@
 sync:
 	make delete-branch
 	git pull
-	git revert HEAD --no-edit
 	git checkout -b aux
-	git revert HEAD --no-edit
 	git checkout main
 	rm -rf ./target
 	mkdir ./target
