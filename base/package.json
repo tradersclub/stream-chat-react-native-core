@@ -1,0 +1,11 @@
+{
+  "name": "stream-chat-react-native-core",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "vitorsiqueiratc <vitor.siqueira@tc.com.br>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "stream-chat-react-native-core": "^5.39.0"
+  }
+}
