@@ -12,7 +12,6 @@ var _OverlayContext = require("../../../contexts/overlayContext/OverlayContext")
 var _ThemeContext = require("../../../contexts/themeContext/ThemeContext");
 var _TranslationContext = require("../../../contexts/translationContext/TranslationContext");
 var _icons = require("../../../icons");
-var _getDateString = require("../../../utils/i18n/getDateString");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/ImageGallery/components/ImageGalleryHeader.tsx";
@@ -80,14 +79,20 @@ var ImageGalleryHeader = function ImageGalleryHeader(props) {
     tDateTimeParser = _useTranslationContex.tDateTimeParser;
   var _useOverlayContext = (0, _OverlayContext.useOverlayContext)(),
     setOverlay = _useOverlayContext.setOverlay;
-  var date = (0, _react.useMemo)(function () {
-    return (0, _getDateString.getDateString)({
-      date: photo == null ? void 0 : photo.created_at,
-      t: t,
-      tDateTimeParser: tDateTimeParser,
-      timestampTranslationKey: 'timestamp/ImageGalleryHeader'
-    });
-  }, [photo == null ? void 0 : photo.created_at, t, tDateTimeParser]);
+  var parsedDate = photo ? tDateTimeParser(photo == null ? void 0 : photo.created_at) : null;
+  var getDateObject = function getDateObject(date) {
+    if (date === null || !(0, _TranslationContext.isDayOrMoment)(date)) {
+      return null;
+    }
+    if (date.calendar) {
+      return date.calendar();
+    }
+    if (date.fromNow) {
+      return date.fromNow();
+    }
+    return null;
+  };
+  var date = getDateObject(parsedDate);
   var headerStyle = (0, _reactNativeReanimated.useAnimatedStyle)(function () {
     return {
       opacity: opacity.value,

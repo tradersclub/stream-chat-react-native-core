@@ -28,6 +28,7 @@ var useCreateMessageInputContext = function useCreateMessageInputContext(_ref) {
     compressImageQuality = _ref.compressImageQuality,
     cooldownEndsAt = _ref.cooldownEndsAt,
     CooldownTimer = _ref.CooldownTimer,
+    disabled = _ref.disabled,
     doDocUploadRequest = _ref.doDocUploadRequest,
     doImageUploadRequest = _ref.doImageUploadRequest,
     editing = _ref.editing,
@@ -36,8 +37,6 @@ var useCreateMessageInputContext = function useCreateMessageInputContext(_ref) {
     FileUploadPreview = _ref.FileUploadPreview,
     fileUploads = _ref.fileUploads,
     giphyActive = _ref.giphyActive,
-    handleAttachButtonPress = _ref.handleAttachButtonPress,
-    hasCameraPicker = _ref.hasCameraPicker,
     hasCommands = _ref.hasCommands,
     hasFilePicker = _ref.hasFilePicker,
     hasImagePicker = _ref.hasImagePicker,
@@ -66,7 +65,6 @@ var useCreateMessageInputContext = function useCreateMessageInputContext(_ref) {
     openCommandsPicker = _ref.openCommandsPicker,
     openFilePicker = _ref.openFilePicker,
     openMentionsPicker = _ref.openMentionsPicker,
-    pickAndUploadImageFromNativePicker = _ref.pickAndUploadImageFromNativePicker,
     pickFile = _ref.pickFile,
     quotedMessage = _ref.quotedMessage,
     removeFile = _ref.removeFile,
@@ -96,7 +94,6 @@ var useCreateMessageInputContext = function useCreateMessageInputContext(_ref) {
     showMoreOptions = _ref.showMoreOptions,
     ShowThreadMessageInChannelButton = _ref.ShowThreadMessageInChannelButton,
     StartAudioRecordingButton = _ref.StartAudioRecordingButton,
-    takeAndUploadImage = _ref.takeAndUploadImage,
     text = _ref.text,
     thread = _ref.thread,
     toggleAttachmentPicker = _ref.toggleAttachmentPicker,
@@ -150,6 +147,7 @@ var useCreateMessageInputContext = function useCreateMessageInputContext(_ref) {
       compressImageQuality: compressImageQuality,
       cooldownEndsAt: cooldownEndsAt,
       CooldownTimer: CooldownTimer,
+      disabled: disabled,
       doDocUploadRequest: doDocUploadRequest,
       doImageUploadRequest: doImageUploadRequest,
       editing: editing,
@@ -158,8 +156,6 @@ var useCreateMessageInputContext = function useCreateMessageInputContext(_ref) {
       FileUploadPreview: FileUploadPreview,
       fileUploads: fileUploads,
       giphyActive: giphyActive,
-      handleAttachButtonPress: handleAttachButtonPress,
-      hasCameraPicker: hasCameraPicker,
       hasCommands: hasCommands,
       hasFilePicker: hasFilePicker,
       hasImagePicker: hasImagePicker,
@@ -188,7 +184,6 @@ var useCreateMessageInputContext = function useCreateMessageInputContext(_ref) {
       openCommandsPicker: openCommandsPicker,
       openFilePicker: openFilePicker,
       openMentionsPicker: openMentionsPicker,
-      pickAndUploadImageFromNativePicker: pickAndUploadImageFromNativePicker,
       pickFile: pickFile,
       quotedMessage: quotedMessage,
       removeFile: removeFile,
@@ -218,7 +213,6 @@ var useCreateMessageInputContext = function useCreateMessageInputContext(_ref) {
       showMoreOptions: showMoreOptions,
       ShowThreadMessageInChannelButton: ShowThreadMessageInChannelButton,
       StartAudioRecordingButton: StartAudioRecordingButton,
-      takeAndUploadImage: takeAndUploadImage,
       text: text,
       toggleAttachmentPicker: toggleAttachmentPicker,
       triggerSettings: triggerSettings,
@@ -229,7 +223,7 @@ var useCreateMessageInputContext = function useCreateMessageInputContext(_ref) {
       uploadNewImage: uploadNewImage,
       UploadProgressIndicator: UploadProgressIndicator
     };
-  }, [asyncIdsLength, asyncUploadsValue, cooldownEndsAt, editingdep, fileUploadsValue, giphyActive, imageUploadsValue, maxMessageLength, mentionedUsersLength, quotedMessageId, selectedPicker, sendThreadMessageInChannel, showMoreOptions, text, threadId]);
+  }, [asyncIdsLength, asyncUploadsValue, cooldownEndsAt, disabled, editingdep, fileUploadsValue, giphyActive, imageUploadsValue, maxMessageLength, mentionedUsersLength, quotedMessageId, selectedPicker, sendThreadMessageInChannel, showMoreOptions, text, threadId]);
   return messageInputContext;
 };
 exports.useCreateMessageInputContext = useCreateMessageInputContext;

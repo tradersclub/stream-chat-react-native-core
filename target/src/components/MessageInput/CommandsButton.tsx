@@ -3,6 +3,10 @@ import type { GestureResponderEvent } from 'react-native';
 import { Pressable } from 'react-native';
 
 import {
+  ChannelContextValue,
+  useChannelContext,
+} from '../../contexts/channelContext/ChannelContext';
+import {
   isSuggestionCommand,
   SuggestionsContextValue,
   useSuggestionsContext,
@@ -14,17 +18,18 @@ import type { DefaultStreamChatGenerics } from '../../types/types';
 
 type CommandsButtonPropsWithContext<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
-> = Pick<SuggestionsContextValue<StreamChatGenerics>, 'suggestions'> & {
-  /** Function that opens commands selector */
-  handleOnPress?: ((event: GestureResponderEvent) => void) & (() => void);
-};
+> = Pick<ChannelContextValue<StreamChatGenerics>, 'disabled'> &
+  Pick<SuggestionsContextValue<StreamChatGenerics>, 'suggestions'> & {
+    /** Function that opens commands selector */
+    handleOnPress?: ((event: GestureResponderEvent) => void) & (() => void);
+  };
 
 const CommandsButtonWithContext = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 >(
   props: CommandsButtonPropsWithContext<StreamChatGenerics>,
 ) => {
-  const { handleOnPress, suggestions } = props;
+  const { disabled, handleOnPress, suggestions } = props;
 
   const {
     theme: {
@@ -34,14 +39,18 @@ const CommandsButtonWithContext = <
   } = useTheme();
 
   return (
-    <Pressable onPress={handleOnPress} style={[commandsButton]} testID='commands-button'>
+    <Pressable
+      disabled={disabled}
+      onPress={handleOnPress}
+      style={[commandsButton]}
+      testID='commands-button'
+    >
       <Lightning
-        fill={
+        pathFill={
           suggestions && suggestions.data.some((suggestion) => isSuggestionCommand(suggestion))
             ? accent_blue
             : grey
         }
-        size={32}
       />
     </Pressable>
   );
@@ -51,8 +60,11 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
   prevProps: CommandsButtonPropsWithContext<StreamChatGenerics>,
   nextProps: CommandsButtonPropsWithContext<StreamChatGenerics>,
 ) => {
-  const { suggestions: prevSuggestions } = prevProps;
-  const { suggestions: nextSuggestions } = nextProps;
+  const { disabled: prevDisabled, suggestions: prevSuggestions } = prevProps;
+  const { disabled: nextDisabled, suggestions: nextSuggestions } = nextProps;
+
+  const disabledEqual = prevDisabled === nextDisabled;
+  if (!disabledEqual) return false;
 
   const suggestionsEqual = !!prevSuggestions === !!nextSuggestions;
   if (!suggestionsEqual) return false;
@@ -77,9 +89,10 @@ export const CommandsButton = <
 >(
   props: CommandsButtonProps<StreamChatGenerics>,
 ) => {
+  const { disabled = false } = useChannelContext<StreamChatGenerics>();
   const { suggestions } = useSuggestionsContext<StreamChatGenerics>();
 
-  return <MemoizedCommandsButton {...{ suggestions }} {...props} />;
+  return <MemoizedCommandsButton {...{ disabled, suggestions }} {...props} />;
 };
 
 CommandsButton.displayName = 'CommandsButton{messageInput}';

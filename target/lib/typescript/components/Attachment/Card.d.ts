@@ -4,7 +4,7 @@ import type { Attachment } from 'stream-chat';
 import { ChatContextValue } from '../../contexts/chatContext/ChatContext';
 import { MessageContextValue } from '../../contexts/messageContext/MessageContext';
 import { MessagesContextValue } from '../../contexts/messagesContext/MessagesContext';
-import { DefaultStreamChatGenerics } from '../../types/types';
+import type { DefaultStreamChatGenerics } from '../../types/types';
 export type CardPropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Attachment<StreamChatGenerics> & Pick<ChatContextValue, 'ImageComponent'> & Pick<MessageContextValue<StreamChatGenerics>, 'onLongPress' | 'onPress' | 'onPressIn' | 'preventPress'> & Pick<MessagesContextValue<StreamChatGenerics>, 'additionalTouchableProps' | 'CardCover' | 'CardFooter' | 'CardHeader' | 'myMessageTheme'> & {
     channelId: string | undefined;
     messageId: string | undefined;

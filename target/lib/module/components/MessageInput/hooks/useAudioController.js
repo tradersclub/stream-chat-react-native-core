@@ -11,7 +11,6 @@ var _react = require("react");
 var _reactNative = require("react-native");
 var _MessageInputContext = require("../../../contexts/messageInputContext/MessageInputContext");
 var _native = require("../../../native");
-var _types = require("../../../types/types");
 var _audioSampling = require("../utils/audioSampling");
 var _normalizeAudioLevel = require("../utils/normalizeAudioLevel");
 var useAudioController = function useAudioController() {
@@ -62,7 +61,6 @@ var useAudioController = function useAudioController() {
   (0, _react.useEffect)(function () {
     return function () {
       stopVoicePlayer();
-      stopSDKVoiceRecording();
     };
   }, []);
   (0, _react.useEffect)(function () {
@@ -97,59 +95,53 @@ var useAudioController = function useAudioController() {
       return _regenerator["default"].wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
-            if (_native.Audio) {
-              _context.next = 2;
-              break;
-            }
-            return _context.abrupt("return");
-          case 2:
             if (!paused) {
-              _context.next = 16;
-              break;
-            }
-            if (!(progress === 0)) {
-              _context.next = 8;
-              break;
-            }
-            _context.next = 6;
-            return startVoicePlayer();
-          case 6:
-            _context.next = 14;
-            break;
-          case 8:
-            if (!_native.Audio.resumePlayer) {
-              _context.next = 11;
-              break;
-            }
-            _context.next = 11;
-            return _native.Audio.resumePlayer();
-          case 11:
-            if (!((_soundRef$current = soundRef.current) != null && _soundRef$current.playAsync)) {
               _context.next = 14;
               break;
             }
-            _context.next = 14;
-            return soundRef.current.playAsync();
-          case 14:
-            _context.next = 22;
+            if (!(progress === 0)) {
+              _context.next = 6;
+              break;
+            }
+            _context.next = 4;
+            return startVoicePlayer();
+          case 4:
+            _context.next = 12;
             break;
-          case 16:
+          case 6:
+            if (!_native.Audio.resumePlayer) {
+              _context.next = 9;
+              break;
+            }
+            _context.next = 9;
+            return _native.Audio.resumePlayer();
+          case 9:
+            if (!((_soundRef$current = soundRef.current) != null && _soundRef$current.playAsync)) {
+              _context.next = 12;
+              break;
+            }
+            _context.next = 12;
+            return soundRef.current.playAsync();
+          case 12:
+            _context.next = 20;
+            break;
+          case 14:
             if (!_native.Audio.pausePlayer) {
-              _context.next = 19;
+              _context.next = 17;
               break;
             }
-            _context.next = 19;
+            _context.next = 17;
             return _native.Audio.pausePlayer();
-          case 19:
+          case 17:
             if (!((_soundRef$current2 = soundRef.current) != null && _soundRef$current2.pauseAsync)) {
-              _context.next = 22;
+              _context.next = 20;
               break;
             }
-            _context.next = 22;
+            _context.next = 20;
             return soundRef.current.pauseAsync();
-          case 22:
+          case 20:
             setPaused(!paused);
-          case 23:
+          case 21:
           case "end":
             return _context.stop();
         }
@@ -165,50 +157,44 @@ var useAudioController = function useAudioController() {
       return _regenerator["default"].wrap(function _callee2$(_context2) {
         while (1) switch (_context2.prev = _context2.next) {
           case 0:
-            if (_native.Audio) {
+            if (recording) {
               _context2.next = 2;
               break;
             }
             return _context2.abrupt("return");
           case 2:
-            if (recording) {
-              _context2.next = 4;
-              break;
-            }
-            return _context2.abrupt("return");
-          case 4:
             if (!_native.Audio.startPlayer) {
-              _context2.next = 7;
+              _context2.next = 5;
               break;
             }
-            _context2.next = 7;
+            _context2.next = 5;
             return _native.Audio.startPlayer(recording, {}, onVoicePlayerPlaybackStatusUpdate);
-          case 7:
+          case 5:
             if (!(recording && typeof recording !== 'string')) {
-              _context2.next = 18;
+              _context2.next = 16;
               break;
             }
             uri = recording.getURI();
             if (!uri) {
-              _context2.next = 18;
+              _context2.next = 16;
               break;
             }
-            _context2.next = 12;
+            _context2.next = 10;
             return _native.Sound.initializeSound({
               uri: uri
             }, {}, onVoicePlayerPlaybackStatusUpdate);
-          case 12:
+          case 10:
             soundRef.current = _context2.sent;
             if (!((_soundRef$current3 = soundRef.current) != null && _soundRef$current3.playAsync && soundRef.current.setProgressUpdateIntervalAsync)) {
-              _context2.next = 18;
+              _context2.next = 16;
               break;
             }
-            _context2.next = 16;
+            _context2.next = 14;
             return soundRef.current.playAsync();
-          case 16:
-            _context2.next = 18;
+          case 14:
+            _context2.next = 16;
             return soundRef.current.setProgressUpdateIntervalAsync(_reactNative.Platform.OS === 'android' ? 100 : 60);
-          case 18:
+          case 16:
           case "end":
             return _context2.stop();
         }
@@ -220,34 +206,31 @@ var useAudioController = function useAudioController() {
   }();
   var stopVoicePlayer = function () {
     var _ref3 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee3() {
-      var _soundRef$current4, _soundRef$current5;
-      var _soundRef$current6;
+      var _soundRef$current4, _soundRef$current5, _soundRef$current6;
       return _regenerator["default"].wrap(function _callee3$(_context3) {
         while (1) switch (_context3.prev = _context3.next) {
           case 0:
-            if (_native.Audio) {
-              _context3.next = 2;
-              break;
-            }
-            return _context3.abrupt("return");
-          case 2:
             if (!_native.Audio.stopPlayer) {
-              _context3.next = 5;
+              _context3.next = 3;
               break;
             }
-            _context3.next = 5;
+            _context3.next = 3;
             return _native.Audio.stopPlayer();
-          case 5:
-            if (!((_soundRef$current4 = soundRef.current) != null && _soundRef$current4.stopAsync && (_soundRef$current5 = soundRef.current) != null && _soundRef$current5.unloadAsync)) {
-              _context3.next = 10;
+          case 3:
+            if (!(recording && typeof recording !== 'string')) {
+              _context3.next = 9;
               break;
             }
-            _context3.next = 8;
+            if (!((_soundRef$current4 = soundRef.current) != null && _soundRef$current4.stopAsync && (_soundRef$current5 = soundRef.current) != null && _soundRef$current5.unloadAsync)) {
+              _context3.next = 9;
+              break;
+            }
+            _context3.next = 7;
             return soundRef.current.stopAsync();
-          case 8:
-            _context3.next = 10;
+          case 7:
+            _context3.next = 9;
             return (_soundRef$current6 = soundRef.current) == null ? void 0 : _soundRef$current6.unloadAsync();
-          case 10:
+          case 9:
           case "end":
             return _context3.stop();
         }
@@ -274,21 +257,16 @@ var useAudioController = function useAudioController() {
       return _regenerator["default"].wrap(function _callee4$(_context4) {
         while (1) switch (_context4.prev = _context4.next) {
           case 0:
-            if (_native.Audio) {
-              _context4.next = 2;
-              break;
-            }
-            return _context4.abrupt("return");
-          case 2:
-            _context4.next = 4;
+            setRecordingStatus('recording');
+            _context4.next = 3;
             return _native.Audio.startRecording({
               isMeteringEnabled: true
             }, onRecordingStatusUpdate);
-          case 4:
+          case 3:
             recordingInfo = _context4.sent;
             accessGranted = recordingInfo.accessGranted;
             if (!accessGranted) {
-              _context4.next = 16;
+              _context4.next = 14;
               break;
             }
             setPermissionsGranted(true);
@@ -297,17 +275,16 @@ var useAudioController = function useAudioController() {
               _recording.setProgressUpdateInterval(_reactNative.Platform.OS === 'android' ? 100 : 60);
             }
             setRecording(_recording);
-            setRecordingStatus('recording');
-            _context4.next = 14;
+            _context4.next = 12;
             return stopVoicePlayer();
-          case 14:
-            _context4.next = 19;
+          case 12:
+            _context4.next = 17;
             break;
-          case 16:
+          case 14:
             setPermissionsGranted(false);
             resetState();
             _reactNative.Alert.alert('Please allow Audio permissions in settings.');
-          case 19:
+          case 17:
           case "end":
             return _context4.stop();
         }
@@ -317,46 +294,40 @@ var useAudioController = function useAudioController() {
       return _ref4.apply(this, arguments);
     };
   }();
-  var stopSDKVoiceRecording = function () {
+  var stopVoiceRecording = function () {
     var _ref5 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee5() {
       return _regenerator["default"].wrap(function _callee5$(_context5) {
         while (1) switch (_context5.prev = _context5.next) {
           case 0:
-            if (_native.Audio) {
-              _context5.next = 2;
+            if (!recording) {
+              _context5.next = 10;
               break;
             }
-            return _context5.abrupt("return");
-          case 2:
+            if (!(typeof recording !== 'string')) {
+              _context5.next = 8;
+              break;
+            }
             _context5.next = 4;
-            return _native.Audio.stopRecording();
+            return recording.stopAndUnloadAsync();
           case 4:
+            _context5.next = 6;
+            return _native.Audio.stopRecording();
+          case 6:
+            _context5.next = 10;
+            break;
+          case 8:
+            _context5.next = 10;
+            return _native.Audio.stopRecording();
+          case 10:
+            setRecordingStatus('stopped');
+          case 11:
           case "end":
             return _context5.stop();
         }
       }, _callee5);
     }));
-    return function stopSDKVoiceRecording() {
-      return _ref5.apply(this, arguments);
-    };
-  }();
-  var stopVoiceRecording = function () {
-    var _ref6 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee6() {
-      return _regenerator["default"].wrap(function _callee6$(_context6) {
-        while (1) switch (_context6.prev = _context6.next) {
-          case 0:
-            _context6.next = 2;
-            return stopSDKVoiceRecording();
-          case 2:
-            setRecordingStatus('stopped');
-          case 3:
-          case "end":
-            return _context6.stop();
-        }
-      }, _callee6);
-    }));
     return function stopVoiceRecording() {
-      return _ref6.apply(this, arguments);
+      return _ref5.apply(this, arguments);
     };
   }();
   var resetState = function resetState() {
@@ -369,92 +340,90 @@ var useAudioController = function useAudioController() {
     setProgress(0);
   };
   var deleteVoiceRecording = function () {
-    var _ref7 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee7() {
-      return _regenerator["default"].wrap(function _callee7$(_context7) {
-        while (1) switch (_context7.prev = _context7.next) {
+    var _ref6 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee6() {
+      return _regenerator["default"].wrap(function _callee6$(_context6) {
+        while (1) switch (_context6.prev = _context6.next) {
           case 0:
             if (!(recordingStatus === 'recording')) {
-              _context7.next = 3;
+              _context6.next = 3;
               break;
             }
-            _context7.next = 3;
+            _context6.next = 3;
             return stopVoiceRecording();
           case 3:
             if (paused) {
-              _context7.next = 6;
+              _context6.next = 6;
               break;
             }
-            _context7.next = 6;
+            _context6.next = 6;
             return stopVoicePlayer();
           case 6:
             resetState();
             (0, _native.triggerHaptic)('impactMedium');
           case 8:
           case "end":
-            return _context7.stop();
+            return _context6.stop();
         }
-      }, _callee7);
+      }, _callee6);
     }));
     return function deleteVoiceRecording() {
-      return _ref7.apply(this, arguments);
+      return _ref6.apply(this, arguments);
     };
   }();
   var uploadVoiceRecording = function () {
-    var _ref8 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee8(multiSendEnabled) {
-      var durationInSeconds, resampledWaveformData, clearFilter, date, file;
-      return _regenerator["default"].wrap(function _callee8$(_context8) {
-        while (1) switch (_context8.prev = _context8.next) {
+    var _ref7 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee7(multiSendEnabled) {
+      var durationInSeconds, resampledWaveformData, file;
+      return _regenerator["default"].wrap(function _callee7$(_context7) {
+        while (1) switch (_context7.prev = _context7.next) {
           case 0:
             if (paused) {
-              _context8.next = 3;
+              _context7.next = 3;
               break;
             }
-            _context8.next = 3;
+            _context7.next = 3;
             return stopVoicePlayer();
           case 3:
             if (!(recordingStatus === 'recording')) {
-              _context8.next = 6;
+              _context7.next = 6;
               break;
             }
-            _context8.next = 6;
+            _context7.next = 6;
             return stopVoiceRecording();
           case 6:
             durationInSeconds = parseFloat((recordingDuration / 1000).toFixed(3));
             resampledWaveformData = (0, _audioSampling.resampleWaveformData)(waveformData, 100);
-            clearFilter = new RegExp('[.:]', 'g');
-            date = new Date().toISOString().replace(clearFilter, '_');
             file = {
               duration: durationInSeconds,
               mimeType: 'audio/aac',
-              name: "audio_recording_".concat(date, ".aac"),
-              type: _types.FileTypes.VoiceRecording,
+              name: "audio_recording_".concat(new Date().toISOString(), ".aac"),
+              type: 'voiceRecording',
               uri: typeof recording !== 'string' ? recording == null ? void 0 : recording.getURI() : recording,
               waveform_data: resampledWaveformData
             };
             if (!multiSendEnabled) {
-              _context8.next = 16;
+              _context7.next = 14;
               break;
             }
-            _context8.next = 14;
+            _context7.next = 12;
             return uploadNewFile(file);
-          case 14:
-            _context8.next = 19;
+          case 12:
+            _context7.next = 17;
             break;
-          case 16:
-            _context8.next = 18;
+          case 14:
+            _context7.next = 16;
             return uploadNewFile(file);
-          case 18:
+          case 16:
             setIsScheduleForSubmit(true);
-          case 19:
+          case 17:
             resetState();
-          case 20:
+          case 18:
           case "end":
-            return _context8.stop();
+            return _context7.stop();
         }
-      }, _callee8);
+      }, _callee7);
     }));
     return function uploadVoiceRecording(_x) {
-      return _ref8.apply(this, arguments);
+      return _ref7.apply(this, arguments);
     };
   }();
   return {

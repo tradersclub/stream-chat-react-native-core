@@ -6,7 +6,6 @@ exports.moveChannelUp = exports.getChannel = exports.MAX_QUERY_CHANNELS_LIMIT = 
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
-var _uniqBy = _interopRequireDefault(require("lodash/uniqBy"));
 var moveChannelUp = function moveChannelUp(_ref) {
   var _ref$channels = _ref.channels,
     channels = _ref$channels === void 0 ? [] : _ref$channels,
@@ -18,7 +17,7 @@ var moveChannelUp = function moveChannelUp(_ref) {
   var channel = channels[index];
   channels.splice(index, 1);
   channels.unshift(channel);
-  return (0, _uniqBy["default"])([channel].concat((0, _toConsumableArray2["default"])(channels)), 'cid');
+  return (0, _toConsumableArray2["default"])(channels);
 };
 exports.moveChannelUp = moveChannelUp;
 var getChannel = function () {

@@ -90,26 +90,13 @@ var ChatWithContext = function ChatWithContext(props) {
         userID: userID
       });
       _QuickSqliteClient.QuickSqliteClient.initializeDatabase();
+      _DBSyncManager.DBSyncManager.init(client);
       setInitialisedDatabaseConfig({
         initialised: true,
         userID: userID
       });
-      _DBSyncManager.DBSyncManager.init(client);
     }
   }, [userID, enableOfflineSupport]);
-  (0, _react.useEffect)(function () {
-    if (!client) return;
-    client.threads.registerSubscriptions();
-    return function () {
-      client.threads.unregisterSubscriptions();
-    };
-  }, [client]);
-  (0, _react.useEffect)(function () {
-    return function () {
-      var _DBSyncManager$connec;
-      return (_DBSyncManager$connec = _DBSyncManager.DBSyncManager.connectionChangedListener) == null ? void 0 : _DBSyncManager$connec.unsubscribe();
-    };
-  }, []);
   var initialisedDatabase = initialisedDatabaseConfig.initialised && userID === initialisedDatabaseConfig.userID;
   var appSettings = (0, _useAppSettings.useAppSettings)(client, isOnline, enableOfflineSupport, initialisedDatabase);
   var chatContext = (0, _useCreateChatContext.useCreateChatContext)({

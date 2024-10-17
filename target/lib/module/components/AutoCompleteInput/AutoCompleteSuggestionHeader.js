@@ -40,8 +40,7 @@ var AutoCompleteSuggestionHeaderWithContext = function AutoCompleteSuggestionHea
     return (0, _jsxRuntime.jsxs)(_reactNative.View, {
       style: [styles.container, container],
       children: [(0, _jsxRuntime.jsx)(_Lightning.Lightning, {
-        fill: accent_blue,
-        size: 32
+        pathFill: accent_blue
       }), (0, _jsxRuntime.jsx)(_reactNative.Text, {
         style: [styles.title, {
           color: grey

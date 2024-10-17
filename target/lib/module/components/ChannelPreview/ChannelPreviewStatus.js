@@ -1,20 +1,16 @@
-var _typeof = require("@babel/runtime/helpers/typeof");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.ChannelPreviewStatus = void 0;
-var _react = _interopRequireWildcard(require("react"));
+var _react = _interopRequireDefault(require("react"));
 var _reactNative = require("react-native");
 var _useLatestMessagePreview = require("./hooks/useLatestMessagePreview");
 var _ThemeContext = require("../../contexts/themeContext/ThemeContext");
-var _TranslationContext = require("../../contexts/translationContext/TranslationContext");
 var _icons = require("../../icons");
-var _getDateString = require("../../utils/i18n/getDateString");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/ChannelPreview/ChannelPreviewStatus.tsx";
-function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
-function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != _typeof(e) && "function" != typeof e) return { "default": e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n["default"] = e, t && t.set(e, n), n; }
 var styles = _reactNative.StyleSheet.create({
   date: {
     fontSize: 12,
@@ -29,9 +25,6 @@ var ChannelPreviewStatus = function ChannelPreviewStatus(props) {
   var _latestMessagePreview;
   var formatLatestMessageDate = props.formatLatestMessageDate,
     latestMessagePreview = props.latestMessagePreview;
-  var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
-    t = _useTranslationContex.t,
-    tDateTimeParser = _useTranslationContex.tDateTimeParser;
   var _useTheme = (0, _ThemeContext.useTheme)(),
     _useTheme$theme = _useTheme.theme,
     _useTheme$theme$chann = _useTheme$theme.channelPreview,
@@ -43,14 +36,6 @@ var ChannelPreviewStatus = function ChannelPreviewStatus(props) {
     grey = _useTheme$theme$color.grey;
   var created_at = (_latestMessagePreview = latestMessagePreview.messageObject) == null ? void 0 : _latestMessagePreview.created_at;
   var latestMessageDate = created_at ? new Date(created_at) : new Date();
-  var formattedDate = (0, _react.useMemo)(function () {
-    return (0, _getDateString.getDateString)({
-      date: created_at,
-      t: t,
-      tDateTimeParser: tDateTimeParser,
-      timestampTranslationKey: 'timestamp/ChannelPreviewStatus'
-    });
-  }, [created_at, t, tDateTimeParser]);
   var status = latestMessagePreview.status;
   return (0, _jsxRuntime.jsxs)(_reactNative.View, {
     style: styles.flexRow,
@@ -62,7 +47,7 @@ var ChannelPreviewStatus = function ChannelPreviewStatus(props) {
       style: [styles.date, {
         color: grey
       }, date],
-      children: formatLatestMessageDate && latestMessageDate ? formatLatestMessageDate(latestMessageDate).toString() : formattedDate
+      children: formatLatestMessageDate && latestMessageDate ? formatLatestMessageDate(latestMessageDate).toString() : latestMessagePreview.created_at.toString()
     })]
   });
 };

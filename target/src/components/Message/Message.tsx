@@ -6,7 +6,6 @@ import type { Attachment, UserResponse } from 'stream-chat';
 import { useCreateMessageContext } from './hooks/useCreateMessageContext';
 import { useMessageActionHandlers } from './hooks/useMessageActionHandlers';
 import { useMessageActions } from './hooks/useMessageActions';
-import { useProcessReactions } from './hooks/useProcessReactions';
 import { messageActions as defaultMessageActions } from './utils/messageActions';
 
 import {
@@ -18,7 +17,11 @@ import {
   KeyboardContextValue,
   useKeyboardContext,
 } from '../../contexts/keyboardContext/KeyboardContext';
-import { MessageContextValue, MessageProvider } from '../../contexts/messageContext/MessageContext';
+import {
+  MessageContextValue,
+  MessageProvider,
+  Reactions,
+} from '../../contexts/messageContext/MessageContext';
 import {
   MessageOverlayContextValue,
   useMessageOverlayContext,
@@ -40,12 +43,11 @@ import {
 } from '../../contexts/translationContext/TranslationContext';
 
 import { isVideoPackageAvailable, triggerHaptic } from '../../native';
-import { DefaultStreamChatGenerics, FileTypes } from '../../types/types';
+import type { DefaultStreamChatGenerics } from '../../types/types';
 import {
   hasOnlyEmojis,
   isBlockedMessage,
   isBouncedMessage,
-  isEditedMessage,
   MessageStatusTypes,
 } from '../../utils/utils';
 
@@ -101,7 +103,7 @@ export type MessageTouchableHandlerPayload<
   /**
    * Set of action handler functions for various message actions. You can use these functions to perform any action when give interaction occurs.
    */
-  actionHandlers?: MessageActionHandlers<StreamChatGenerics>;
+  actionHandlers?: MessageActionHandlers;
   /**
    * Additional message touchable handler info.
    */
@@ -112,31 +114,24 @@ export type MessageTouchableHandlerPayload<
   message?: MessageType<StreamChatGenerics>;
 };
 
-export type MessageActionHandlers<
-  StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
-> = {
-  copyMessage: () => void;
-  deleteMessage: () => void;
+export type MessageActionHandlers = {
+  deleteMessage: () => Promise<void>;
   editMessage: () => void;
-  flagMessage: () => void;
   pinMessage: () => Promise<void>;
   quotedReply: () => void;
   resendMessage: () => Promise<void>;
-  /**
-   * @deprecated
-   * TODO: This seems useless for the action handlers here so can be removed.
-   */
   showMessageOverlay: () => void;
   toggleBanUser: () => Promise<void>;
   toggleMuteUser: () => Promise<void>;
   toggleReaction: (reactionType: string) => Promise<void>;
-  unpinMessage: () => Promise<void>;
-  threadReply?: (message: MessageType<StreamChatGenerics>) => Promise<void>;
 };
 
 export type MessagePropsWithContext<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
-> = Pick<ChannelContextValue<StreamChatGenerics>, 'channel' | 'enforceUniqueReaction' | 'members'> &
+> = Pick<
+  ChannelContextValue<StreamChatGenerics>,
+  'channel' | 'disabled' | 'enforceUniqueReaction' | 'members'
+> &
   Pick<KeyboardContextValue, 'dismissKeyboard'> &
   Partial<Omit<MessageContextValue<StreamChatGenerics>, 'groupStyles' | 'message'>> &
   Pick<MessageContextValue<StreamChatGenerics>, 'groupStyles' | 'message'> &
@@ -146,7 +141,6 @@ export type MessagePropsWithContext<
     | 'deleteMessage'
     | 'dismissKeyboardOnMessageTouch'
     | 'forceAlignMessages'
-    | 'handleBan'
     | 'handleBlock'
     | 'handleCopy'
     | 'handleDelete'
@@ -239,7 +233,6 @@ const MessageWithContext = <
   props: MessagePropsWithContext<StreamChatGenerics>,
 ) => {
   const [isBounceDialogOpen, setIsBounceDialogOpen] = useState(false);
-  const [isEditedMessageOpen, setIsEditedMessageOpen] = useState(false);
   const isMessageTypeDeleted = props.message.type === 'deleted';
 
   const {
@@ -247,6 +240,7 @@ const MessageWithContext = <
     chatContext,
     deleteMessage: deleteMessageFromContext,
     deleteReaction,
+    disabled,
     dismissKeyboard,
     dismissKeyboardOnMessageTouch,
     enableLongPress = true,
@@ -254,7 +248,6 @@ const MessageWithContext = <
     forceAlignMessages = false,
     goToMessage,
     groupStyles = ['bottom'],
-    handleBan,
     handleBlock,
     handleCopy,
     handleDelete,
@@ -341,9 +334,6 @@ const MessageWithContext = <
     if (dismissKeyboardOnMessageTouch) {
       Keyboard.dismiss();
     }
-    if (isEditedMessage(message)) {
-      setIsEditedMessageOpen((prevState) => !prevState);
-    }
     const quotedMessage = message.quoted_message as MessageType<StreamChatGenerics>;
     if (error) {
       /**
@@ -359,7 +349,7 @@ const MessageWithContext = <
         setIsBounceDialogOpen(true);
         return;
       }
-      showMessageOverlay(true, true);
+      showMessageOverlay(false, true);
     } else if (quotedMessage) {
       onPressQuotedMessage(quotedMessage);
     }
@@ -383,26 +373,22 @@ const MessageWithContext = <
     !isMessageTypeDeleted && Array.isArray(message.attachments)
       ? message.attachments.reduce(
           (acc, cur) => {
-            if (cur.type === FileTypes.File) {
+            if (cur.type === 'file') {
               acc.files.push(cur);
               acc.other = []; // remove other attachments if a file exists
-            } else if (
-              cur.type === FileTypes.Video &&
-              !cur.og_scrape_url &&
-              isVideoPackageAvailable()
-            ) {
+            } else if (cur.type === 'video' && !cur.og_scrape_url && isVideoPackageAvailable()) {
               acc.videos.push({
                 image_url: cur.asset_url,
                 thumb_url: cur.thumb_url,
-                type: FileTypes.Video,
+                type: 'video',
               });
               acc.other = [];
-            } else if (cur.type === FileTypes.Video && !cur.og_scrape_url) {
+            } else if (cur.type === 'video' && !cur.og_scrape_url) {
               acc.files.push(cur);
               acc.other = []; // remove other attachments if a file exists
-            } else if (cur.type === FileTypes.Audio || cur.type === FileTypes.VoiceRecording) {
+            } else if (cur.type === 'audio' || cur.type === 'voiceRecording') {
               acc.files.push(cur);
-            } else if (cur.type === FileTypes.Image && !cur.title_link && !cur.og_scrape_url) {
+            } else if (cur.type === 'image' && !cur.title_link && !cur.og_scrape_url) {
               /**
                * this next if is not combined with the above one for cases where we have
                * an image with no url links at all falling back to being an attachment
@@ -477,21 +463,34 @@ const MessageWithContext = <
     }
   };
 
-  const { existingReactions, hasReactions } = useProcessReactions({
-    latest_reactions: message.latest_reactions,
-    own_reactions: message.own_reactions,
-    reaction_groups: message.reaction_groups,
-  });
+  const hasReactions =
+    !isMessageTypeDeleted && !!message.latest_reactions && message.latest_reactions.length > 0;
 
-  const reactions = hasReactions ? existingReactions : [];
+  const clientId = client.userID;
+
+  const reactions = hasReactions
+    ? supportedReactions.reduce((acc, cur) => {
+        const reactionType = cur.type;
+        const reactionsOfReactionType = message.latest_reactions?.filter(
+          (reaction) => reaction.type === reactionType,
+        );
+
+        if (reactionsOfReactionType?.length) {
+          const hasOwnReaction = reactionsOfReactionType.some(
+            (reaction) => reaction.user_id === clientId,
+          );
+          acc.push({ own: hasOwnReaction, type: reactionType });
+        }
+
+        return acc;
+      }, [] as Reactions)
+    : [];
 
   const ownCapabilities = useOwnCapabilitiesContext();
 
   const {
-    handleCopyMessage,
     handleDeleteMessage,
     handleEditMessage,
-    handleFlagMessage,
     handleQuotedReplyMessage,
     handleResendMessage,
     handleToggleBanUser,
@@ -513,7 +512,6 @@ const MessageWithContext = <
   });
 
   const {
-    banUser,
     blockUser,
     copyMessage,
     deleteMessage,
@@ -532,7 +530,6 @@ const MessageWithContext = <
     deleteMessage: deleteMessageFromContext,
     deleteReaction,
     enforceUniqueReaction,
-    handleBan,
     handleBlock,
     handleCopy,
     handleDelete,
@@ -561,7 +558,7 @@ const MessageWithContext = <
 
   const { userLanguage } = useTranslationContext();
 
-  const showMessageOverlay = async (isMessageActionsVisible = true, error = errorOrFailed) => {
+  const showMessageOverlay = async (messageReactions = false, error = errorOrFailed) => {
     await dismissKeyboard();
 
     const isThreadMessage = threadList || !!message.parent_id;
@@ -572,7 +569,6 @@ const MessageWithContext = <
       typeof messageActionsProp !== 'function'
         ? messageActionsProp
         : messageActionsProp({
-            banUser,
             blockUser,
             copyMessage,
             deleteMessage,
@@ -580,11 +576,10 @@ const MessageWithContext = <
             editMessage,
             error,
             flagMessage,
-            isMessageActionsVisible,
             isMyMessage,
             isThreadMessage,
             message,
-            messageReactions: isMessageActionsVisible === false,
+            messageReactions,
             muteUser,
             ownCapabilities,
             pinMessage,
@@ -605,7 +600,7 @@ const MessageWithContext = <
       message,
       messageActions: messageActions?.filter(Boolean) as MessageActionListItemProps[] | undefined,
       messageContext: { ...messageContext, preventPress: true },
-      messageReactionTitle: !error && !isMessageActionsVisible ? t('Message Reactions') : undefined,
+      messageReactionTitle: !error && messageReactions ? t('Message Reactions') : undefined,
       messagesContext: { ...messagesContext, messageContentOrder },
       onlyEmojis,
       otherAttachments: attachments.other,
@@ -620,24 +615,20 @@ const MessageWithContext = <
     setOverlay('message');
   };
 
-  const actionHandlers: MessageActionHandlers<StreamChatGenerics> = {
-    copyMessage: handleCopyMessage,
+  const actionHandlers: MessageActionHandlers = {
     deleteMessage: handleDeleteMessage,
     editMessage: handleEditMessage,
-    flagMessage: handleFlagMessage,
     pinMessage: handleTogglePinMessage,
     quotedReply: handleQuotedReplyMessage,
     resendMessage: handleResendMessage,
     showMessageOverlay,
-    threadReply: handleThreadReply,
     toggleBanUser: handleToggleBanUser,
     toggleMuteUser: handleToggleMuteUser,
     toggleReaction: handleToggleReaction,
-    unpinMessage: handleTogglePinMessage,
   };
 
   const onLongPressMessage =
-    hasAttachmentActions || isBlockedMessage(message)
+    disabled || hasAttachmentActions || isBlockedMessage(message)
       ? () => null
       : onLongPressMessageProp
       ? (payload?: TouchableHandlerPayload) =>
@@ -664,7 +655,7 @@ const MessageWithContext = <
             return;
           }
           triggerHaptic('impactMedium');
-          showMessageOverlay(true);
+          showMessageOverlay(false);
         }
       : () => null;
 
@@ -672,14 +663,13 @@ const MessageWithContext = <
     actionsEnabled,
     alignment,
     channel,
+    disabled,
     files: attachments.files,
     goToMessage,
     groupStyles,
     handleAction,
-    handleCopyMessage,
     handleDeleteMessage,
     handleEditMessage,
-    handleFlagMessage,
     handleQuotedReplyMessage,
     handleResendMessage,
     handleToggleBanUser,
@@ -687,7 +677,6 @@ const MessageWithContext = <
     handleToggleReaction,
     hasReactions,
     images: attachments.images,
-    isEditedMessageOpen,
     isMyMessage,
     lastGroupMessage: groupStyles?.[0] === 'single' || groupStyles?.[0] === 'bottom',
     lastReceivedId,
@@ -738,7 +727,6 @@ const MessageWithContext = <
     otherAttachments: attachments.other,
     preventPress,
     reactions,
-    setIsEditedMessageOpen,
     showAvatar,
     showMessageOverlay,
     showMessageStatus: typeof showMessageStatus === 'boolean' ? showMessageStatus : isMyMessage,
@@ -789,6 +777,7 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
 ) => {
   const {
     chatContext: { mutedUsers: prevMutedUsers },
+    disabled: prevDisabled,
     goToMessage: prevGoToMessage,
     groupStyles: prevGroupStyles,
     isAttachmentEqual,
@@ -802,6 +791,7 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
   } = prevProps;
   const {
     chatContext: { mutedUsers: nextMutedUsers },
+    disabled: nextDisabled,
     goToMessage: nextGoToMessage,
     groupStyles: nextGroupStyles,
     isTargetedMessage: nextIsTargetedMessage,
@@ -812,6 +802,9 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
     showUnreadUnderlay: nextShowUnreadUnderlay,
     t: nextT,
   } = nextProps;
+
+  const disabledEqual = prevDisabled === nextDisabled;
+  if (!disabledEqual) return false;
 
   const membersEqual = Object.keys(prevMembers).length === Object.keys(nextMembers).length;
   if (!membersEqual) return false;
@@ -848,8 +841,7 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
     prevMessage.type === nextMessage.type &&
     prevMessage.text === nextMessage.text &&
     prevMessage.pinned === nextMessage.pinned &&
-    `${prevMessage?.updated_at}` === `${nextMessage?.updated_at}` &&
-    prevMessage.i18n === nextMessage.i18n;
+    `${prevMessage?.updated_at}` === `${nextMessage?.updated_at}`;
 
   if (!messageEqual) return false;
 
@@ -873,7 +865,7 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
       prevMessageAttachments.length === nextMessageAttachments.length &&
       prevMessageAttachments.every((attachment, index) => {
         const attachmentKeysEqual =
-          attachment.type === FileTypes.Image
+          attachment.type === 'image'
             ? attachment.image_url === nextMessageAttachments[index].image_url &&
               attachment.thumb_url === nextMessageAttachments[index].thumb_url
             : attachment.type === nextMessageAttachments[index].type;
@@ -939,7 +931,8 @@ export const Message = <
 >(
   props: MessageProps<StreamChatGenerics>,
 ) => {
-  const { channel, enforceUniqueReaction, members } = useChannelContext<StreamChatGenerics>();
+  const { channel, disabled, enforceUniqueReaction, members } =
+    useChannelContext<StreamChatGenerics>();
   const chatContext = useChatContext<StreamChatGenerics>();
   const { dismissKeyboard } = useKeyboardContext();
   const { setData } = useMessageOverlayContext<StreamChatGenerics>();
@@ -954,6 +947,7 @@ export const Message = <
       {...{
         channel,
         chatContext,
+        disabled,
         dismissKeyboard,
         enforceUniqueReaction,
         members,

@@ -15,7 +15,6 @@ var _ThemeContext = require("../../../contexts/themeContext/ThemeContext");
 var _TranslationContext = require("../../../contexts/translationContext/TranslationContext");
 var _icons = require("../../../icons");
 var _native = require("../../../native");
-var _types = require("../../../types/types");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/ImageGallery/components/ImageGalleryFooter.tsx";
@@ -154,10 +153,10 @@ var ImageGalleryFooterWithContext = function ImageGalleryFooterWithContext(props
     pointerEvents: 'box-none',
     style: styles.wrapper,
     children: (0, _jsxRuntime.jsxs)(ReanimatedSafeAreaView, {
-      style: [{
+      style: [container, footerStyle, {
         backgroundColor: white
-      }, footerStyle, container],
-      children: [photo.type === _types.FileTypes.Video ? videoControlElement ? videoControlElement({
+      }],
+      children: [photo.type === 'video' ? videoControlElement ? videoControlElement({
         duration: duration,
         onPlayPause: onPlayPause,
         paused: paused,
@@ -170,9 +169,9 @@ var ImageGalleryFooterWithContext = function ImageGalleryFooterWithContext(props
         progress: progress,
         videoRef: videoRef
       }) : null, (0, _jsxRuntime.jsxs)(_reactNative.View, {
-        style: [styles.innerContainer, {
+        style: [styles.innerContainer, innerContainer, {
           backgroundColor: white
-        }, innerContainer],
+        }],
         children: [leftElement ? leftElement({
           openGridView: openGridView,
           photo: photo,

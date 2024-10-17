@@ -1,8 +1,9 @@
 import React from 'react';
+import { ChannelContextValue } from '../../../../contexts/channelContext/ChannelContext';
 import { MessageInputContextValue } from '../../../../contexts/messageInputContext/MessageInputContext';
 import { AudioRecordingReturnType } from '../../../../native';
 import type { DefaultStreamChatGenerics } from '../../../../types/types';
-type AudioRecordingButtonPropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<MessageInputContextValue<StreamChatGenerics>, 'asyncMessagesMinimumPressDuration'> & {
+type AudioRecordingButtonPropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<ChannelContextValue<StreamChatGenerics>, 'disabled'> & Pick<MessageInputContextValue<StreamChatGenerics>, 'asyncMessagesMinimumPressDuration'> & {
     /**
      * The current voice recording that is in progress.
      */

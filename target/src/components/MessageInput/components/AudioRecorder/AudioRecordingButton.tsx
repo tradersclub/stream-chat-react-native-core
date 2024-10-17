@@ -2,6 +2,10 @@ import React from 'react';
 import { Alert, Linking, Pressable, StyleSheet } from 'react-native';
 
 import {
+  ChannelContextValue,
+  useChannelContext,
+} from '../../../../contexts/channelContext/ChannelContext';
+import {
   MessageInputContextValue,
   useMessageInputContext,
 } from '../../../../contexts/messageInputContext/MessageInputContext';
@@ -14,32 +18,33 @@ import type { DefaultStreamChatGenerics } from '../../../../types/types';
 
 type AudioRecordingButtonPropsWithContext<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
-> = Pick<MessageInputContextValue<StreamChatGenerics>, 'asyncMessagesMinimumPressDuration'> & {
-  /**
-   * The current voice recording that is in progress.
-   */
-  recording: AudioRecordingReturnType;
-  /**
-   * Size of the mic button.
-   */
-  buttonSize?: number;
-  /**
-   * Handler to determine what should happen on long press of the mic button.
-   */
-  handleLongPress?: () => void;
-  /**
-   * Handler to determine what should happen on press of the mic button.
-   */
-  handlePress?: () => void;
-  /**
-   * Boolean to determine if the audio recording permissions are granted.
-   */
-  permissionsGranted?: boolean;
-  /**
-   * Function to start the voice recording.
-   */
-  startVoiceRecording?: () => Promise<void>;
-};
+> = Pick<ChannelContextValue<StreamChatGenerics>, 'disabled'> &
+  Pick<MessageInputContextValue<StreamChatGenerics>, 'asyncMessagesMinimumPressDuration'> & {
+    /**
+     * The current voice recording that is in progress.
+     */
+    recording: AudioRecordingReturnType;
+    /**
+     * Size of the mic button.
+     */
+    buttonSize?: number;
+    /**
+     * Handler to determine what should happen on long press of the mic button.
+     */
+    handleLongPress?: () => void;
+    /**
+     * Handler to determine what should happen on press of the mic button.
+     */
+    handlePress?: () => void;
+    /**
+     * Boolean to determine if the audio recording permissions are granted.
+     */
+    permissionsGranted?: boolean;
+    /**
+     * Function to start the voice recording.
+     */
+    startVoiceRecording?: () => Promise<void>;
+  };
 
 const AudioRecordingButtonWithContext = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
@@ -49,6 +54,7 @@ const AudioRecordingButtonWithContext = <
   const {
     asyncMessagesMinimumPressDuration,
     buttonSize,
+    disabled,
     handleLongPress,
     handlePress,
     permissionsGranted,
@@ -101,6 +107,7 @@ const AudioRecordingButtonWithContext = <
   return (
     <Pressable
       delayLongPress={asyncMessagesMinimumPressDuration}
+      disabled={disabled}
       onLongPress={onLongPressHandler}
       onPress={onPressHandler}
       style={({ pressed }) => [
@@ -125,16 +132,21 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
 ) => {
   const {
     asyncMessagesMinimumPressDuration: prevAsyncMessagesMinimumPressDuration,
+    disabled: prevDisabled,
     recording: prevRecording,
   } = prevProps;
   const {
     asyncMessagesMinimumPressDuration: nextAsyncMessagesMinimumPressDuration,
+    disabled: nextDisabled,
     recording: nextRecording,
   } = nextProps;
 
   const asyncMessagesMinimumPressDurationEqual =
     prevAsyncMessagesMinimumPressDuration === nextAsyncMessagesMinimumPressDuration;
   if (!asyncMessagesMinimumPressDurationEqual) return false;
+
+  const disabledEqual = prevDisabled === nextDisabled;
+  if (!disabledEqual) return false;
 
   const recordingEqual = prevRecording === nextRecording;
   if (!recordingEqual) return false;
@@ -161,9 +173,12 @@ export const AudioRecordingButton = <
 >(
   props: AudioRecordingButtonProps<StreamChatGenerics>,
 ) => {
+  const { disabled = false } = useChannelContext<StreamChatGenerics>();
   const { asyncMessagesMinimumPressDuration } = useMessageInputContext<StreamChatGenerics>();
 
-  return <MemoizedAudioRecordingButton {...{ asyncMessagesMinimumPressDuration }} {...props} />;
+  return (
+    <MemoizedAudioRecordingButton {...{ asyncMessagesMinimumPressDuration, disabled }} {...props} />
+  );
 };
 
 const styles = StyleSheet.create({

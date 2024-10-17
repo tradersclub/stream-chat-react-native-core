@@ -146,7 +146,6 @@ var ChannelPreviewMessengerWithContext = function ChannelPreviewMessengerWithCon
 var MemoizedChannelPreviewMessengerWithContext = _react["default"].memo(ChannelPreviewMessengerWithContext);
 var ChannelPreviewMessenger = function ChannelPreviewMessenger(props) {
   var _useChannelsContext = (0, _ChannelsContext.useChannelsContext)(),
-    forceUpdate = _useChannelsContext.forceUpdate,
     maxUnreadCount = _useChannelsContext.maxUnreadCount,
     onSelect = _useChannelsContext.onSelect,
     PreviewAvatar = _useChannelsContext.PreviewAvatar,
@@ -156,7 +155,6 @@ var ChannelPreviewMessenger = function ChannelPreviewMessenger(props) {
     PreviewTitle = _useChannelsContext.PreviewTitle,
     PreviewUnreadCount = _useChannelsContext.PreviewUnreadCount;
   return (0, _jsxRuntime.jsx)(MemoizedChannelPreviewMessengerWithContext, Object.assign({
-    forceUpdate: forceUpdate,
     maxUnreadCount: maxUnreadCount,
     onSelect: onSelect,
     PreviewAvatar: PreviewAvatar,

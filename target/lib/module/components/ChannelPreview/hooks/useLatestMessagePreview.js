@@ -8,8 +8,6 @@ var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers
 var _react = require("react");
 var _ChatContext = require("../../../contexts/chatContext/ChatContext");
 var _TranslationContext = require("../../../contexts/translationContext/TranslationContext");
-var _useTranslatedMessage = require("../../../hooks/useTranslatedMessage");
-var _utils = require("../../../utils/utils");
 var getMessageSenderName = function getMessageSenderName(message, currentUserId, t, membersLength) {
   var _message$user;
   if ((message == null ? void 0 : (_message$user = message.user) == null ? void 0 : _message$user.id) === currentUserId) {
@@ -105,6 +103,16 @@ var getLatestMessageDisplayText = function getLatestMessageDisplayText(channel, 
     text: t('Empty message...')
   }];
 };
+var getLatestMessageDisplayDate = function getLatestMessageDisplayDate(message, tDateTimeParser) {
+  var parserOutput = tDateTimeParser(message == null ? void 0 : message.created_at);
+  if ((0, _TranslationContext.isDayOrMoment)(parserOutput)) {
+    if (parserOutput.isSame(new Date(), 'day')) {
+      return parserOutput.format('LT');
+    }
+    return parserOutput.format('L');
+  }
+  return parserOutput;
+};
 var MessageReadStatus = function (MessageReadStatus) {
   MessageReadStatus[MessageReadStatus["NOT_SENT_BY_CURRENT_USER"] = 0] = "NOT_SENT_BY_CURRENT_USER";
   MessageReadStatus[MessageReadStatus["UNREAD"] = 1] = "UNREAD";
@@ -118,7 +126,7 @@ var getLatestMessageReadStatus = function getLatestMessageReadStatus(channel, cl
   if (!message || currentUserId !== ((_message$user5 = message.user) == null ? void 0 : _message$user5.id) || readEvents === false) {
     return MessageReadStatus.NOT_SENT_BY_CURRENT_USER;
   }
-  var readList = Object.assign({}, channel.state.read);
+  var readList = channel.state.read;
   if (currentUserId) {
     delete readList[currentUserId];
   }
@@ -133,7 +141,8 @@ var getLatestMessagePreview = function getLatestMessagePreview(params) {
     client = params.client,
     lastMessage = params.lastMessage,
     readEvents = params.readEvents,
-    t = params.t;
+    t = params.t,
+    tDateTimeParser = params.tDateTimeParser;
   var messages = channel.state.messages;
   if (!messages.length && !lastMessage) {
     return {
@@ -149,7 +158,7 @@ var getLatestMessagePreview = function getLatestMessagePreview(params) {
   var channelStateLastMessage = messages.length ? messages[messages.length - 1] : undefined;
   var message = lastMessage !== undefined ? lastMessage : channelStateLastMessage;
   return {
-    created_at: message == null ? void 0 : message.created_at,
+    created_at: getLatestMessageDisplayDate(message, tDateTimeParser),
     messageObject: message,
     previews: getLatestMessageDisplayText(channel, client, message, t),
     status: getLatestMessageReadStatus(channel, client, message, readEvents)
@@ -159,10 +168,12 @@ var useLatestMessagePreview = function useLatestMessagePreview(channel, forceUpd
   var _useChatContext = (0, _ChatContext.useChatContext)(),
     client = _useChatContext.client;
   var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
-    t = _useTranslationContex.t;
+    t = _useTranslationContex.t,
+    tDateTimeParser = _useTranslationContex.tDateTimeParser;
   var channelConfigExists = typeof (channel == null ? void 0 : channel.getConfig) === 'function';
-  var translatedLastMessage = (0, _useTranslatedMessage.useTranslatedMessage)(lastMessage);
-  var channelLastMessageString = translatedLastMessage ? (0, _utils.stringifyMessage)(translatedLastMessage) : '';
+  var messages = channel.state.messages;
+  var message = messages.length ? messages[messages.length - 1] : undefined;
+  var channelLastMessageString = "".concat((lastMessage == null ? void 0 : lastMessage.id) || (message == null ? void 0 : message.id)).concat((lastMessage == null ? void 0 : lastMessage.updated_at) || (message == null ? void 0 : message.updated_at));
   var _useState = (0, _react.useState)(true),
     _useState2 = (0, _slicedToArray2["default"])(_useState, 2),
     readEvents = _useState2[0],
@@ -179,7 +190,7 @@ var useLatestMessagePreview = function useLatestMessagePreview(channel, forceUpd
     _useState4 = (0, _slicedToArray2["default"])(_useState3, 2),
     latestMessagePreview = _useState4[0],
     setLatestMessagePreview = _useState4[1];
-  var readStatus = getLatestMessageReadStatus(channel, client, translatedLastMessage, readEvents);
+  var readStatus = getLatestMessageReadStatus(channel, client, lastMessage || message, readEvents);
   (0, _react.useEffect)(function () {
     if (channelConfigExists) {
       var _channel$getConfig;
@@ -193,9 +204,10 @@ var useLatestMessagePreview = function useLatestMessagePreview(channel, forceUpd
     return setLatestMessagePreview(getLatestMessagePreview({
       channel: channel,
       client: client,
-      lastMessage: translatedLastMessage,
+      lastMessage: lastMessage,
       readEvents: readEvents,
-      t: t
+      t: t,
+      tDateTimeParser: tDateTimeParser
     }));
   }, [channelLastMessageString, forceUpdate, readEvents, readStatus]);
   return latestMessagePreview;

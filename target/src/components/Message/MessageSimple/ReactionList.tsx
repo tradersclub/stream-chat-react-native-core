@@ -1,12 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 
 import Svg, { Circle } from 'react-native-svg';
 
-import { ReactionGroupResponse, ReactionResponse } from 'stream-chat';
-
 import {
   MessageContextValue,
+  Reactions,
   useMessageContext,
 } from '../../../contexts/messageContext/MessageContext';
 import {
@@ -20,10 +19,26 @@ import { Unknown } from '../../../icons/Unknown';
 import type { IconProps } from '../../../icons/utils/base';
 import type { DefaultStreamChatGenerics } from '../../../types/types';
 import type { ReactionData } from '../../../utils/utils';
-import { ReactionSummary } from '../hooks/useProcessReactions';
+
+const styles = StyleSheet.create({
+  container: {
+    left: 0,
+    position: 'absolute',
+    top: 0,
+  },
+  reactionBubble: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    position: 'absolute',
+  },
+  reactionBubbleBackground: {
+    position: 'absolute',
+  },
+});
 
 export type MessageReactions = {
-  reactions: ReactionSummary[];
+  reactions: Reactions;
   supportedReactions?: ReactionData[];
 };
 
@@ -61,13 +76,7 @@ export type ReactionListPropsWithContext<
     messageContentWidth: number;
     supportedReactions: ReactionData[];
     fill?: string;
-    /** An array of the reaction objects to display in the list */
-    latest_reactions?: ReactionResponse<StreamChatGenerics>[];
-    /** An array of the own reaction objects to distinguish own reactions visually */
-    own_reactions?: ReactionResponse<StreamChatGenerics>[] | null;
     radius?: number; // not recommended to change this
-    /** An object containing summary for each reaction type on a message */
-    reaction_groups?: Record<string, ReactionGroupResponse> | null;
     reactionSize?: number;
     stroke?: string;
     strokeSize?: number; // not recommended to change this
@@ -101,7 +110,6 @@ const ReactionListWithContext = <
     theme: {
       colors: {
         accent_blue,
-        black,
         grey,
         grey_gainsboro,
         grey_whisper,
@@ -117,8 +125,7 @@ const ReactionListWithContext = <
           middleIcon,
           radius: themeRadius,
           reactionBubble,
-          reactionContainer,
-          reactionCount,
+          reactionBubbleBackground,
           reactionSize: themeReactionSize,
           strokeSize: themeStrokeSize,
         },
@@ -193,6 +200,21 @@ const ReactionListWithContext = <
             <Circle cx={x1} cy={y1} fill={alignmentLeft ? fill : white} r={radius} />
             <Circle cx={x2} cy={y2} fill={alignmentLeft ? fill : white} r={radius * 2} />
           </Svg>
+          <View
+            style={[
+              styles.reactionBubbleBackground,
+              {
+                backgroundColor: alignmentLeft ? fill : white,
+                borderColor: fill,
+                borderRadius: reactionSize,
+                borderWidth: strokeSize,
+                height: reactionSize,
+                left,
+                width: reactionSize * reactions.length,
+              },
+              reactionBubbleBackground,
+            ]}
+          />
           <View pointerEvents='none' style={[StyleSheet.absoluteFill]}>
             <Svg>
               <Circle cx={x2} cy={y2} fill={alignmentLeft ? fill : white} r={radius * 2} />
@@ -211,7 +233,7 @@ const ReactionListWithContext = <
             onPress={(event) => {
               if (onPress) {
                 onPress({
-                  defaultHandler: () => showMessageOverlay(false),
+                  defaultHandler: () => showMessageOverlay(true),
                   emitter: 'reactionList',
                   event,
                 });
@@ -220,7 +242,7 @@ const ReactionListWithContext = <
             onPressIn={(event) => {
               if (onPressIn) {
                 onPressIn({
-                  defaultHandler: () => showMessageOverlay(false),
+                  defaultHandler: () => showMessageOverlay(true),
                   emitter: 'reactionList',
                   event,
                 });
@@ -230,39 +252,24 @@ const ReactionListWithContext = <
               styles.reactionBubble,
               {
                 backgroundColor: alignmentLeft ? fill : white,
-                borderColor: fill,
-                borderRadius: reactionSize,
-                borderWidth: strokeSize,
+                borderRadius: reactionSize - strokeSize * 2,
                 height: reactionSize - strokeSize * 2,
                 left: left + strokeSize,
                 top: strokeSize,
+                width: reactionSize * reactions.length - strokeSize * 2,
               },
               reactionBubble,
             ]}
           >
-            {reactions.map((reaction, index) => (
-              <View
+            {reactions.map((reaction) => (
+              <Icon
                 key={reaction.type}
-                style={[
-                  styles.reactionContainer,
-                  {
-                    marginRight: index < reactions.length - 1 ? 5 : 0,
-                  },
-                  reactionContainer,
-                ]}
-              >
-                <Icon
-                  key={reaction.type}
-                  pathFill={reaction.own ? iconFillColor || accent_blue : grey}
-                  size={reactionSize / 2}
-                  style={middleIcon}
-                  supportedReactions={supportedReactions}
-                  type={reaction.type}
-                />
-                <Text style={[styles.reactionCount, { color: black }, reactionCount]}>
-                  {reaction.count}
-                </Text>
-              </View>
+                pathFill={reaction.own ? iconFillColor || accent_blue : grey}
+                size={reactionSize / 2}
+                style={middleIcon}
+                supportedReactions={supportedReactions}
+                type={reaction.type}
+              />
             ))}
           </TouchableOpacity>
         </View>
@@ -278,13 +285,11 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
   const {
     message: prevMessage,
     messageContentWidth: prevMessageContentWidth,
-    reactions: prevReactions,
     targetedMessage: prevTargetedMessage,
   } = prevProps;
   const {
     message: nextMessage,
     messageContentWidth: nextMessageContentWidth,
-    reactions: nextReactions,
     targetedMessage: nextTargetedMessage,
   } = nextProps;
 
@@ -308,18 +313,6 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
       : prevMessage.latest_reactions === nextMessage.latest_reactions;
   if (!latestReactionsEqual) return false;
 
-  const reactionsEqual =
-    Array.isArray(prevReactions) && Array.isArray(nextReactions)
-      ? prevReactions.length === nextReactions.length &&
-        prevReactions.every(
-          ({ count, type }, index) =>
-            type === nextMessage.latest_reactions?.[index].type &&
-            count === nextMessage.latest_reactions?.[index].count,
-        )
-      : prevReactions === nextReactions;
-
-  if (!reactionsEqual) return false;
-
   return true;
 };
 
@@ -330,7 +323,7 @@ const MemoizedReactionList = React.memo(
 
 export type ReactionListProps<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
-> = Partial<ReactionListPropsWithContext<StreamChatGenerics>> &
+> = Partial<Omit<ReactionListPropsWithContext<StreamChatGenerics>, 'messageContentWidth'>> &
   Pick<ReactionListPropsWithContext<StreamChatGenerics>, 'messageContentWidth'>;
 
 /**
@@ -371,28 +364,3 @@ export const ReactionList = <
     />
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    left: 0,
-    position: 'absolute',
-    top: 0,
-  },
-  reactionBubble: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    paddingHorizontal: 5,
-    position: 'absolute',
-  },
-  reactionContainer: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  reactionCount: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginLeft: 2,
-  },
-});

@@ -9,7 +9,6 @@ var _reactNative = require("react-native");
 var _reactNativeMarkdownPackage = _interopRequireDefault(require("react-native-markdown-package"));
 var _simpleMarkdown = require("simple-markdown");
 var _generateMarkdownText = require("./generateMarkdownText");
-var _utils = require("../../../../utils/utils");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/Message/MessageSimple/utils/renderText.tsx";
@@ -84,6 +83,10 @@ var renderText = function renderText(params) {
     }, markdownStyles == null ? void 0 : markdownStyles.text)
   });
   var onLink = function onLink(url) {
+    var pattern = new RegExp(/^\S+:\/\//);
+    if (!pattern.test(url)) {
+      url = 'http://' + url;
+    }
     return onLinkParams ? onLinkParams(url) : _reactNative.Linking.canOpenURL(url).then(function (canOpenUrl) {
       return canOpenUrl && _reactNative.Linking.openURL(url);
     });
@@ -152,14 +155,15 @@ var renderText = function renderText(params) {
     }, state.key);
   };
   var mentioned_users = message.mentioned_users;
-  var mentionedUsernames = (mentioned_users || []).map(function (user) {
-    return user.name || user.id;
-  }).filter(Boolean).sort(function (a, b) {
-    return b.length - a.length;
-  }).map(_utils.escapeRegExp);
-  var mentionedUsers = mentionedUsernames.map(function (username) {
-    return "@".concat(username);
-  }).join('|');
+  var mentionedUsers = Array.isArray(mentioned_users) ? mentioned_users.reduce(function (acc, cur) {
+    var userName = cur.name || cur.id || '';
+    if (userName) {
+      acc += "".concat(acc.length ? '|' : '', "@").concat(userName.replace(/[.*+?^${}()|[\]\\]/g, function (match) {
+        return '\\' + match;
+      }));
+    }
+    return acc;
+  }, '') : '';
   var regEx = new RegExp("^\\B(".concat(mentionedUsers, ")"), 'g');
   var mentionsMatchFunction = function mentionsMatchFunction(source) {
     return regEx.exec(source);

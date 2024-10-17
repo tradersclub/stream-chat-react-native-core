@@ -9,14 +9,12 @@ import type { DefaultStreamChatGenerics } from '../../../../types/types';
 type Parameters<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> =
   {
     setChannels: React.Dispatch<React.SetStateAction<Channel<StreamChatGenerics>[] | null>>;
-    setForceUpdate: React.Dispatch<React.SetStateAction<number>>;
   };
 
 export const useUserPresence = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 >({
   setChannels,
-  setForceUpdate,
 }: Parameters<StreamChatGenerics>) => {
   const { client } = useChatContext<StreamChatGenerics>();
 
@@ -35,7 +33,6 @@ export const useUserPresence = <
 
         return [...newChannels];
       });
-      setForceUpdate((u) => u + 1);
     };
 
     const listeners = [
@@ -46,6 +43,5 @@ export const useUserPresence = <
     return () => {
       listeners?.forEach((l) => l?.unsubscribe());
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };

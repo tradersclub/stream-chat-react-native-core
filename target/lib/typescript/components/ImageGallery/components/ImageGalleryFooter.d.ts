@@ -1,7 +1,7 @@
 import React from 'react';
 import Animated from 'react-native-reanimated';
 import { VideoType } from '../../../native';
-import { DefaultStreamChatGenerics } from '../../../types/types';
+import type { DefaultStreamChatGenerics } from '../../../types/types';
 import type { Photo } from '../ImageGallery';
 export type ImageGalleryFooterCustomComponent<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = ({ openGridView, photo, share, shareMenuOpen, }: {
     openGridView: () => void;

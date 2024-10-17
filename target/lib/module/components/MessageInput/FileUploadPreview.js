@@ -7,6 +7,7 @@ exports.FileUploadPreview = void 0;
 var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
 var _react = _interopRequireWildcard(require("react"));
 var _reactNative = require("react-native");
+var _dayjs = _interopRequireDefault(require("dayjs"));
 var _UploadProgressIndicator = require("./UploadProgressIndicator");
 var _contexts = require("../../contexts");
 var _MessageInputContext = require("../../contexts/messageInputContext/MessageInputContext");
@@ -31,7 +32,6 @@ var styles = _reactNative.StyleSheet.create({
   dismiss: {
     borderRadius: 24,
     height: 24,
-    marginRight: 4,
     position: 'absolute',
     right: 8,
     top: 8,
@@ -50,16 +50,17 @@ var styles = _reactNative.StyleSheet.create({
   },
   filenameText: {
     fontSize: 14,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    paddingHorizontal: 10
   },
   fileSizeText: {
     fontSize: 12,
-    marginTop: 10
+    marginTop: 10,
+    paddingHorizontal: 10
   },
   fileTextContainer: {
     justifyContent: 'space-around',
-    marginVertical: 10,
-    paddingHorizontal: 10
+    marginVertical: 10
   },
   flatList: {
     marginBottom: 12,
@@ -72,7 +73,7 @@ var styles = _reactNative.StyleSheet.create({
   },
   unsupportedFile: {
     flexDirection: 'row',
-    paddingTop: 10
+    paddingLeft: 10
   },
   unsupportedFileText: {
     fontSize: 12,
@@ -93,6 +94,15 @@ var UnsupportedFileTypeOrFileSizeIndicator = function UnsupportedFileTypeOrFileS
     grey = _useTheme$theme$color.grey,
     grey_dark = _useTheme$theme$color.grey_dark,
     fileSizeText = _useTheme$theme.messageInput.fileUploadPreview.fileSizeText;
+  var ONE_HOUR_IN_SECONDS = 3600;
+  var durationLabel = '00:00';
+  var videoDuration = item.file.duration;
+  if (videoDuration) {
+    var isDurationLongerThanHour = videoDuration / ONE_HOUR_IN_SECONDS >= 1;
+    var formattedDurationParam = isDurationLongerThanHour ? 'HH:mm:ss' : 'mm:ss';
+    var formattedVideoDuration = _dayjs["default"].duration(videoDuration, 'second').format(formattedDurationParam);
+    durationLabel = formattedVideoDuration;
+  }
   var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
     t = _useTranslationContex.t;
   return indicatorType === _utils.ProgressIndicatorTypes.NOT_SUPPORTED ? (0, _jsxRuntime.jsxs)(_reactNative.View, {
@@ -112,7 +122,7 @@ var UnsupportedFileTypeOrFileSizeIndicator = function UnsupportedFileTypeOrFileS
     style: [styles.fileSizeText, {
       color: grey
     }, fileSizeText],
-    children: item.file.duration ? (0, _utils.getDurationLabelFromDuration)(item.file.duration) : (0, _FileAttachment.getFileSizeDisplayText)(item.file.size)
+    children: videoDuration ? durationLabel : (0, _FileAttachment.getFileSizeDisplayText)(item.file.size)
   });
 };
 var FileUploadPreviewWithContext = function FileUploadPreviewWithContext(props) {
@@ -194,8 +204,8 @@ var FileUploadPreviewWithContext = function FileUploadPreviewWithContext(props) 
     var _item$file$mimeType;
     var item = _ref2.item;
     var indicatorType = (0, _utils.getIndicatorTypeForFileState)(item.state, enableOfflineSupport);
-    return (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
-      children: [(0, _jsxRuntime.jsx)(_UploadProgressIndicator.UploadProgressIndicator, {
+    return (0, _jsxRuntime.jsx)(_jsxRuntime.Fragment, {
+      children: (0, _jsxRuntime.jsxs)(_UploadProgressIndicator.UploadProgressIndicator, {
         action: function action() {
           uploadFile({
             newFile: item
@@ -203,7 +213,7 @@ var FileUploadPreviewWithContext = function FileUploadPreviewWithContext(props) 
         },
         style: styles.overlay,
         type: indicatorType,
-        children: (_item$file$mimeType = item.file.mimeType) != null && _item$file$mimeType.startsWith('audio/') && (0, _native.isAudioPackageAvailable)() ? (0, _jsxRuntime.jsx)(AudioAttachmentUploadPreview, {
+        children: [(_item$file$mimeType = item.file.mimeType) != null && _item$file$mimeType.startsWith('audio/') && (0, _native.isAudioPackageAvailable)() ? (0, _jsxRuntime.jsx)(AudioAttachmentUploadPreview, {
           hideProgressBar: true,
           item: item,
           onLoad: onLoad,
@@ -237,19 +247,19 @@ var FileUploadPreviewWithContext = function FileUploadPreviewWithContext(props) 
               item: item
             })]
           })]
-        })
-      }), (0, _jsxRuntime.jsx)(_reactNative.TouchableOpacity, {
-        onPress: function onPress() {
-          removeFile(item.id);
-        },
-        style: [styles.dismiss, {
-          backgroundColor: grey_gainsboro
-        }, dismiss],
-        testID: "remove-file-upload-preview",
-        children: (0, _jsxRuntime.jsx)(_Close.Close, {
-          pathFill: grey_dark
-        })
-      })]
+        }), (0, _jsxRuntime.jsx)(_reactNative.TouchableOpacity, {
+          onPress: function onPress() {
+            removeFile(item.id);
+          },
+          style: [styles.dismiss, {
+            backgroundColor: grey_gainsboro
+          }, dismiss],
+          testID: "remove-file-upload-preview",
+          children: (0, _jsxRuntime.jsx)(_Close.Close, {
+            pathFill: grey_dark
+          })
+        })]
+      })
     });
   };
   var fileUploadsLength = fileUploads.length;

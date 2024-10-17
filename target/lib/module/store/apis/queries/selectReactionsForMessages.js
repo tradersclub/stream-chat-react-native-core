@@ -15,7 +15,7 @@ var selectReactionsForMessages = function selectReactionsForMessages(messageIds)
   _QuickSqliteClient.QuickSqliteClient.logger == null ? void 0 : _QuickSqliteClient.QuickSqliteClient.logger('info', 'selectReactionsForMessages', {
     messageIds: messageIds
   });
-  var result = _QuickSqliteClient.QuickSqliteClient.executeSql("SELECT\n      json_object(\n        'user', json_object(\n          ".concat(userColumnNames, "\n        ),\n        ").concat(reactionsColumnNames, "\n      ) as value\n    FROM reactions a\n    LEFT JOIN\n      users b\n    ON b.id = a.userId\n    WHERE a.messageId in (").concat(questionMarks, ")"), messageIds);
+  var result = _QuickSqliteClient.QuickSqliteClient.executeSql("SELECT\n      json_object(\n        'user', json_object(\n          ".concat(userColumnNames, "\n        ),\n        ").concat(reactionsColumnNames, "\n      ) as value\n    FROM reactions a\n    LEFT JOIN\n      users b\n    ON b.id = a.userId \n    WHERE a.messageId in (").concat(questionMarks, ")"), messageIds);
   return result.map(function (r) {
     return JSON.parse(r.value);
   });

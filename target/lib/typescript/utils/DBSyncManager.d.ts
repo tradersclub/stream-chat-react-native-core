@@ -5,9 +5,6 @@ export declare class DBSyncManager {
     static syncStatus: boolean;
     static listeners: Array<(status: boolean) => void>;
     static client: StreamChat | null;
-    static connectionChangedListener: {
-        unsubscribe: () => void;
-    } | null;
     /**
      * Returns weather channel states in local DB are synced with backend or not.
      * @returns boolean

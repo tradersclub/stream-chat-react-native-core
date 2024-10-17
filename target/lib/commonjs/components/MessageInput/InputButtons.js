@@ -20,7 +20,6 @@ var InputButtonsWithContext = function InputButtonsWithContext(props) {
   var AttachButton = props.AttachButton,
     CommandsButton = props.CommandsButton,
     giphyActive = props.giphyActive,
-    hasCameraPicker = props.hasCameraPicker,
     hasCommands = props.hasCommands,
     hasFilePicker = props.hasFilePicker,
     hasImagePicker = props.hasImagePicker,
@@ -28,7 +27,8 @@ var InputButtonsWithContext = function InputButtonsWithContext(props) {
     openCommandsPicker = props.openCommandsPicker,
     setShowMoreOptions = props.setShowMoreOptions,
     showMoreOptions = props.showMoreOptions,
-    text = props.text;
+    text = props.text,
+    toggleAttachmentPicker = props.toggleAttachmentPicker;
   var _useTheme = (0, _ThemeContext.useTheme)(),
     _useTheme$theme$messa = _useTheme.theme.messageInput,
     attachButtonContainer = _useTheme$theme$messa.attachButtonContainer,
@@ -37,14 +37,16 @@ var InputButtonsWithContext = function InputButtonsWithContext(props) {
   if (giphyActive) {
     return null;
   }
-  return !showMoreOptions && (hasCameraPicker || hasImagePicker || hasFilePicker) && hasCommands ? (0, _jsxRuntime.jsx)(MoreOptionsButton, {
+  return !showMoreOptions && (hasImagePicker || hasFilePicker) && hasCommands ? (0, _jsxRuntime.jsx)(MoreOptionsButton, {
     handleOnPress: function handleOnPress() {
       return setShowMoreOptions(true);
     }
   }) : (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
-    children: [(hasCameraPicker || hasImagePicker || hasFilePicker) && ownCapabilities.uploadFile && (0, _jsxRuntime.jsx)(_reactNative.View, {
+    children: [(hasImagePicker || hasFilePicker) && ownCapabilities.uploadFile && (0, _jsxRuntime.jsx)(_reactNative.View, {
       style: [hasCommands ? styles.attachButtonContainer : undefined, attachButtonContainer],
-      children: (0, _jsxRuntime.jsx)(AttachButton, {})
+      children: (0, _jsxRuntime.jsx)(AttachButton, {
+        handleOnPress: toggleAttachmentPicker
+      })
     }), hasCommands && !text && (0, _jsxRuntime.jsx)(_reactNative.View, {
       style: commandsButtonContainer,
       children: (0, _jsxRuntime.jsx)(CommandsButton, {
@@ -56,7 +58,6 @@ var InputButtonsWithContext = function InputButtonsWithContext(props) {
 exports.InputButtonsWithContext = InputButtonsWithContext;
 var areEqual = function areEqual(prevProps, nextProps) {
   var prevGiphyActive = prevProps.giphyActive,
-    prevHasCameraPicker = prevProps.hasCameraPicker,
     prevHasCommands = prevProps.hasCommands,
     prevHasFilePicker = prevProps.hasFilePicker,
     prevHasImagePicker = prevProps.hasImagePicker,
@@ -64,16 +65,12 @@ var areEqual = function areEqual(prevProps, nextProps) {
     prevShowMoreOptions = prevProps.showMoreOptions,
     prevText = prevProps.text;
   var nextGiphyActive = nextProps.giphyActive,
-    nextHasCameraPicker = nextProps.hasCameraPicker,
     nextHasCommands = nextProps.hasCommands,
     nextHasFilePicker = nextProps.hasFilePicker,
     nextHasImagePicker = nextProps.hasImagePicker,
     nextSelectedPicker = nextProps.selectedPicker,
     nextShowMoreOptions = nextProps.showMoreOptions,
     nextText = nextProps.text;
-  if (prevHasCameraPicker !== nextHasCameraPicker) {
-    return false;
-  }
   if (prevHasImagePicker !== nextHasImagePicker) {
     return false;
   }
@@ -103,7 +100,6 @@ var InputButtons = function InputButtons(props) {
     AttachButton = _useMessageInputConte.AttachButton,
     CommandsButton = _useMessageInputConte.CommandsButton,
     giphyActive = _useMessageInputConte.giphyActive,
-    hasCameraPicker = _useMessageInputConte.hasCameraPicker,
     hasCommands = _useMessageInputConte.hasCommands,
     hasFilePicker = _useMessageInputConte.hasFilePicker,
     hasImagePicker = _useMessageInputConte.hasImagePicker,
@@ -118,7 +114,6 @@ var InputButtons = function InputButtons(props) {
     AttachButton: AttachButton,
     CommandsButton: CommandsButton,
     giphyActive: giphyActive,
-    hasCameraPicker: hasCameraPicker,
     hasCommands: hasCommands,
     hasFilePicker: hasFilePicker,
     hasImagePicker: hasImagePicker,

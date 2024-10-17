@@ -11,7 +11,6 @@ var _Gallery = require("../../components/Attachment/Gallery");
 var _Giphy = require("../../components/Attachment/Giphy");
 var _MessagesContext = require("../../contexts/messagesContext/MessagesContext");
 var _native = require("../../native");
-var _types = require("../../types/types");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/Attachment/Attachment.tsx";
@@ -26,7 +25,7 @@ var AttachmentWithContext = function AttachmentWithContext(props) {
     giphyVersion = props.giphyVersion,
     UrlPreview = props.UrlPreview;
   var hasAttachmentActions = !!((_attachment$actions = attachment.actions) != null && _attachment$actions.length);
-  if (attachment.type === _types.FileTypes.Giphy || attachment.type === _types.FileTypes.Imgur) {
+  if (attachment.type === 'giphy' || attachment.type === 'imgur') {
     return (0, _jsxRuntime.jsx)(Giphy, {
       attachment: attachment,
       giphyVersion: giphyVersion
@@ -35,14 +34,14 @@ var AttachmentWithContext = function AttachmentWithContext(props) {
   if (attachment.og_scrape_url || attachment.title_link) {
     return (0, _jsxRuntime.jsx)(UrlPreview, Object.assign({}, attachment));
   }
-  if (attachment.type === _types.FileTypes.Image) {
+  if (attachment.type === 'image') {
     return (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
       children: [(0, _jsxRuntime.jsx)(Gallery, {
         images: [attachment]
       }), hasAttachmentActions && (0, _jsxRuntime.jsx)(AttachmentActions, Object.assign({}, attachment), "key-actions-".concat(attachment.id))]
     });
   }
-  if (attachment.type === _types.FileTypes.Video && !attachment.og_scrape_url) {
+  if (attachment.type === 'video' && !attachment.og_scrape_url) {
     return (0, _native.isVideoPackageAvailable)() ? (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
       children: [(0, _jsxRuntime.jsx)(Gallery, {
         videos: [attachment]
@@ -51,7 +50,7 @@ var AttachmentWithContext = function AttachmentWithContext(props) {
       attachment: attachment
     });
   }
-  if (attachment.type === _types.FileTypes.File || attachment.type === _types.FileTypes.Audio || attachment.type === _types.FileTypes.VoiceRecording) {
+  if (attachment.type === 'file' || attachment.type === 'audio' || attachment.type === 'voiceRecording') {
     return (0, _jsxRuntime.jsx)(FileAttachment, {
       attachment: attachment
     });

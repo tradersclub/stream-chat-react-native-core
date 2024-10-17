@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import type { ChannelContextValue } from '../../../contexts/channelContext/ChannelContext';
 import {
   MessageInputContextValue,
   useMessageInputContext,
@@ -24,23 +25,19 @@ const styles = StyleSheet.create({
   },
 });
 
-export type InputEditingStateHeaderProps<
+export type InputEditingStateHeaderPropsWithContext<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
-> = Partial<Pick<MessageInputContextValue<StreamChatGenerics>, 'clearEditingState' | 'resetInput'>>;
+> = Pick<MessageInputContextValue<StreamChatGenerics>, 'clearEditingState' | 'resetInput'> &
+  Pick<ChannelContextValue<StreamChatGenerics>, 'disabled'>;
 
-export const InputEditingStateHeader = <
+export const InputEditingStateHeaderWithContext = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 >({
-  clearEditingState: propClearEditingState,
-  resetInput: propResetInput,
-}: InputEditingStateHeaderProps<StreamChatGenerics>) => {
+  clearEditingState,
+  disabled,
+  resetInput,
+}: InputEditingStateHeaderPropsWithContext<StreamChatGenerics>) => {
   const { t } = useTranslationContext();
-  const { clearEditingState: contextClearEditingState, resetInput: contextResetInput } =
-    useMessageInputContext<StreamChatGenerics>();
-
-  const clearEditingState = propClearEditingState || contextClearEditingState;
-  const resetInput = propResetInput || contextResetInput;
-
   const {
     theme: {
       colors: { black, grey, grey_gainsboro },
@@ -57,13 +54,10 @@ export const InputEditingStateHeader = <
         {t<string>('Editing Message')}
       </Text>
       <TouchableOpacity
+        disabled={disabled}
         onPress={() => {
-          if (resetInput) {
-            resetInput();
-          }
-          if (clearEditingState) {
-            clearEditingState();
-          }
+          resetInput();
+          clearEditingState();
         }}
         testID='close-button'
       >
@@ -71,6 +65,38 @@ export const InputEditingStateHeader = <
       </TouchableOpacity>
     </View>
   );
+};
+
+const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(
+  prevProps: InputEditingStateHeaderPropsWithContext<StreamChatGenerics>,
+  nextProps: InputEditingStateHeaderPropsWithContext<StreamChatGenerics>,
+) => {
+  const { disabled: prevDisabled } = prevProps;
+  const { disabled: nextDisabled } = nextProps;
+
+  const disabledEqual = prevDisabled === nextDisabled;
+  if (!disabledEqual) return false;
+
+  return true;
+};
+
+const MemoizedInputEditingStateHeader = React.memo(
+  InputEditingStateHeaderWithContext,
+  areEqual,
+) as typeof InputEditingStateHeaderWithContext;
+
+export type InputEditingStateHeaderProps<
+  StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
+> = Partial<InputEditingStateHeaderPropsWithContext<StreamChatGenerics>>;
+
+export const InputEditingStateHeader = <
+  StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
+>(
+  props: InputEditingStateHeaderProps<StreamChatGenerics>,
+) => {
+  const { clearEditingState, resetInput } = useMessageInputContext<StreamChatGenerics>();
+
+  return <MemoizedInputEditingStateHeader {...{ clearEditingState, resetInput }} {...props} />;
 };
 
 InputEditingStateHeader.displayName = 'EditingStateHeader{messageInput}';

@@ -15,7 +15,7 @@ var _MessageInputContext = require("../../contexts/messageInputContext/MessageIn
 var _SuggestionsContext = require("../../contexts/suggestionsContext/SuggestionsContext");
 var _ThemeContext = require("../../contexts/themeContext/ThemeContext");
 var _TranslationContext = require("../../contexts/translationContext/TranslationContext");
-var _ACITriggerSettings = require("../../utils/ACITriggerSettings");
+var _utils = require("../../utils/utils");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/AutoCompleteInput/AutoCompleteInput.tsx";
@@ -24,7 +24,7 @@ function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; 
 var styles = _reactNative.StyleSheet.create({
   inputBox: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
     includeFontPadding: false,
     padding: 0,
     paddingTop: 0,
@@ -119,7 +119,7 @@ var AutoCompleteInputWithContext = function AutoCompleteInputWithContext(props) 
         while (1) switch (_context2.prev = _context2.next) {
           case 0:
             query = _ref2.query, trigger = _ref2.trigger;
-            if (!(0, _ACITriggerSettings.isMentionTrigger)(trigger)) {
+            if (!(0, _utils.isMentionTrigger)(trigger)) {
               _context2.next = 8;
               break;
             }
@@ -151,7 +151,7 @@ var AutoCompleteInputWithContext = function AutoCompleteInputWithContext(props) 
             _context2.next = 19;
             break;
           case 8:
-            if (!(0, _ACITriggerSettings.isCommandTrigger)(trigger)) {
+            if (!(0, _utils.isCommandTrigger)(trigger)) {
               _context2.next = 15;
               break;
             }
@@ -224,19 +224,19 @@ var AutoCompleteInputWithContext = function AutoCompleteInputWithContext(props) 
       return;
     }
     var newTokenString = '';
-    if ((0, _ACITriggerSettings.isCommandTrigger)(trigger) && (0, _SuggestionsContext.isSuggestionCommand)(item)) {
+    if ((0, _utils.isCommandTrigger)(trigger) && (0, _SuggestionsContext.isSuggestionCommand)(item)) {
       var triggerSetting = triggerSettings[trigger];
       if (triggerSetting) {
         newTokenString = "".concat(triggerSetting.output(item).text, " ");
       }
     }
-    if ((0, _ACITriggerSettings.isEmojiTrigger)(trigger) && (0, _SuggestionsContext.isSuggestionEmoji)(item)) {
+    if ((0, _utils.isEmojiTrigger)(trigger) && (0, _SuggestionsContext.isSuggestionEmoji)(item)) {
       var _triggerSetting3 = triggerSettings[trigger];
       if (_triggerSetting3) {
         newTokenString = "".concat(_triggerSetting3.output(item).text, " ");
       }
     }
-    if ((0, _ACITriggerSettings.isMentionTrigger)(trigger) && (0, _SuggestionsContext.isSuggestionUser)(item)) {
+    if ((0, _utils.isMentionTrigger)(trigger) && (0, _SuggestionsContext.isSuggestionUser)(item)) {
       var _triggerSetting4 = triggerSettings[trigger];
       if (_triggerSetting4) {
         newTokenString = "".concat(_triggerSetting4.output(item).text, " ");
@@ -255,7 +255,7 @@ var AutoCompleteInputWithContext = function AutoCompleteInputWithContext(props) 
       onChange(newText);
     }
     selectionEnd.current = newCaretPosition || 0;
-    if ((0, _ACITriggerSettings.isMentionTrigger)(trigger) && (0, _SuggestionsContext.isSuggestionUser)(item)) {
+    if ((0, _utils.isMentionTrigger)(trigger) && (0, _SuggestionsContext.isSuggestionUser)(item)) {
       var _triggerSetting5 = triggerSettings[trigger];
       if (_triggerSetting5) {
         _triggerSetting5.callback(item);

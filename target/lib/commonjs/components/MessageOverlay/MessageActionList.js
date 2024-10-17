@@ -37,9 +37,7 @@ var MessageActionListWithContext = function MessageActionListWithContext(props) 
   var _useViewport = (0, _useViewport2.useViewport)(),
     vw = _useViewport.vw;
   var _useTheme = (0, _ThemeContext.useTheme)(),
-    _useTheme$theme = _useTheme.theme,
-    white_snow = _useTheme$theme.colors.white_snow,
-    container = _useTheme$theme.overlay.messageActionsList.container;
+    white_snow = _useTheme.theme.colors.white_snow;
   var height = (0, _reactNativeReanimated.useSharedValue)(0);
   var width = (0, _reactNativeReanimated.useSharedValue)(0);
   var showScreenStyle = (0, _reactNativeReanimated.useAnimatedStyle)(function () {
@@ -62,7 +60,7 @@ var MessageActionListWithContext = function MessageActionListWithContext(props) 
     style: [styles.container, {
       backgroundColor: white_snow,
       minWidth: vw(65)
-    }, showScreenStyle, container],
+    }, showScreenStyle],
     testID: "message-action-list",
     children: messageActions == null ? void 0 : messageActions.map(function (messageAction, index) {
       return (0, _jsxRuntime.jsx)(MessageActionListItem, Object.assign({}, messageActionProps, Object.assign({}, messageAction, {

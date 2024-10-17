@@ -1,5 +1,5 @@
 import React from 'react';
-import { DefaultStreamChatGenerics } from '../../../types/types';
+import type { DefaultStreamChatGenerics } from '../../../types/types';
 import type { Photo } from '../ImageGallery';
 export type ImageGalleryGridImageComponent<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = ({ item, }: {
     item: Photo<StreamChatGenerics> & {

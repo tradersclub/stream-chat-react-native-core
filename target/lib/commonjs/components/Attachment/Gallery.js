@@ -19,7 +19,6 @@ var _OverlayContext = require("../../contexts/overlayContext/OverlayContext");
 var _ThemeContext = require("../../contexts/themeContext/ThemeContext");
 var _useLoadingImage2 = require("../../hooks/useLoadingImage");
 var _native = require("../../native");
-var _types = require("../../types/types");
 var _utils = require("../../utils/utils");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
@@ -170,7 +169,6 @@ var GalleryThumbnail = function GalleryThumbnail(_ref) {
     overlay = _useTheme2$theme.colors.overlay,
     _useTheme2$theme$mess = _useTheme2$theme.messageSimple.gallery,
     image = _useTheme2$theme$mess.image,
-    imageBorderRadius = _useTheme2$theme$mess.imageBorderRadius,
     imageContainer = _useTheme2$theme$mess.imageContainer,
     moreImagesContainer = _useTheme2$theme$mess.moreImagesContainer,
     moreImagesText = _useTheme2$theme$mess.moreImagesText;
@@ -192,7 +190,7 @@ var GalleryThumbnail = function GalleryThumbnail(_ref) {
   };
   var defaultOnPress = function defaultOnPress() {
     if (thumbnail.url) {
-      if (thumbnail.type === _types.FileTypes.Video && !(0, _native.isVideoPackageAvailable)()) {
+      if (thumbnail.type === 'video' && !(0, _native.isVideoPackageAvailable)()) {
         (0, _openUrlSafely.openUrlSafely)(thumbnail.url);
       } else {
         openImageViewer();
@@ -234,8 +232,8 @@ var GalleryThumbnail = function GalleryThumbnail(_ref) {
     }, imageContainer],
     testID: "gallery-".concat(invertedDirections ? 'row' : 'column', "-").concat(colIndex, "-item-").concat(rowIndex)
   }, additionalTouchableProps, {
-    children: [thumbnail.type === _types.FileTypes.Video ? (0, _jsxRuntime.jsx)(VideoThumbnail, {
-      style: [imageBorderRadius != null ? imageBorderRadius : borderRadius, {
+    children: [thumbnail.type === 'video' ? (0, _jsxRuntime.jsx)(VideoThumbnail, {
+      style: [borderRadius, {
         height: thumbnail.height - 1,
         width: thumbnail.width - 1
       }, image],
@@ -243,7 +241,7 @@ var GalleryThumbnail = function GalleryThumbnail(_ref) {
     }) : (0, _jsxRuntime.jsx)(_reactNative.View, {
       style: styles.imageContainerStyle,
       children: (0, _jsxRuntime.jsx)(GalleryImageThumbnail, {
-        borderRadius: imageBorderRadius != null ? imageBorderRadius : borderRadius,
+        borderRadius: borderRadius,
         ImageLoadingFailedIndicator: ImageLoadingFailedIndicator,
         ImageLoadingIndicator: ImageLoadingIndicator,
         thumbnail: thumbnail

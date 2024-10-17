@@ -24,8 +24,8 @@ var styles = _reactNative.StyleSheet.create({
   errorContainer: {
     alignItems: 'center',
     bottom: 0,
-    justifyContent: 'center',
     left: 0,
+    paddingTop: 16,
     position: 'absolute',
     right: 0
   },
@@ -86,7 +86,7 @@ var AttachmentPickerError = function AttachmentPickerError(props) {
   return (0, _jsxRuntime.jsxs)(_reactNative.View, {
     style: [styles.errorContainer, {
       backgroundColor: white_smoke,
-      height: attachmentPickerBottomSheetHeight
+      height: attachmentPickerBottomSheetHeight != null ? attachmentPickerBottomSheetHeight : 308
     }, errorContainer],
     children: [(0, _jsxRuntime.jsx)(AttachmentPickerErrorImage, {}), (0, _jsxRuntime.jsx)(_reactNative.Text, {
       style: [styles.errorText, {

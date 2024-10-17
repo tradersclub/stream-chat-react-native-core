@@ -18,7 +18,6 @@ var AttachmentPickerIOSSelectMorePhotos = function AttachmentPickerIOSSelectMore
     _useTheme$theme$color = _useTheme.theme.colors,
     accent_blue = _useTheme$theme$color.accent_blue,
     white = _useTheme$theme$color.white;
-  if (!_native.iOS14RefreshGallerySelection) return null;
   return (0, _jsxRuntime.jsx)(_reactNative.Pressable, {
     onPress: _native.iOS14RefreshGallerySelection,
     style: [styles.container, {

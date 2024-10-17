@@ -13,7 +13,6 @@ var _reactNative = require("react-native");
 var _useCreateMessageContext = require("./hooks/useCreateMessageContext");
 var _useMessageActionHandlers = require("./hooks/useMessageActionHandlers");
 var _useMessageActions2 = require("./hooks/useMessageActions");
-var _useProcessReactions2 = require("./hooks/useProcessReactions");
 var _messageActions = require("./utils/messageActions");
 var _ChannelContext = require("../../contexts/channelContext/ChannelContext");
 var _ChatContext = require("../../contexts/chatContext/ChatContext");
@@ -27,7 +26,6 @@ var _ThemeContext = require("../../contexts/themeContext/ThemeContext");
 var _ThreadContext = require("../../contexts/threadContext/ThreadContext");
 var _TranslationContext = require("../../contexts/translationContext/TranslationContext");
 var _native = require("../../native");
-var _types = require("../../types/types");
 var _utils = require("../../utils/utils");
 var _useMessageList = require("../MessageList/hooks/useMessageList");
 var _jsxRuntime = require("react/jsx-runtime");
@@ -41,15 +39,12 @@ var MessageWithContext = function MessageWithContext(props) {
     _useState2 = (0, _slicedToArray2["default"])(_useState, 2),
     isBounceDialogOpen = _useState2[0],
     setIsBounceDialogOpen = _useState2[1];
-  var _useState3 = (0, _react.useState)(false),
-    _useState4 = (0, _slicedToArray2["default"])(_useState3, 2),
-    isEditedMessageOpen = _useState4[0],
-    setIsEditedMessageOpen = _useState4[1];
   var isMessageTypeDeleted = props.message.type === 'deleted';
   var channel = props.channel,
     chatContext = props.chatContext,
     deleteMessageFromContext = props.deleteMessage,
     deleteReaction = props.deleteReaction,
+    disabled = props.disabled,
     dismissKeyboard = props.dismissKeyboard,
     dismissKeyboardOnMessageTouch = props.dismissKeyboardOnMessageTouch,
     _props$enableLongPres = props.enableLongPress,
@@ -60,7 +55,6 @@ var MessageWithContext = function MessageWithContext(props) {
     goToMessage = props.goToMessage,
     _props$groupStyles = props.groupStyles,
     groupStyles = _props$groupStyles === void 0 ? ['bottom'] : _props$groupStyles,
-    handleBan = props.handleBan,
     handleBlock = props.handleBlock,
     handleCopy = props.handleCopy,
     handleDelete = props.handleDelete,
@@ -162,11 +156,6 @@ var MessageWithContext = function MessageWithContext(props) {
     if (dismissKeyboardOnMessageTouch) {
       _reactNative.Keyboard.dismiss();
     }
-    if ((0, _utils.isEditedMessage)(message)) {
-      setIsEditedMessageOpen(function (prevState) {
-        return !prevState;
-      });
-    }
     var quotedMessage = message.quoted_message;
     if (error) {
       if ((0, _utils.isBlockedMessage)(message)) {
@@ -176,29 +165,29 @@ var MessageWithContext = function MessageWithContext(props) {
         setIsBounceDialogOpen(true);
         return;
       }
-      showMessageOverlay(true, true);
+      showMessageOverlay(false, true);
     } else if (quotedMessage) {
       onPressQuotedMessage(quotedMessage);
     }
   };
   var alignment = forceAlignMessages && (forceAlignMessages === 'left' || forceAlignMessages === 'right') ? forceAlignMessages : isMyMessage ? 'right' : 'left';
   var attachments = !isMessageTypeDeleted && Array.isArray(message.attachments) ? message.attachments.reduce(function (acc, cur) {
-    if (cur.type === _types.FileTypes.File) {
+    if (cur.type === 'file') {
       acc.files.push(cur);
       acc.other = [];
-    } else if (cur.type === _types.FileTypes.Video && !cur.og_scrape_url && (0, _native.isVideoPackageAvailable)()) {
+    } else if (cur.type === 'video' && !cur.og_scrape_url && (0, _native.isVideoPackageAvailable)()) {
       acc.videos.push({
         image_url: cur.asset_url,
         thumb_url: cur.thumb_url,
-        type: _types.FileTypes.Video
+        type: 'video'
       });
       acc.other = [];
-    } else if (cur.type === _types.FileTypes.Video && !cur.og_scrape_url) {
+    } else if (cur.type === 'video' && !cur.og_scrape_url) {
       acc.files.push(cur);
       acc.other = [];
-    } else if (cur.type === _types.FileTypes.Audio || cur.type === _types.FileTypes.VoiceRecording) {
+    } else if (cur.type === 'audio' || cur.type === 'voiceRecording') {
       acc.files.push(cur);
-    } else if (cur.type === _types.FileTypes.Image && !cur.title_link && !cur.og_scrape_url) {
+    } else if (cur.type === 'image' && !cur.title_link && !cur.og_scrape_url) {
       if (cur.image_url || cur.thumb_url) {
         acc.images.push(cur);
         acc.other = [];
@@ -250,14 +239,25 @@ var MessageWithContext = function MessageWithContext(props) {
       openThread(message);
     }
   };
-  var _useProcessReactions = (0, _useProcessReactions2.useProcessReactions)({
-      latest_reactions: message.latest_reactions,
-      own_reactions: message.own_reactions,
-      reaction_groups: message.reaction_groups
-    }),
-    existingReactions = _useProcessReactions.existingReactions,
-    hasReactions = _useProcessReactions.hasReactions;
-  var reactions = hasReactions ? existingReactions : [];
+  var hasReactions = !isMessageTypeDeleted && !!message.latest_reactions && message.latest_reactions.length > 0;
+  var clientId = client.userID;
+  var reactions = hasReactions ? supportedReactions.reduce(function (acc, cur) {
+    var _message$latest_react;
+    var reactionType = cur.type;
+    var reactionsOfReactionType = (_message$latest_react = message.latest_reactions) == null ? void 0 : _message$latest_react.filter(function (reaction) {
+      return reaction.type === reactionType;
+    });
+    if (reactionsOfReactionType != null && reactionsOfReactionType.length) {
+      var hasOwnReaction = reactionsOfReactionType.some(function (reaction) {
+        return reaction.user_id === clientId;
+      });
+      acc.push({
+        own: hasOwnReaction,
+        type: reactionType
+      });
+    }
+    return acc;
+  }, []) : [];
   var ownCapabilities = (0, _OwnCapabilitiesContext.useOwnCapabilitiesContext)();
   var _useMessageActionHand = (0, _useMessageActionHandlers.useMessageActionHandlers)({
       channel: channel,
@@ -272,10 +272,8 @@ var MessageWithContext = function MessageWithContext(props) {
       setQuotedMessageState: setQuotedMessageState,
       supportedReactions: supportedReactions
     }),
-    handleCopyMessage = _useMessageActionHand.handleCopyMessage,
     handleDeleteMessage = _useMessageActionHand.handleDeleteMessage,
     handleEditMessage = _useMessageActionHand.handleEditMessage,
-    handleFlagMessage = _useMessageActionHand.handleFlagMessage,
     handleQuotedReplyMessage = _useMessageActionHand.handleQuotedReplyMessage,
     handleResendMessage = _useMessageActionHand.handleResendMessage,
     handleToggleBanUser = _useMessageActionHand.handleToggleBanUser,
@@ -288,7 +286,6 @@ var MessageWithContext = function MessageWithContext(props) {
       deleteMessage: deleteMessageFromContext,
       deleteReaction: deleteReaction,
       enforceUniqueReaction: enforceUniqueReaction,
-      handleBan: handleBan,
       handleBlock: handleBlock,
       handleCopy: handleCopy,
       handleDelete: handleDelete,
@@ -314,7 +311,6 @@ var MessageWithContext = function MessageWithContext(props) {
       t: t,
       updateMessage: updateMessage
     }),
-    banUser = _useMessageActions.banUser,
     blockUser = _useMessageActions.blockUser,
     copyMessage = _useMessageActions.copyMessage,
     deleteMessage = _useMessageActions.deleteMessage,
@@ -331,7 +327,7 @@ var MessageWithContext = function MessageWithContext(props) {
     userLanguage = _useTranslationContex.userLanguage;
   var showMessageOverlay = function () {
     var _ref2 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee2() {
-      var isMessageActionsVisible,
+      var messageReactions,
         error,
         isThreadMessage,
         dismissOverlay,
@@ -340,7 +336,7 @@ var MessageWithContext = function MessageWithContext(props) {
       return _regenerator["default"].wrap(function _callee2$(_context2) {
         while (1) switch (_context2.prev = _context2.next) {
           case 0:
-            isMessageActionsVisible = _args2.length > 0 && _args2[0] !== undefined ? _args2[0] : true;
+            messageReactions = _args2.length > 0 && _args2[0] !== undefined ? _args2[0] : false;
             error = _args2.length > 1 && _args2[1] !== undefined ? _args2[1] : errorOrFailed;
             _context2.next = 4;
             return dismissKeyboard();
@@ -350,7 +346,6 @@ var MessageWithContext = function MessageWithContext(props) {
               return setOverlay('none');
             };
             messageActions = typeof messageActionsProp !== 'function' ? messageActionsProp : messageActionsProp({
-              banUser: banUser,
               blockUser: blockUser,
               copyMessage: copyMessage,
               deleteMessage: deleteMessage,
@@ -358,11 +353,10 @@ var MessageWithContext = function MessageWithContext(props) {
               editMessage: editMessage,
               error: error,
               flagMessage: flagMessage,
-              isMessageActionsVisible: isMessageActionsVisible,
               isMyMessage: isMyMessage,
               isThreadMessage: isThreadMessage,
               message: message,
-              messageReactions: isMessageActionsVisible === false,
+              messageReactions: messageReactions,
               muteUser: muteUser,
               ownCapabilities: ownCapabilities,
               pinMessage: pinMessage,
@@ -384,7 +378,7 @@ var MessageWithContext = function MessageWithContext(props) {
               messageContext: Object.assign({}, messageContext, {
                 preventPress: true
               }),
-              messageReactionTitle: !error && !isMessageActionsVisible ? t('Message Reactions') : undefined,
+              messageReactionTitle: !error && messageReactions ? t('Message Reactions') : undefined,
               messagesContext: Object.assign({}, messagesContext, {
                 messageContentOrder: messageContentOrder
               }),
@@ -409,21 +403,17 @@ var MessageWithContext = function MessageWithContext(props) {
     };
   }();
   var actionHandlers = {
-    copyMessage: handleCopyMessage,
     deleteMessage: handleDeleteMessage,
     editMessage: handleEditMessage,
-    flagMessage: handleFlagMessage,
     pinMessage: handleTogglePinMessage,
     quotedReply: handleQuotedReplyMessage,
     resendMessage: handleResendMessage,
     showMessageOverlay: showMessageOverlay,
-    threadReply: handleThreadReply,
     toggleBanUser: handleToggleBanUser,
     toggleMuteUser: handleToggleMuteUser,
-    toggleReaction: handleToggleReaction,
-    unpinMessage: handleTogglePinMessage
+    toggleReaction: handleToggleReaction
   };
-  var onLongPressMessage = hasAttachmentActions || (0, _utils.isBlockedMessage)(message) ? function () {
+  var onLongPressMessage = disabled || hasAttachmentActions || (0, _utils.isBlockedMessage)(message) ? function () {
     return null;
   } : onLongPressMessageProp ? function (payload) {
     return onLongPressMessageProp({
@@ -446,7 +436,7 @@ var MessageWithContext = function MessageWithContext(props) {
       return;
     }
     (0, _native.triggerHaptic)('impactMedium');
-    showMessageOverlay(true);
+    showMessageOverlay(false);
   } : function () {
     return null;
   };
@@ -454,14 +444,13 @@ var MessageWithContext = function MessageWithContext(props) {
     actionsEnabled: actionsEnabled,
     alignment: alignment,
     channel: channel,
+    disabled: disabled,
     files: attachments.files,
     goToMessage: goToMessage,
     groupStyles: groupStyles,
     handleAction: handleAction,
-    handleCopyMessage: handleCopyMessage,
     handleDeleteMessage: handleDeleteMessage,
     handleEditMessage: handleEditMessage,
-    handleFlagMessage: handleFlagMessage,
     handleQuotedReplyMessage: handleQuotedReplyMessage,
     handleResendMessage: handleResendMessage,
     handleToggleBanUser: handleToggleBanUser,
@@ -469,7 +458,6 @@ var MessageWithContext = function MessageWithContext(props) {
     handleToggleReaction: handleToggleReaction,
     hasReactions: hasReactions,
     images: attachments.images,
-    isEditedMessageOpen: isEditedMessageOpen,
     isMyMessage: isMyMessage,
     lastGroupMessage: (groupStyles == null ? void 0 : groupStyles[0]) === 'single' || (groupStyles == null ? void 0 : groupStyles[0]) === 'bottom',
     lastReceivedId: lastReceivedId,
@@ -514,7 +502,6 @@ var MessageWithContext = function MessageWithContext(props) {
     otherAttachments: attachments.other,
     preventPress: preventPress,
     reactions: reactions,
-    setIsEditedMessageOpen: setIsEditedMessageOpen,
     showAvatar: showAvatar,
     showMessageOverlay: showMessageOverlay,
     showMessageStatus: typeof showMessageStatus === 'boolean' ? showMessageStatus : isMyMessage,
@@ -548,6 +535,7 @@ var MessageWithContext = function MessageWithContext(props) {
 var areEqual = function areEqual(prevProps, nextProps) {
   var _prevMessage$quoted_m, _nextMessage$quoted_m, _prevMessage$quoted_m2, _nextMessage$quoted_m2, _prevMessage$user, _nextMessage$user;
   var prevMutedUsers = prevProps.chatContext.mutedUsers,
+    prevDisabled = prevProps.disabled,
     prevGoToMessage = prevProps.goToMessage,
     prevGroupStyles = prevProps.groupStyles,
     isAttachmentEqual = prevProps.isAttachmentEqual,
@@ -559,6 +547,7 @@ var areEqual = function areEqual(prevProps, nextProps) {
     prevShowUnreadUnderlay = prevProps.showUnreadUnderlay,
     prevT = prevProps.t;
   var nextMutedUsers = nextProps.chatContext.mutedUsers,
+    nextDisabled = nextProps.disabled,
     nextGoToMessage = nextProps.goToMessage,
     nextGroupStyles = nextProps.groupStyles,
     nextIsTargetedMessage = nextProps.isTargetedMessage,
@@ -568,6 +557,8 @@ var areEqual = function areEqual(prevProps, nextProps) {
     nextMessagesContext = nextProps.messagesContext,
     nextShowUnreadUnderlay = nextProps.showUnreadUnderlay,
     nextT = nextProps.t;
+  var disabledEqual = prevDisabled === nextDisabled;
+  if (!disabledEqual) return false;
   var membersEqual = Object.keys(prevMembers).length === Object.keys(nextMembers).length;
   if (!membersEqual) return false;
   var repliesEqual = prevMessage.reply_count === nextMessage.reply_count;
@@ -580,7 +571,7 @@ var areEqual = function areEqual(prevProps, nextProps) {
   if (!groupStylesEqual) return false;
   var isPrevMessageTypeDeleted = prevMessage.type === 'deleted';
   var isNextMessageTypeDeleted = nextMessage.type === 'deleted';
-  var messageEqual = isPrevMessageTypeDeleted === isNextMessageTypeDeleted && ((0, _useMessageList.isMessageWithStylesReadByAndDateSeparator)(prevMessage) && prevMessage.readBy) === ((0, _useMessageList.isMessageWithStylesReadByAndDateSeparator)(nextMessage) && nextMessage.readBy) && prevMessage.status === nextMessage.status && prevMessage.type === nextMessage.type && prevMessage.text === nextMessage.text && prevMessage.pinned === nextMessage.pinned && "".concat(prevMessage == null ? void 0 : prevMessage.updated_at) === "".concat(nextMessage == null ? void 0 : nextMessage.updated_at) && prevMessage.i18n === nextMessage.i18n;
+  var messageEqual = isPrevMessageTypeDeleted === isNextMessageTypeDeleted && ((0, _useMessageList.isMessageWithStylesReadByAndDateSeparator)(prevMessage) && prevMessage.readBy) === ((0, _useMessageList.isMessageWithStylesReadByAndDateSeparator)(nextMessage) && nextMessage.readBy) && prevMessage.status === nextMessage.status && prevMessage.type === nextMessage.type && prevMessage.text === nextMessage.text && prevMessage.pinned === nextMessage.pinned && "".concat(prevMessage == null ? void 0 : prevMessage.updated_at) === "".concat(nextMessage == null ? void 0 : nextMessage.updated_at);
   if (!messageEqual) return false;
   var isPrevQuotedMessageTypeDeleted = ((_prevMessage$quoted_m = prevMessage.quoted_message) == null ? void 0 : _prevMessage$quoted_m.type) === 'deleted';
   var isNextQuotedMessageTypeDeleted = ((_nextMessage$quoted_m = nextMessage.quoted_message) == null ? void 0 : _nextMessage$quoted_m.type) === 'deleted';
@@ -591,7 +582,7 @@ var areEqual = function areEqual(prevProps, nextProps) {
   var prevMessageAttachments = prevMessage.attachments;
   var nextMessageAttachments = nextMessage.attachments;
   var attachmentsEqual = Array.isArray(prevMessageAttachments) && Array.isArray(nextMessageAttachments) && prevMessageAttachments.length === nextMessageAttachments.length && prevMessageAttachments.every(function (attachment, index) {
-    var attachmentKeysEqual = attachment.type === _types.FileTypes.Image ? attachment.image_url === nextMessageAttachments[index].image_url && attachment.thumb_url === nextMessageAttachments[index].thumb_url : attachment.type === nextMessageAttachments[index].type;
+    var attachmentKeysEqual = attachment.type === 'image' ? attachment.image_url === nextMessageAttachments[index].image_url && attachment.thumb_url === nextMessageAttachments[index].thumb_url : attachment.type === nextMessageAttachments[index].type;
     if (isAttachmentEqual) return attachmentKeysEqual && !!isAttachmentEqual(attachment, nextMessageAttachments[index]);
     return attachmentKeysEqual;
   }) || prevMessageAttachments === nextMessageAttachments;
@@ -626,6 +617,7 @@ var MemoizedMessage = _react["default"].memo(MessageWithContext, areEqual);
 var Message = function Message(props) {
   var _useChannelContext = (0, _ChannelContext.useChannelContext)(),
     channel = _useChannelContext.channel,
+    disabled = _useChannelContext.disabled,
     enforceUniqueReaction = _useChannelContext.enforceUniqueReaction,
     members = _useChannelContext.members;
   var chatContext = (0, _ChatContext.useChatContext)();
@@ -643,6 +635,7 @@ var Message = function Message(props) {
   return (0, _jsxRuntime.jsx)(MemoizedMessage, Object.assign({}, messagesContext, {
     channel: channel,
     chatContext: chatContext,
+    disabled: disabled,
     dismissKeyboard: dismissKeyboard,
     enforceUniqueReaction: enforceUniqueReaction,
     members: members,

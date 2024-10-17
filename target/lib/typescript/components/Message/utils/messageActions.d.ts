@@ -3,21 +3,13 @@ import type { OwnCapabilitiesContextValue } from '../../../contexts/ownCapabilit
 import type { DefaultStreamChatGenerics } from '../../../types/types';
 import type { MessageActionType } from '../../MessageOverlay/MessageActionListItem';
 export type MessageActionsParams<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = {
-    banUser: MessageActionType;
-    copyMessage: MessageActionType;
+    blockUser: MessageActionType;
     deleteMessage: MessageActionType;
     dismissOverlay: () => void;
     editMessage: MessageActionType;
     error: boolean | Error;
     flagMessage: MessageActionType;
-    /**
-     * Determines if the message actions are visible.
-     */
-    isMessageActionsVisible: boolean;
     isThreadMessage: boolean;
-    /**
-     * @deprecated use `isMessageActionsVisible` instead.
-     */
     messageReactions: boolean;
     muteUser: MessageActionType;
     ownCapabilities: OwnCapabilitiesContextValue;
@@ -26,11 +18,8 @@ export type MessageActionsParams<StreamChatGenerics extends DefaultStreamChatGen
     retry: MessageActionType;
     threadReply: MessageActionType;
     unpinMessage: MessageActionType;
-    /**
-     * @deprecated use `banUser` instead.
-     */
-    blockUser?: MessageActionType;
+    copyMessage?: MessageActionType;
 } & Pick<MessageContextValue<StreamChatGenerics>, 'message' | 'isMyMessage'>;
 export type MessageActionsProp<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = (param: MessageActionsParams<StreamChatGenerics>) => MessageActionType[];
-export declare const messageActions: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>({ banUser, blockUser, copyMessage, deleteMessage, editMessage, error, flagMessage, isMessageActionsVisible, isMyMessage, isThreadMessage, message, messageReactions, ownCapabilities, pinMessage, quotedReply, retry, threadReply, unpinMessage, }: MessageActionsParams<StreamChatGenerics>) => MessageActionType[];
+export declare const messageActions: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>({ blockUser, copyMessage, deleteMessage, editMessage, error, flagMessage, isMyMessage, isThreadMessage, message, messageReactions, ownCapabilities, pinMessage, quotedReply, retry, threadReply, unpinMessage, }: MessageActionsParams<StreamChatGenerics>) => MessageActionType[] | undefined;
 //# sourceMappingURL=messageActions.d.ts.map

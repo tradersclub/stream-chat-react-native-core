@@ -7,14 +7,12 @@ var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/sli
 var _react = require("react");
 var _reactNative = require("react-native");
 var useScreenDimensions = function useScreenDimensions(rounded) {
-  var _useState = (0, _react.useState)(function () {
-      return _reactNative.Dimensions.get('screen');
-    }),
+  var _useState = (0, _react.useState)(_reactNative.Dimensions.get('screen')),
     _useState2 = (0, _slicedToArray2["default"])(_useState, 2),
     screenDimensions = _useState2[0],
     setScreenDimensions = _useState2[1];
   (0, _react.useEffect)(function () {
-    var handleChange = function handleChange(_ref) {
+    var subscriptions = _reactNative.Dimensions.addEventListener('change', function (_ref) {
       var screen = _ref.screen;
       setScreenDimensions(function (prev) {
         var height = screen.height,
@@ -24,27 +22,26 @@ var useScreenDimensions = function useScreenDimensions(rounded) {
         }
         return prev;
       });
-    };
-    var subscription = _reactNative.Dimensions.addEventListener('change', handleChange);
-    handleChange({
-      screen: _reactNative.Dimensions.get('screen')
     });
     return function () {
-      subscription.remove();
+      return subscriptions == null ? void 0 : subscriptions.remove();
     };
   }, []);
-  var vw = (0, _react.useCallback)(function (percentageWidth) {
+  var vw = function vw(percentageWidth) {
     var value = screenDimensions.width * (percentageWidth / 100);
     return rounded ? Math.round(value) : value;
-  }, [rounded, screenDimensions.width]);
-  var vh = (0, _react.useCallback)(function (percentageHeight) {
+  };
+  var vh = function vh(percentageHeight) {
     var value = screenDimensions.height * (percentageHeight / 100);
     return rounded ? Math.round(value) : value;
-  }, [rounded, screenDimensions.height]);
-  return {
-    vh: vh,
-    vw: vw
   };
+  var screenDimensionFunctions = (0, _react.useMemo)(function () {
+    return {
+      vh: vh,
+      vw: vw
+    };
+  }, [vh, vw]);
+  return screenDimensionFunctions;
 };
 exports.useScreenDimensions = useScreenDimensions;
 //# sourceMappingURL=useScreenDimensions.js.map

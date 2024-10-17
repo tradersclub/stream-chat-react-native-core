@@ -42,7 +42,6 @@ export const LoadingDot = (props: Props) => {
         -1,
       ),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const dotStyle = useAnimatedStyle<ViewStyle>(
@@ -62,8 +61,8 @@ export const LoadingDot = (props: Props) => {
           width: diameter,
         },
         style,
-        dotStyle,
         loadingDot,
+        dotStyle,
       ]}
     />
   );

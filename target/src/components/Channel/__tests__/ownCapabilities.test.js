@@ -107,17 +107,17 @@ describe('Own capabilities', () => {
   });
 
   describe(`${allOwnCapabilities.banChannelMembers} capability`, () => {
-    it(`should render "Ban User" message action when ${allOwnCapabilities.banChannelMembers} capability is enabled`, async () => {
+    it(`should render "Block User" message action when ${allOwnCapabilities.banChannelMembers} capability is enabled`, async () => {
       await generateChannelWithCapabilities([allOwnCapabilities.banChannelMembers]);
       const { queryByTestId } = await renderChannelAndOpenMessageActionsList(receivedMessage);
-      expect(!!queryByTestId('banUser-list-item')).toBeTruthy();
+      expect(!!queryByTestId('blockUser-list-item')).toBeTruthy();
     });
 
-    it(`should not render "Ban User" message action when ${allOwnCapabilities.banChannelMembers} capability is disabled`, async () => {
+    it(`should not render "Block User" message action when ${allOwnCapabilities.banChannelMembers} capability is disabled`, async () => {
       await generateChannelWithCapabilities();
 
       const { queryByTestId } = await renderChannelAndOpenMessageActionsList(receivedMessage);
-      expect(!!queryByTestId('banUser-list-item')).toBeFalsy();
+      expect(!!queryByTestId('blockUser-list-item')).toBeFalsy();
     });
 
     it(`should override capability from "overrideOwnCapability.banChannelMembers" prop`, async () => {
@@ -128,7 +128,7 @@ describe('Own capabilities', () => {
           banChannelMembers: false,
         },
       });
-      expect(!!queryByTestId('banUser-list-item')).toBeFalsy();
+      expect(!!queryByTestId('blockUser-list-item')).toBeFalsy();
     });
   });
 
@@ -311,6 +311,24 @@ describe('Own capabilities', () => {
         },
       });
       expect(!!queryByTestId('overlay-reaction-list')).toBeFalsy();
+    });
+  });
+
+  describe(`${allOwnCapabilities.sendMessage} capability`, () => {
+    it(`should not render SendMessageDisallowedIndicator when "${allOwnCapabilities.sendMessage}" capability is enabled`, async () => {
+      await generateChannelWithCapabilities([allOwnCapabilities.sendMessage]);
+      const { queryByTestId } = render(getComponent());
+
+      await waitFor(() => expect(!!queryByTestId('send-message-disallowed-indicator')).toBeFalsy());
+    });
+
+    it(`should render SendMessageDisallowedIndicator when "${allOwnCapabilities.sendMessage}" capability is disabled`, async () => {
+      await generateChannelWithCapabilities();
+      const { queryByTestId } = render(getComponent());
+
+      await waitFor(() =>
+        expect(!!queryByTestId('send-message-disallowed-indicator')).toBeTruthy(),
+      );
     });
   });
 

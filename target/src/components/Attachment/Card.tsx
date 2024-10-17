@@ -27,7 +27,7 @@ import {
 } from '../../contexts/messagesContext/MessagesContext';
 import { useTheme } from '../../contexts/themeContext/ThemeContext';
 import { Play } from '../../icons/Play';
-import { DefaultStreamChatGenerics, FileTypes } from '../../types/types';
+import type { DefaultStreamChatGenerics } from '../../types/types';
 import { makeImageCompatibleUrl } from '../../utils/utils';
 import { ImageBackground } from '../ImageBackground';
 
@@ -137,7 +137,7 @@ const CardWithContext = <
 
   const {
     theme: {
-      colors: { accent_blue, black, blue_alice, static_black, static_white, transparent },
+      colors: { accent_blue, black, blue_alice, transparent, white },
       messageSimple: {
         card: {
           authorName,
@@ -160,7 +160,7 @@ const CardWithContext = <
 
   const defaultOnPress = () => openUrlSafely(og_scrape_url || uri);
 
-  const isVideoCard = type === FileTypes.Video && og_scrape_url;
+  const isVideoCard = type === 'video' && og_scrape_url;
 
   return (
     <TouchableOpacity
@@ -207,13 +207,11 @@ const CardWithContext = <
             imageStyle={styles.cardCover}
             resizeMode='cover'
             source={{ uri: makeImageCompatibleUrl(uri) }}
-            style={[styles.cardCover, stylesProp.cardCover, cover]}
+            style={[styles.cardCover, cover, stylesProp.cardCover]}
           >
             {isVideoCard ? (
-              <View
-                style={[styles.playButtonStyle, roundedView, { backgroundColor: static_white }]}
-              >
-                <Play height={height} pathFill={static_black} width={width} />
+              <View style={[styles.playButtonStyle, roundedView, { backgroundColor: white }]}>
+                <Play height={height} pathFill={black} width={width} />
               </View>
             ) : null}
           </ImageBackground>

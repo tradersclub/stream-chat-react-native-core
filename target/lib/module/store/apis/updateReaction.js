@@ -24,13 +24,13 @@ var updateReaction = function updateReaction(_ref) {
     messageId: reaction.message_id,
     userId: reaction.user_id
   }));
-  var updatedReactionGroups;
-  if (message.reaction_groups) {
+  var updatedReactionCounts;
+  if (message.reaction_counts) {
     var _mapMessageToStorable = (0, _mapMessageToStorable2.mapMessageToStorable)(message),
-      reactionGroups = _mapMessageToStorable.reactionGroups;
-    updatedReactionGroups = reactionGroups;
+      reactionCounts = _mapMessageToStorable.reactionCounts;
+    updatedReactionCounts = reactionCounts;
     queries.push((0, _createUpdateQuery.createUpdateQuery)('messages', {
-      reactionGroups: reactionGroups
+      reactionCounts: reactionCounts
     }, {
       id: message.id
     }));
@@ -39,7 +39,7 @@ var updateReaction = function updateReaction(_ref) {
     addedUser: storableUser,
     flush: flush,
     updatedReaction: storableReaction,
-    updatedReactionGroups: updatedReactionGroups
+    updatedReactionCounts: updatedReactionCounts
   });
   if (flush) {
     _QuickSqliteClient.QuickSqliteClient.executeSqlBatch(queries);

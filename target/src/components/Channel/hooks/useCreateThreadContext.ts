@@ -1,16 +1,8 @@
-import { ThreadState } from 'stream-chat';
+import { useMemo } from 'react';
 
 import type { ThreadContextValue } from '../../../contexts/threadContext/ThreadContext';
-import { useStateStore } from '../../../hooks';
 import type { DefaultStreamChatGenerics } from '../../../types/types';
-
-const selector = (nextValue: ThreadState) =>
-  [
-    nextValue.replies,
-    nextValue.pagination.isLoadingPrev,
-    nextValue.pagination.isLoadingNext,
-    nextValue.parentMessage,
-  ] as const;
+import { reduceMessagesToString } from '../../../utils/utils';
 
 export const useCreateThreadContext = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
@@ -23,35 +15,35 @@ export const useCreateThreadContext = <
   setThreadLoadingMore,
   thread,
   threadHasMore,
-  threadInstance,
   threadLoadingMore,
   threadMessages,
 }: ThreadContextValue<StreamChatGenerics>) => {
-  const [latestReplies, isLoadingPrev, isLoadingNext] =
-    useStateStore(threadInstance?.state, selector) ?? [];
+  const threadId = thread?.id;
+  const threadReplyCount = thread?.reply_count;
+  const threadMessagesStr = reduceMessagesToString(threadMessages);
 
-  const contextAdapter = threadInstance
-    ? {
-        loadMoreRecentThread: threadInstance.loadNextPage,
-        loadMoreThread: threadInstance.loadPrevPage,
-        threadInstance,
-        threadLoadingMore: isLoadingPrev,
-        threadLoadingMoreRecent: isLoadingNext,
-        threadMessages: latestReplies ?? [],
-      }
-    : {};
+  const threadContext: ThreadContextValue<StreamChatGenerics> = useMemo(
+    () => ({
+      allowThreadMessagesInChannel,
+      closeThread,
+      loadMoreThread,
+      openThread,
+      reloadThread,
+      setThreadLoadingMore,
+      thread,
+      threadHasMore,
+      threadLoadingMore,
+      threadMessages,
+    }),
+    [
+      allowThreadMessagesInChannel,
+      threadHasMore,
+      threadId,
+      threadLoadingMore,
+      threadMessagesStr,
+      threadReplyCount,
+    ],
+  );
 
-  return {
-    allowThreadMessagesInChannel,
-    closeThread,
-    loadMoreThread,
-    openThread,
-    reloadThread,
-    setThreadLoadingMore,
-    thread,
-    threadHasMore,
-    threadLoadingMore,
-    threadMessages,
-    ...contextAdapter,
-  };
+  return threadContext;
 };

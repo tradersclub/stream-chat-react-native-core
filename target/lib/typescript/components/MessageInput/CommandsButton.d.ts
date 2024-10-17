@@ -1,8 +1,9 @@
 import React from 'react';
 import type { GestureResponderEvent } from 'react-native';
+import { ChannelContextValue } from '../../contexts/channelContext/ChannelContext';
 import { SuggestionsContextValue } from '../../contexts/suggestionsContext/SuggestionsContext';
 import type { DefaultStreamChatGenerics } from '../../types/types';
-type CommandsButtonPropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<SuggestionsContextValue<StreamChatGenerics>, 'suggestions'> & {
+type CommandsButtonPropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<ChannelContextValue<StreamChatGenerics>, 'disabled'> & Pick<SuggestionsContextValue<StreamChatGenerics>, 'suggestions'> & {
     /** Function that opens commands selector */
     handleOnPress?: ((event: GestureResponderEvent) => void) & (() => void);
 };

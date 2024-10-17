@@ -1,8 +1,4 @@
 import React from 'react';
 import { IconProps } from './utils/base';
-type Props = IconProps & {
-    size: number;
-};
-export declare const Pin: (props: Props) => React.JSX.Element;
-export {};
+export declare const Pin: (props: IconProps) => React.JSX.Element;
 //# sourceMappingURL=Pin.d.ts.map

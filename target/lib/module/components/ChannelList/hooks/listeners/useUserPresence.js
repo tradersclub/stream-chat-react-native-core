@@ -7,8 +7,7 @@ var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers
 var _react = require("react");
 var _ChatContext = require("../../../../contexts/chatContext/ChatContext");
 var useUserPresence = function useUserPresence(_ref) {
-  var setChannels = _ref.setChannels,
-    setForceUpdate = _ref.setForceUpdate;
+  var setChannels = _ref.setChannels;
   var _useChatContext = (0, _ChatContext.useChatContext)(),
     client = _useChatContext.client;
   (0, _react.useEffect)(function () {
@@ -24,9 +23,6 @@ var useUserPresence = function useUserPresence(_ref) {
           return channel;
         });
         return (0, _toConsumableArray2["default"])(newChannels);
-      });
-      setForceUpdate(function (u) {
-        return u + 1;
       });
     };
     var listeners = [client == null ? void 0 : client.on('user.presence.changed', handleEvent), client == null ? void 0 : client.on('user.updated', handleEvent)];

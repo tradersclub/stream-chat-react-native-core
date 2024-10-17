@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Attachment as AttachmentType } from 'stream-chat';
 import { MessagesContextValue } from '../../contexts/messagesContext/MessagesContext';
-import { DefaultStreamChatGenerics } from '../../types/types';
+import type { DefaultStreamChatGenerics } from '../../types/types';
 export type ActionHandler = (name: string, value: string) => void;
 export type AttachmentPropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<MessagesContextValue<StreamChatGenerics>, 'AttachmentActions' | 'Card' | 'FileAttachment' | 'Gallery' | 'giphyVersion' | 'Giphy' | 'isAttachmentEqual' | 'UrlPreview' | 'myMessageTheme'> & {
     /**

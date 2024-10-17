@@ -46,15 +46,6 @@ type PickDocument = ({ maxNumberOfFiles }: {
     assets?: File[];
 }> | never;
 export declare let pickDocument: PickDocument;
-type PickImageAssetType = {
-    askToOpenSettings?: boolean;
-    assets?: Array<Omit<Asset, 'source'> & {
-        source: 'picker';
-    }>;
-    cancelled?: boolean;
-};
-type PickImage = () => Promise<PickImageAssetType> | never;
-export declare let pickImage: PickImage;
 type SaveFileOptions = {
     fileName: string;
     fromUrl: string;
@@ -69,10 +60,13 @@ type ShareOptions = {
 };
 type ShareImage = (options: ShareOptions) => Promise<boolean> | never;
 export declare let shareImage: ShareImage;
-type Photo = Omit<Asset, 'source'> & {
+type Photo = (Omit<Asset, 'source'> & {
+    cancelled: false;
     source: 'camera';
     askToOpenSettings?: boolean;
-    cancelled?: boolean;
+}) | {
+    cancelled: true;
+    askToOpenSettings?: boolean;
 };
 type TakePhoto = (options: {
     compressImageQuality?: number;
@@ -259,7 +253,6 @@ type Handlers = {
     NetInfo?: NetInfo;
     oniOS14GalleryLibrarySelectionChange?: OniOS14LibrarySelectionChange;
     pickDocument?: PickDocument;
-    pickImage?: PickImage;
     saveFile?: SaveFile;
     SDK?: string;
     setClipboardString?: SetClipboardString;
@@ -270,10 +263,8 @@ type Handlers = {
     Video?: React.ComponentType<VideoType>;
 };
 export declare const registerNativeHandlers: (handlers: Handlers) => void;
-export declare const isImagePickerAvailable: () => boolean;
 export declare const isVideoPackageAvailable: () => boolean;
 export declare const isAudioPackageAvailable: () => true;
 export declare const isRecordingPackageAvailable: () => boolean;
-export declare const isImageMediaLibraryAvailable: () => boolean;
 export {};
 //# sourceMappingURL=native.d.ts.map

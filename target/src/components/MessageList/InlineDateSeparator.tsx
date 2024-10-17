@@ -1,9 +1,11 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { useTheme } from '../../contexts/themeContext/ThemeContext';
-import { useTranslationContext } from '../../contexts/translationContext/TranslationContext';
-import { getDateString } from '../../utils/i18n/getDateString';
+import {
+  isDayOrMoment,
+  useTranslationContext,
+} from '../../contexts/translationContext/TranslationContext';
 
 const styles = StyleSheet.create({
   container: {
@@ -22,13 +24,7 @@ const styles = StyleSheet.create({
   },
 });
 
-/**
- * Props for the `InlineDateSeparator` component.
- */
 export type InlineDateSeparatorProps = {
-  /**
-   * Date to be displayed.
-   */
   date?: Date;
 };
 
@@ -39,18 +35,17 @@ export const InlineDateSeparator = ({ date }: InlineDateSeparatorProps) => {
       inlineDateSeparator: { container, text },
     },
   } = useTheme();
-  const { t, tDateTimeParser } = useTranslationContext();
+  const { tDateTimeParser } = useTranslationContext();
 
-  const dateString = useMemo(
-    () =>
-      getDateString({
-        date,
-        t,
-        tDateTimeParser,
-        timestampTranslationKey: 'timestamp/InlineDateSeparator',
-      }),
-    [date, t, tDateTimeParser],
-  );
+  if (!date) {
+    return null;
+  }
+
+  const dateFormat = date.getFullYear() === new Date().getFullYear() ? 'MMM D' : 'MMM D, YYYY';
+  const tDate = tDateTimeParser(date);
+  const dateString = isDayOrMoment(tDate)
+    ? tDate.format(dateFormat)
+    : new Date(tDate).toDateString();
 
   return (
     <View

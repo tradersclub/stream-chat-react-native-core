@@ -24,7 +24,6 @@ var _OverlayContext = require("../../contexts/overlayContext/OverlayContext");
 var _ThemeContext = require("../../contexts/themeContext/ThemeContext");
 var _useViewport2 = require("../../hooks/useViewport");
 var _native = require("../../native");
-var _types = require("../../types/types");
 var _getResizedImageUrl = require("../../utils/getResizedImageUrl");
 var _getUrlOfImageAttachment = require("../../utils/getUrlOfImageAttachment");
 var _getGiphyMimeType = require("../Attachment/utils/getGiphyMimeType");
@@ -134,7 +133,7 @@ var ImageGallery = function ImageGallery(props) {
     var _cur$attachments;
     var attachmentImages = ((_cur$attachments = cur.attachments) == null ? void 0 : _cur$attachments.filter(function (attachment) {
       var _attachment$giphy, _attachment$giphy$gip;
-      return attachment.type === _types.FileTypes.Giphy && (((_attachment$giphy = attachment.giphy) == null ? void 0 : (_attachment$giphy$gip = _attachment$giphy[giphyVersion]) == null ? void 0 : _attachment$giphy$gip.url) || attachment.thumb_url || attachment.image_url) || attachment.type === _types.FileTypes.Image && !attachment.title_link && !attachment.og_scrape_url && (0, _getUrlOfImageAttachment.getUrlOfImageAttachment)(attachment) || (0, _native.isVideoPackageAvailable)() && attachment.type === _types.FileTypes.Video;
+      return attachment.type === 'giphy' && (((_attachment$giphy = attachment.giphy) == null ? void 0 : (_attachment$giphy$gip = _attachment$giphy[giphyVersion]) == null ? void 0 : _attachment$giphy$gip.url) || attachment.thumb_url || attachment.image_url) || attachment.type === 'image' && !attachment.title_link && !attachment.og_scrape_url && (0, _getUrlOfImageAttachment.getUrlOfImageAttachment)(attachment) || (0, _native.isVideoPackageAvailable)() && attachment.type === 'video';
     }).reverse()) || [];
     var attachmentPhotos = attachmentImages.map(function (a) {
       var _a$giphy, _a$giphy$giphyVersion;
@@ -197,7 +196,7 @@ var ImageGallery = function ImageGallery(props) {
       var imageHeight = Math.floor(height * (fullWindowWidth / width));
       setCurrentImageHeight(imageHeight > fullWindowHeight ? fullWindowHeight : imageHeight);
     } else if (photo != null && photo.uri) {
-      if (photo.type === _types.FileTypes.Image) {
+      if (photo.type === 'image') {
         _reactNative.Image.getSize(photo.uri, function (width, height) {
           var imageHeight = Math.floor(height * (fullWindowWidth / width));
           setCurrentImageHeight(imageHeight > fullWindowHeight ? fullWindowHeight : imageHeight);
@@ -360,7 +359,7 @@ var ImageGallery = function ImageGallery(props) {
                     children: (0, _jsxRuntime.jsx)(_reactNativeReanimated["default"].View, {
                       style: [styles.animatedContainer, pagerStyle, pager],
                       children: imageGalleryAttachments.map(function (photo, i) {
-                        return photo.type === _types.FileTypes.Video ? (0, _jsxRuntime.jsx)(_AnimatedGalleryVideo.AnimatedGalleryVideo, {
+                        return photo.type === 'video' ? (0, _jsxRuntime.jsx)(_AnimatedGalleryVideo.AnimatedGalleryVideo, {
                           attachmentId: photo.id,
                           handleEnd: handleEnd,
                           handleLoad: handleLoad,

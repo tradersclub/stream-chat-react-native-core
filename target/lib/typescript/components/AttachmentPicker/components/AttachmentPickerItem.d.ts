@@ -1,5 +1,5 @@
 import React from 'react';
-import { AttachmentPickerContextValue } from '../../../contexts/attachmentPickerContext/AttachmentPickerContext';
+import type { AttachmentPickerContextValue } from '../../../contexts/attachmentPickerContext/AttachmentPickerContext';
 import type { Asset } from '../../../types/types';
 type AttachmentPickerItemType = Pick<AttachmentPickerContextValue, 'selectedFiles' | 'setSelectedFiles' | 'setSelectedImages' | 'selectedImages' | 'maxNumberOfFiles'> & {
     asset: Asset;

@@ -66,15 +66,6 @@ type PickDocument = ({ maxNumberOfFiles }: { maxNumberOfFiles?: number }) =>
   | never;
 export let pickDocument: PickDocument = fail;
 
-type PickImageAssetType = {
-  askToOpenSettings?: boolean;
-  assets?: Array<Omit<Asset, 'source'> & { source: 'picker' }>;
-  cancelled?: boolean;
-};
-
-type PickImage = () => Promise<PickImageAssetType> | never;
-export let pickImage: PickImage = fail;
-
 type SaveFileOptions = {
   fileName: string;
   fromUrl: string;
@@ -92,11 +83,16 @@ type ShareOptions = {
 type ShareImage = (options: ShareOptions) => Promise<boolean> | never;
 export let shareImage: ShareImage = fail;
 
-type Photo = Omit<Asset, 'source'> & {
-  source: 'camera';
-  askToOpenSettings?: boolean;
-  cancelled?: boolean;
-};
+type Photo =
+  | (Omit<Asset, 'source'> & {
+      cancelled: false;
+      source: 'camera';
+      askToOpenSettings?: boolean;
+    })
+  | {
+      cancelled: true;
+      askToOpenSettings?: boolean;
+    };
 type TakePhoto = (options: { compressImageQuality?: number }) => Promise<Photo> | never;
 export let takePhoto: TakePhoto = fail;
 
@@ -298,7 +294,6 @@ type Handlers = {
   NetInfo?: NetInfo;
   oniOS14GalleryLibrarySelectionChange?: OniOS14LibrarySelectionChange;
   pickDocument?: PickDocument;
-  pickImage?: PickImage;
   saveFile?: SaveFile;
   SDK?: string;
   setClipboardString?: SetClipboardString;
@@ -329,28 +324,24 @@ export const registerNativeHandlers = (handlers: Handlers) => {
     NetInfo = handlers.NetInfo;
   }
 
-  if (handlers.getLocalAssetUri !== undefined) {
+  if (handlers.getLocalAssetUri) {
     getLocalAssetUri = handlers.getLocalAssetUri;
   }
 
-  if (handlers.getPhotos !== undefined) {
+  if (handlers.getPhotos) {
     getPhotos = handlers.getPhotos;
   }
 
-  if (handlers.iOS14RefreshGallerySelection !== undefined) {
+  if (handlers.iOS14RefreshGallerySelection) {
     iOS14RefreshGallerySelection = handlers.iOS14RefreshGallerySelection;
   }
 
-  if (handlers.oniOS14GalleryLibrarySelectionChange !== undefined) {
+  if (handlers.oniOS14GalleryLibrarySelectionChange) {
     oniOS14GalleryLibrarySelectionChange = handlers.oniOS14GalleryLibrarySelectionChange;
   }
 
   if (handlers.pickDocument !== undefined) {
     pickDocument = handlers.pickDocument;
-  }
-
-  if (handlers.pickImage !== undefined) {
-    pickImage = handlers.pickImage;
   }
 
   if (handlers.saveFile) {
@@ -369,11 +360,11 @@ export const registerNativeHandlers = (handlers: Handlers) => {
     Sound = handlers.Sound;
   }
 
-  if (handlers.takePhoto !== undefined) {
+  if (handlers.takePhoto) {
     takePhoto = handlers.takePhoto;
   }
 
-  if (handlers.triggerHaptic !== undefined) {
+  if (handlers.triggerHaptic) {
     triggerHaptic = handlers.triggerHaptic;
   }
 
@@ -386,12 +377,6 @@ export const registerNativeHandlers = (handlers: Handlers) => {
   }
 };
 
-export const isImagePickerAvailable = () => !!takePhoto;
 export const isVideoPackageAvailable = () => !!Video;
 export const isAudioPackageAvailable = () => !!Sound.Player || !!Sound.initializeSound;
 export const isRecordingPackageAvailable = () => !!Audio;
-export const isImageMediaLibraryAvailable = () =>
-  !!getPhotos &&
-  !!iOS14RefreshGallerySelection &&
-  !!oniOS14GalleryLibrarySelectionChange &&
-  !!getLocalAssetUri;

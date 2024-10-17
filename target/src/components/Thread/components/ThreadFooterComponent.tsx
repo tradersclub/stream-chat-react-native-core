@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import {
@@ -17,10 +17,6 @@ import type { DefaultStreamChatGenerics } from '../../../types/types';
 
 const styles = StyleSheet.create({
   absolute: { position: 'absolute' },
-  activityIndicatorContainer: {
-    padding: 10,
-    width: '100%',
-  },
   messagePadding: {
     paddingHorizontal: 8,
   },
@@ -42,33 +38,14 @@ const styles = StyleSheet.create({
 type ThreadFooterComponentPropsWithContext<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 > = Pick<MessagesContextValue<StreamChatGenerics>, 'Message'> &
-  Pick<ThreadContextValue<StreamChatGenerics>, 'parentMessagePreventPress' | 'thread'>;
-
-export const InlineLoadingMoreThreadIndicator = () => {
-  const { threadLoadingMore } = useThreadContext();
-  const {
-    theme: {
-      colors: { accent_blue },
-    },
-  } = useTheme();
-
-  if (!threadLoadingMore) {
-    return null;
-  }
-
-  return (
-    <View style={styles.activityIndicatorContainer}>
-      <ActivityIndicator color={accent_blue} size='small' />
-    </View>
-  );
-};
+  Pick<ThreadContextValue<StreamChatGenerics>, 'thread'>;
 
 const ThreadFooterComponentWithContext = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 >(
   props: ThreadFooterComponentPropsWithContext<StreamChatGenerics>,
 ) => {
-  const { Message, parentMessagePreventPress, thread } = props;
+  const { Message, thread } = props;
   const { t } = useTranslationContext();
   const { vw } = useViewport();
 
@@ -94,12 +71,7 @@ const ThreadFooterComponentWithContext = <
   return (
     <View style={styles.threadHeaderContainer} testID='thread-footer-component'>
       <View style={styles.messagePadding}>
-        <Message
-          groupStyles={['single']}
-          message={thread}
-          preventPress={parentMessagePreventPress}
-          threadList
-        />
+        <Message groupStyles={['single']} message={thread} preventPress threadList />
       </View>
       <View style={[styles.newThread, newThread]}>
         <Svg height={threadHeight ?? 24} style={styles.absolute} width={vw(100)}>
@@ -134,7 +106,6 @@ const ThreadFooterComponentWithContext = <
               })}
         </Text>
       </View>
-      <InlineLoadingMoreThreadIndicator />
     </View>
   );
 };
@@ -143,12 +114,8 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
   prevProps: ThreadFooterComponentPropsWithContext<StreamChatGenerics>,
   nextProps: ThreadFooterComponentPropsWithContext<StreamChatGenerics>,
 ) => {
-  const { parentMessagePreventPress: prevParentMessagePreventPress, thread: prevThread } =
-    prevProps;
-  const { parentMessagePreventPress: nextParentMessagePreventPress, thread: nextThread } =
-    nextProps;
-
-  if (prevParentMessagePreventPress !== nextParentMessagePreventPress) return false;
+  const { thread: prevThread } = prevProps;
+  const { thread: nextThread } = nextProps;
 
   const threadEqual =
     prevThread?.id === nextThread?.id &&
@@ -176,29 +143,18 @@ const MemoizedThreadFooter = React.memo(
   areEqual,
 ) as typeof ThreadFooterComponentWithContext;
 
-export type ThreadFooterComponentProps<
-  StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
-> = Partial<Pick<MessagesContextValue<StreamChatGenerics>, 'Message'>> &
-  Partial<Pick<ThreadContextValue<StreamChatGenerics>, 'parentMessagePreventPress' | 'thread'>>;
-
 export const ThreadFooterComponent = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
->(
-  props: ThreadFooterComponentProps<StreamChatGenerics>,
-) => {
+>() => {
   const { Message } = useMessagesContext<StreamChatGenerics>();
-  const { parentMessagePreventPress, thread, threadLoadingMore } =
-    useThreadContext<StreamChatGenerics>();
+  const { thread } = useThreadContext<StreamChatGenerics>();
 
   return (
     <MemoizedThreadFooter
       {...{
         Message,
-        parentMessagePreventPress,
         thread,
-        threadLoadingMore,
       }}
-      {...props}
     />
   );
 };

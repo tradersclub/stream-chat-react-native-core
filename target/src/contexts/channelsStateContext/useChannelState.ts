@@ -39,14 +39,12 @@ function useStateManager<
   >,
   initialValue?: ChannelState<StreamChatGenerics>[Key],
 ) {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedInitialValue = useMemo(() => initialValue, []);
   const value =
     state[cid]?.[key] || (memoizedInitialValue as ChannelState<StreamChatGenerics>[Key]);
 
   const setValue = useCallback(
     (value: ChannelState<StreamChatGenerics>[Key]) => setState({ cid, key, value }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [cid, key],
   );
 
@@ -88,7 +86,6 @@ export function useChannelState<
     return () => {
       decreaseSubscriberCount({ cid });
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [members, setMembers] = useStateManager(

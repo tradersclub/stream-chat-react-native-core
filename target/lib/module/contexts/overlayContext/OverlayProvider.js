@@ -24,7 +24,6 @@ var _MessageOverlay = require("../../components/MessageOverlay/MessageOverlay");
 var _OverlayBackdrop = require("../../components/MessageOverlay/OverlayBackdrop");
 var _useStreami18n = require("../../hooks/useStreami18n");
 var _useViewport2 = require("../../hooks/useViewport");
-var _native = require("../../native");
 var _AttachmentPickerContext = require("../attachmentPickerContext/AttachmentPickerContext");
 var _ImageGalleryContext = require("../imageGalleryContext/ImageGalleryContext");
 var _MessageOverlayContext = require("../messageOverlayContext/MessageOverlayContext");
@@ -228,9 +227,9 @@ var OverlayProvider = function OverlayProvider(props) {
                 imageGalleryGridSnapPoints: imageGalleryGridSnapPoints,
                 numberOfImageGalleryGridColumns: numberOfImageGalleryGridColumns,
                 overlayOpacity: overlayOpacity
-              }), (0, _native.isImageMediaLibraryAvailable)() ? (0, _jsxRuntime.jsx)(_AttachmentPicker.AttachmentPicker, Object.assign({
+              }), (0, _jsxRuntime.jsx)(_AttachmentPicker.AttachmentPicker, Object.assign({
                 ref: bottomSheetRef
-              }, attachmentPickerProps)) : null]
+              }, attachmentPickerProps))]
             })]
           })
         })

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { ChannelPreviewProps } from './ChannelPreview';
@@ -6,11 +6,9 @@ import type { ChannelPreviewMessengerPropsWithContext } from './ChannelPreviewMe
 import { MessageReadStatus } from './hooks/useLatestMessagePreview';
 
 import { useTheme } from '../../contexts/themeContext/ThemeContext';
-import { useTranslationContext } from '../../contexts/translationContext/TranslationContext';
 import { Check, CheckAll } from '../../icons';
 
 import type { DefaultStreamChatGenerics } from '../../types/types';
-import { getDateString } from '../../utils/i18n/getDateString';
 
 const styles = StyleSheet.create({
   date: {
@@ -37,7 +35,6 @@ export const ChannelPreviewStatus = <
   props: ChannelPreviewStatusProps<StreamChatGenerics>,
 ) => {
   const { formatLatestMessageDate, latestMessagePreview } = props;
-  const { t, tDateTimeParser } = useTranslationContext();
   const {
     theme: {
       channelPreview: { checkAllIcon, checkIcon, date },
@@ -47,17 +44,6 @@ export const ChannelPreviewStatus = <
 
   const created_at = latestMessagePreview.messageObject?.created_at;
   const latestMessageDate = created_at ? new Date(created_at) : new Date();
-
-  const formattedDate = useMemo(
-    () =>
-      getDateString({
-        date: created_at,
-        t,
-        tDateTimeParser,
-        timestampTranslationKey: 'timestamp/ChannelPreviewStatus',
-      }),
-    [created_at, t, tDateTimeParser],
-  );
   const status = latestMessagePreview.status;
 
   return (
@@ -70,7 +56,7 @@ export const ChannelPreviewStatus = <
       <Text style={[styles.date, { color: grey }, date]}>
         {formatLatestMessageDate && latestMessageDate
           ? formatLatestMessageDate(latestMessageDate).toString()
-          : formattedDate}
+          : latestMessagePreview.created_at.toString()}
       </Text>
     </View>
   );

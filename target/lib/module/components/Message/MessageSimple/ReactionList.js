@@ -16,6 +16,22 @@ var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/Message/MessageSimple/ReactionList.tsx";
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != _typeof(e) && "function" != typeof e) return { "default": e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n["default"] = e, t && t.set(e, n), n; }
+var styles = _reactNative.StyleSheet.create({
+  container: {
+    left: 0,
+    position: 'absolute',
+    top: 0
+  },
+  reactionBubble: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    position: 'absolute'
+  },
+  reactionBubbleBackground: {
+    position: 'absolute'
+  }
+});
 var Icon = function Icon(_ref) {
   var _supportedReactions$f;
   var pathFill = _ref.pathFill,
@@ -56,7 +72,6 @@ var ReactionListWithContext = function ReactionListWithContext(props) {
     _useTheme$theme = _useTheme.theme,
     _useTheme$theme$color = _useTheme$theme.colors,
     accent_blue = _useTheme$theme$color.accent_blue,
-    black = _useTheme$theme$color.black,
     grey = _useTheme$theme$color.grey,
     grey_gainsboro = _useTheme$theme$color.grey_gainsboro,
     grey_whisper = _useTheme$theme$color.grey_whisper,
@@ -73,8 +88,7 @@ var ReactionListWithContext = function ReactionListWithContext(props) {
     middleIcon = _useTheme$theme$messa3.middleIcon,
     themeRadius = _useTheme$theme$messa3.radius,
     reactionBubble = _useTheme$theme$messa3.reactionBubble,
-    reactionContainer = _useTheme$theme$messa3.reactionContainer,
-    reactionCount = _useTheme$theme$messa3.reactionCount,
+    reactionBubbleBackground = _useTheme$theme$messa3.reactionBubbleBackground,
     themeReactionSize = _useTheme$theme$messa3.reactionSize,
     themeStrokeSize = _useTheme$theme$messa3.strokeSize,
     screenPadding = _useTheme$theme.screenPadding;
@@ -146,6 +160,16 @@ var ReactionListWithContext = function ReactionListWithContext(props) {
           r: radius * 2
         })]
       }), (0, _jsxRuntime.jsx)(_reactNative.View, {
+        style: [styles.reactionBubbleBackground, {
+          backgroundColor: alignmentLeft ? fill : white,
+          borderColor: fill,
+          borderRadius: reactionSize,
+          borderWidth: strokeSize,
+          height: reactionSize,
+          left: left,
+          width: reactionSize * reactions.length
+        }, reactionBubbleBackground]
+      }), (0, _jsxRuntime.jsx)(_reactNative.View, {
         pointerEvents: "none",
         style: [_reactNative.StyleSheet.absoluteFill],
         children: (0, _jsxRuntime.jsx)(_reactNativeSvg["default"], {
@@ -170,7 +194,7 @@ var ReactionListWithContext = function ReactionListWithContext(props) {
           if (_onPress) {
             _onPress({
               defaultHandler: function defaultHandler() {
-                return showMessageOverlay(false);
+                return showMessageOverlay(true);
               },
               emitter: 'reactionList',
               event: event
@@ -181,7 +205,7 @@ var ReactionListWithContext = function ReactionListWithContext(props) {
           if (_onPressIn) {
             _onPressIn({
               defaultHandler: function defaultHandler() {
-                return showMessageOverlay(false);
+                return showMessageOverlay(true);
               },
               emitter: 'reactionList',
               event: event
@@ -190,30 +214,19 @@ var ReactionListWithContext = function ReactionListWithContext(props) {
         },
         style: [styles.reactionBubble, {
           backgroundColor: alignmentLeft ? fill : white,
-          borderColor: fill,
-          borderRadius: reactionSize,
-          borderWidth: strokeSize,
+          borderRadius: reactionSize - strokeSize * 2,
           height: reactionSize - strokeSize * 2,
           left: left + strokeSize,
-          top: strokeSize
+          top: strokeSize,
+          width: reactionSize * reactions.length - strokeSize * 2
         }, reactionBubble],
-        children: reactions.map(function (reaction, index) {
-          return (0, _jsxRuntime.jsxs)(_reactNative.View, {
-            style: [styles.reactionContainer, {
-              marginRight: index < reactions.length - 1 ? 5 : 0
-            }, reactionContainer],
-            children: [(0, _jsxRuntime.jsx)(Icon, {
-              pathFill: reaction.own ? iconFillColor || accent_blue : grey,
-              size: reactionSize / 2,
-              style: middleIcon,
-              supportedReactions: supportedReactions,
-              type: reaction.type
-            }, reaction.type), (0, _jsxRuntime.jsx)(_reactNative.Text, {
-              style: [styles.reactionCount, {
-                color: black
-              }, reactionCount],
-              children: reaction.count
-            })]
+        children: reactions.map(function (reaction) {
+          return (0, _jsxRuntime.jsx)(Icon, {
+            pathFill: reaction.own ? iconFillColor || accent_blue : grey,
+            size: reactionSize / 2,
+            style: middleIcon,
+            supportedReactions: supportedReactions,
+            type: reaction.type
           }, reaction.type);
         })
       })]
@@ -223,11 +236,9 @@ var ReactionListWithContext = function ReactionListWithContext(props) {
 var areEqual = function areEqual(prevProps, nextProps) {
   var prevMessage = prevProps.message,
     prevMessageContentWidth = prevProps.messageContentWidth,
-    prevReactions = prevProps.reactions,
     prevTargetedMessage = prevProps.targetedMessage;
   var nextMessage = nextProps.message,
     nextMessageContentWidth = nextProps.messageContentWidth,
-    nextReactions = nextProps.reactions,
     nextTargetedMessage = nextProps.targetedMessage;
   var messageContentWidthEqual = prevMessageContentWidth === nextMessageContentWidth;
   if (!messageContentWidthEqual) return false;
@@ -241,13 +252,6 @@ var areEqual = function areEqual(prevProps, nextProps) {
     return type === ((_nextMessage$latest_r = nextMessage.latest_reactions) == null ? void 0 : _nextMessage$latest_r[index].type);
   }) : prevMessage.latest_reactions === nextMessage.latest_reactions;
   if (!latestReactionsEqual) return false;
-  var reactionsEqual = Array.isArray(prevReactions) && Array.isArray(nextReactions) ? prevReactions.length === nextReactions.length && prevReactions.every(function (_ref3, index) {
-    var _nextMessage$latest_r2, _nextMessage$latest_r3;
-    var count = _ref3.count,
-      type = _ref3.type;
-    return type === ((_nextMessage$latest_r2 = nextMessage.latest_reactions) == null ? void 0 : _nextMessage$latest_r2[index].type) && count === ((_nextMessage$latest_r3 = nextMessage.latest_reactions) == null ? void 0 : _nextMessage$latest_r3[index].count);
-  }) : prevReactions === nextReactions;
-  if (!reactionsEqual) return false;
   return true;
 };
 var MemoizedReactionList = _react["default"].memo(ReactionListWithContext, areEqual);
@@ -278,28 +282,4 @@ var ReactionList = function ReactionList(props) {
   }, props));
 };
 exports.ReactionList = ReactionList;
-var styles = _reactNative.StyleSheet.create({
-  container: {
-    left: 0,
-    position: 'absolute',
-    top: 0
-  },
-  reactionBubble: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    paddingHorizontal: 5,
-    position: 'absolute'
-  },
-  reactionContainer: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center'
-  },
-  reactionCount: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginLeft: 2
-  }
-});
 //# sourceMappingURL=ReactionList.js.map

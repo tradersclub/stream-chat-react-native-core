@@ -12,7 +12,6 @@ var _MessageContext = require("../../contexts/messageContext/MessageContext");
 var _MessagesContext = require("../../contexts/messagesContext/MessagesContext");
 var _ThemeContext = require("../../contexts/themeContext/ThemeContext");
 var _Play = require("../../icons/Play");
-var _types = require("../../types/types");
 var _utils = require("../../utils/utils");
 var _ImageBackground = require("../ImageBackground");
 var _jsxRuntime = require("react/jsx-runtime");
@@ -98,9 +97,8 @@ var CardWithContext = function CardWithContext(props) {
     accent_blue = _useTheme$theme$color.accent_blue,
     black = _useTheme$theme$color.black,
     blue_alice = _useTheme$theme$color.blue_alice,
-    static_black = _useTheme$theme$color.static_black,
-    static_white = _useTheme$theme$color.static_white,
     transparent = _useTheme$theme$color.transparent,
+    white = _useTheme$theme$color.white,
     _useTheme$theme$messa = _useTheme$theme.messageSimple.card,
     authorName = _useTheme$theme$messa.authorName,
     authorNameContainer = _useTheme$theme$messa.authorNameContainer,
@@ -122,7 +120,7 @@ var CardWithContext = function CardWithContext(props) {
   var defaultOnPress = function defaultOnPress() {
     return (0, _openUrlSafely.openUrlSafely)(og_scrape_url || uri);
   };
-  var isVideoCard = type === _types.FileTypes.Video && og_scrape_url;
+  var isVideoCard = type === 'video' && og_scrape_url;
   return (0, _jsxRuntime.jsxs)(_reactNative.TouchableOpacity, Object.assign({
     disabled: preventPress,
     onLongPress: function onLongPress(event) {
@@ -171,14 +169,14 @@ var CardWithContext = function CardWithContext(props) {
         source: {
           uri: (0, _utils.makeImageCompatibleUrl)(uri)
         },
-        style: [styles.cardCover, stylesProp.cardCover, cover],
+        style: [styles.cardCover, cover, stylesProp.cardCover],
         children: isVideoCard ? (0, _jsxRuntime.jsx)(_reactNative.View, {
           style: [styles.playButtonStyle, roundedView, {
-            backgroundColor: static_white
+            backgroundColor: white
           }],
           children: (0, _jsxRuntime.jsx)(_Play.Play, {
             height: height,
-            pathFill: static_black,
+            pathFill: black,
             width: width
           })
         }) : null

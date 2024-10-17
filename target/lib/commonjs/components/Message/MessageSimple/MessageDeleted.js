@@ -30,12 +30,13 @@ var styles = _reactNative.StyleSheet.create({
 });
 var MessageDeletedWithContext = function MessageDeletedWithContext(props) {
   var alignment = props.alignment,
-    date = props.date,
+    formattedDate = props.formattedDate,
     groupStyle = props.groupStyle,
     message = props.message,
     MessageFooter = props.MessageFooter,
     noBorder = props.noBorder,
-    onLayout = props.onLayout;
+    onLayout = props.onLayout,
+    t = props.t;
   var _useTheme = (0, _ThemeContext.useTheme)(),
     _useTheme$theme = _useTheme.theme,
     _useTheme$theme$color = _useTheme$theme.colors,
@@ -48,8 +49,6 @@ var MessageDeletedWithContext = function MessageDeletedWithContext(props) {
     deletedContainer = _useTheme$theme$messa.deletedContainer,
     deletedContainerInner = _useTheme$theme$messa.deletedContainerInner,
     deletedText = _useTheme$theme$messa.deletedText;
-  var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
-    t = _useTranslationContex.t;
   return (0, _jsxRuntime.jsxs)(_reactNative.View, {
     onLayout: onLayout,
     style: [alignment === 'left' ? styles.leftAlignItems : styles.rightAlignItems, deletedContainer],
@@ -74,17 +73,17 @@ var MessageDeletedWithContext = function MessageDeletedWithContext(props) {
         })
       })
     }), (0, _jsxRuntime.jsx)(MessageFooter, {
-      date: date,
+      formattedDate: formattedDate,
       isDeleted: true
     })]
   });
 };
 var areEqual = function areEqual(prevProps, nextProps) {
   var prevAlignment = prevProps.alignment,
-    prevDate = prevProps.date,
+    prevFormattedDate = prevProps.formattedDate,
     prevMessage = prevProps.message;
   var nextAlignment = nextProps.alignment,
-    nextDate = nextProps.date,
+    nextFormattedDate = nextProps.formattedDate,
     nextMessage = nextProps.message;
   var alignmentEqual = prevAlignment === nextAlignment;
   if (!alignmentEqual) return false;
@@ -92,8 +91,8 @@ var areEqual = function areEqual(prevProps, nextProps) {
   var isNextMessageTypeDeleted = nextMessage.type === 'deleted';
   var messageEqual = isPrevMessageTypeDeleted === isNextMessageTypeDeleted && prevMessage.reply_count === nextMessage.reply_count && prevMessage.status === nextMessage.status && prevMessage.type === nextMessage.type && prevMessage.text === nextMessage.text && prevMessage.pinned === nextMessage.pinned;
   if (!messageEqual) return false;
-  var dateEqual = prevDate === nextDate;
-  if (!dateEqual) return false;
+  var formattedDateEqual = prevFormattedDate === nextFormattedDate;
+  if (!formattedDateEqual) return false;
   return true;
 };
 var MemoizedMessageDeleted = _react["default"].memo(MessageDeletedWithContext, areEqual);
@@ -103,10 +102,13 @@ var MessageDeleted = function MessageDeleted(props) {
     message = _useMessageContext.message;
   var _useMessagesContext = (0, _MessagesContext.useMessagesContext)(),
     MessageFooter = _useMessagesContext.MessageFooter;
+  var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
+    t = _useTranslationContex.t;
   return (0, _jsxRuntime.jsx)(MemoizedMessageDeleted, Object.assign({
     alignment: alignment,
     message: message,
-    MessageFooter: MessageFooter
+    MessageFooter: MessageFooter,
+    t: t
   }, props));
 };
 exports.MessageDeleted = MessageDeleted;

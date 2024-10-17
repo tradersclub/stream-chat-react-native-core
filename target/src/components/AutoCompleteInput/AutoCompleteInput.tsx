@@ -28,17 +28,14 @@ import {
 } from '../../contexts/translationContext/TranslationContext';
 import type { Emoji } from '../../emoji-data';
 import type { DefaultStreamChatGenerics } from '../../types/types';
-import {
-  isCommandTrigger,
-  isEmojiTrigger,
-  isMentionTrigger,
-  Trigger,
-} from '../../utils/ACITriggerSettings';
+import { isCommandTrigger, isEmojiTrigger, isMentionTrigger } from '../../utils/utils';
+
+import type { Trigger } from '../../utils/utils';
 
 const styles = StyleSheet.create({
   inputBox: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
     includeFontPadding: false, // for android vertical text centering
     padding: 0, // removal of default text input padding on android
     paddingTop: 0, // removal of iOS top padding for weird centering
@@ -132,7 +129,6 @@ const AutoCompleteInputWithContext = <
 
   useEffect(() => {
     handleChange(text, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text]);
 
   const startTracking = (trigger: Trigger) => {

@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.AudioRecordingButton = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _reactNative = require("react-native");
+var _ChannelContext = require("../../../../contexts/channelContext/ChannelContext");
 var _MessageInputContext = require("../../../../contexts/messageInputContext/MessageInputContext");
 var _ThemeContext = require("../../../../contexts/themeContext/ThemeContext");
 var _TranslationContext = require("../../../../contexts/translationContext/TranslationContext");
@@ -16,6 +17,7 @@ var _this = this,
 var AudioRecordingButtonWithContext = function AudioRecordingButtonWithContext(props) {
   var asyncMessagesMinimumPressDuration = props.asyncMessagesMinimumPressDuration,
     buttonSize = props.buttonSize,
+    disabled = props.disabled,
     handleLongPress = props.handleLongPress,
     handlePress = props.handlePress,
     permissionsGranted = props.permissionsGranted,
@@ -62,6 +64,7 @@ var AudioRecordingButtonWithContext = function AudioRecordingButtonWithContext(p
   };
   return (0, _jsxRuntime.jsx)(_reactNative.Pressable, {
     delayLongPress: asyncMessagesMinimumPressDuration,
+    disabled: disabled,
     onLongPress: onLongPressHandler,
     onPress: onPressHandler,
     style: function style(_ref) {
@@ -81,21 +84,29 @@ var AudioRecordingButtonWithContext = function AudioRecordingButtonWithContext(p
 };
 var areEqual = function areEqual(prevProps, nextProps) {
   var prevAsyncMessagesMinimumPressDuration = prevProps.asyncMessagesMinimumPressDuration,
+    prevDisabled = prevProps.disabled,
     prevRecording = prevProps.recording;
   var nextAsyncMessagesMinimumPressDuration = nextProps.asyncMessagesMinimumPressDuration,
+    nextDisabled = nextProps.disabled,
     nextRecording = nextProps.recording;
   var asyncMessagesMinimumPressDurationEqual = prevAsyncMessagesMinimumPressDuration === nextAsyncMessagesMinimumPressDuration;
   if (!asyncMessagesMinimumPressDurationEqual) return false;
+  var disabledEqual = prevDisabled === nextDisabled;
+  if (!disabledEqual) return false;
   var recordingEqual = prevRecording === nextRecording;
   if (!recordingEqual) return false;
   return true;
 };
 var MemoizedAudioRecordingButton = _react["default"].memo(AudioRecordingButtonWithContext, areEqual);
 var AudioRecordingButton = function AudioRecordingButton(props) {
+  var _useChannelContext = (0, _ChannelContext.useChannelContext)(),
+    _useChannelContext$di = _useChannelContext.disabled,
+    disabled = _useChannelContext$di === void 0 ? false : _useChannelContext$di;
   var _useMessageInputConte = (0, _MessageInputContext.useMessageInputContext)(),
     asyncMessagesMinimumPressDuration = _useMessageInputConte.asyncMessagesMinimumPressDuration;
   return (0, _jsxRuntime.jsx)(MemoizedAudioRecordingButton, Object.assign({
-    asyncMessagesMinimumPressDuration: asyncMessagesMinimumPressDuration
+    asyncMessagesMinimumPressDuration: asyncMessagesMinimumPressDuration,
+    disabled: disabled
   }, props));
 };
 exports.AudioRecordingButton = AudioRecordingButton;

@@ -83,8 +83,7 @@ export const AnimatedGalleryVideo = React.memo(
 
     const onLoad = (payload: VideoPayloadData) => {
       setOpacity(0);
-      // Duration is in seconds so we convert to milliseconds.
-      handleLoad(attachmentId, payload.duration * 1000);
+      handleLoad(attachmentId, payload.duration);
     };
 
     const onEnd = () => {
@@ -110,12 +109,12 @@ export const AnimatedGalleryVideo = React.memo(
       } else {
         // Update your UI for the loaded state
         setOpacity(0);
-        handleLoad(attachmentId, playbackStatus.durationMillis);
+        handleLoad(attachmentId, playbackStatus.durationMillis / 1000);
         if (playbackStatus.isPlaying) {
           // Update your UI for the playing state
           handleProgress(
             attachmentId,
-            playbackStatus.positionMillis / playbackStatus.durationMillis,
+            playbackStatus.positionMillis / 1000 / (playbackStatus.durationMillis / 1000),
           );
         }
 
@@ -174,6 +173,7 @@ export const AnimatedGalleryVideo = React.memo(
       <Animated.View
         accessibilityLabel='Image Gallery Video'
         style={[
+          style,
           animatedViewStyles,
           {
             transform: [
@@ -185,7 +185,6 @@ export const AnimatedGalleryVideo = React.memo(
               { scale: oneEighth },
             ],
           },
-          style,
         ]}
       >
         {isVideoPackageAvailable() && (

@@ -249,7 +249,6 @@ export const usePaginatedChannels = <
     }
 
     return () => listener?.unsubscribe?.();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterStr, sortStr]);
 
   return {

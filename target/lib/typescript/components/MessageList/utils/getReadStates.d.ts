@@ -10,5 +10,7 @@ export declare const getReadStates: <StreamChatGenerics extends DefaultStreamCha
         first_unread_message_id?: string | undefined;
         last_read_message_id?: string | undefined;
     };
-} | undefined) => Record<string, number>;
+} | undefined) => {
+    [key: string]: number | boolean;
+};
 //# sourceMappingURL=getReadStates.d.ts.map

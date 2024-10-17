@@ -44,7 +44,10 @@ import { mergeThemes, ThemeProvider, useTheme } from '../../contexts/themeContex
 import { useViewport } from '../../hooks/useViewport';
 import type { DefaultStreamChatGenerics } from '../../types/types';
 import { MessageTextContainer } from '../Message/MessageSimple/MessageTextContainer';
-import { OverlayReactions as DefaultOverlayReactions } from '../MessageOverlay/OverlayReactions';
+import {
+  OverlayReactions as DefaultOverlayReactions,
+  Reaction,
+} from '../MessageOverlay/OverlayReactions';
 import type { ReplyProps } from '../Reply/Reply';
 
 const styles = StyleSheet.create({
@@ -163,7 +166,6 @@ const MessageOverlayWithContext = <
 
   const modifiedTheme = useMemo(
     () => mergeThemes({ style: myMessageTheme, theme }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [myMessageThemeString, theme],
   );
 
@@ -207,7 +209,6 @@ const MessageOverlayWithContext = <
   useEffect(() => {
     Keyboard.dismiss();
     fadeScreen();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onPan = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
@@ -463,16 +464,26 @@ const MessageOverlayWithContext = <
                 message={message}
               />
             )}
-            {!!messageReactionTitle && (
+            {!!messageReactionTitle &&
+            message.latest_reactions &&
+            message.latest_reactions.length > 0 ? (
               <OverlayReactions
                 alignment={alignment}
-                messageId={message.id}
                 OverlayReactionsAvatar={OverlayReactionsAvatar}
+                reactions={
+                  message.latest_reactions.map((reaction) => ({
+                    alignment: clientId && clientId === reaction.user?.id ? 'right' : 'left',
+                    id: reaction?.user?.id || '',
+                    image: reaction?.user?.image,
+                    name: reaction?.user?.name || reaction.user_id || '',
+                    type: reaction.type,
+                  })) as Reaction[]
+                }
                 showScreen={showScreen}
                 supportedReactions={messagesContext?.supportedReactions}
                 title={messageReactionTitle}
               />
-            )}
+            ) : null}
           </View>
         )}
       </Animated.View>

@@ -25,14 +25,13 @@ var useCreateInputMessageInputContext = function useCreateInputMessageInputConte
     CommandsButton = _ref.CommandsButton,
     compressImageQuality = _ref.compressImageQuality,
     CooldownTimer = _ref.CooldownTimer,
+    disabled = _ref.disabled,
     doDocUploadRequest = _ref.doDocUploadRequest,
     doImageUploadRequest = _ref.doImageUploadRequest,
     editing = _ref.editing,
     editMessage = _ref.editMessage,
     emojiSearchIndex = _ref.emojiSearchIndex,
     FileUploadPreview = _ref.FileUploadPreview,
-    handleAttachButtonPress = _ref.handleAttachButtonPress,
-    hasCameraPicker = _ref.hasCameraPicker,
     hasCommands = _ref.hasCommands,
     hasFilePicker = _ref.hasFilePicker,
     hasImagePicker = _ref.hasImagePicker,
@@ -84,14 +83,13 @@ var useCreateInputMessageInputContext = function useCreateInputMessageInputConte
       CommandsButton: CommandsButton,
       compressImageQuality: compressImageQuality,
       CooldownTimer: CooldownTimer,
+      disabled: disabled,
       doDocUploadRequest: doDocUploadRequest,
       doImageUploadRequest: doImageUploadRequest,
       editing: editing,
       editMessage: editMessage,
       emojiSearchIndex: emojiSearchIndex,
       FileUploadPreview: FileUploadPreview,
-      handleAttachButtonPress: handleAttachButtonPress,
-      hasCameraPicker: hasCameraPicker,
       hasCommands: hasCommands,
       hasFilePicker: hasFilePicker,
       hasImagePicker: hasImagePicker,
@@ -120,7 +118,7 @@ var useCreateInputMessageInputContext = function useCreateInputMessageInputConte
       StartAudioRecordingButton: StartAudioRecordingButton,
       UploadProgressIndicator: UploadProgressIndicator
     };
-  }, [compressImageQuality, channelId, editingDep, initialValue, maxMessageLength, quotedMessageId]);
+  }, [compressImageQuality, channelId, disabled, editingDep, initialValue, maxMessageLength, quotedMessageId]);
   return inputMessageInputContext;
 };
 exports.useCreateInputMessageInputContext = useCreateInputMessageInputContext;

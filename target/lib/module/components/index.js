@@ -705,17 +705,6 @@ Object.keys(_Chat).forEach(function (key) {
     }
   });
 });
-var _useCreateChatClient = require("./Chat/hooks/useCreateChatClient");
-Object.keys(_useCreateChatClient).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (key in exports && exports[key] === _useCreateChatClient[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _useCreateChatClient[key];
-    }
-  });
-});
 var _useCreateChatContext = require("./Chat/hooks/useCreateChatContext");
 Object.keys(_useCreateChatContext).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -1002,17 +991,6 @@ Object.keys(_MessageDeleted).forEach(function (key) {
     }
   });
 });
-var _MessageEditedTimestamp = require("./Message/MessageSimple/MessageEditedTimestamp");
-Object.keys(_MessageEditedTimestamp).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (key in exports && exports[key] === _MessageEditedTimestamp[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _MessageEditedTimestamp[key];
-    }
-  });
-});
 var _MessageError = require("./Message/MessageSimple/MessageError");
 Object.keys(_MessageError).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -1098,17 +1076,6 @@ Object.keys(_MessageTextContainer).forEach(function (key) {
     enumerable: true,
     get: function get() {
       return _MessageTextContainer[key];
-    }
-  });
-});
-var _MessageTimestamp = require("./Message/MessageSimple/MessageTimestamp");
-Object.keys(_MessageTimestamp).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (key in exports && exports[key] === _MessageTimestamp[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _MessageTimestamp[key];
     }
   });
 });
@@ -1409,6 +1376,17 @@ Object.keys(_InlineLoadingMoreRecentIndicator).forEach(function (key) {
     }
   });
 });
+var _InlineLoadingMoreThreadIndicator = require("./MessageList/InlineLoadingMoreThreadIndicator");
+Object.keys(_InlineLoadingMoreThreadIndicator).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _InlineLoadingMoreThreadIndicator[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _InlineLoadingMoreThreadIndicator[key];
+    }
+  });
+});
 var _InlineUnreadIndicator = require("./MessageList/InlineUnreadIndicator");
 Object.keys(_InlineUnreadIndicator).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -1670,17 +1648,6 @@ Object.keys(_ThreadFooterComponent).forEach(function (key) {
     enumerable: true,
     get: function get() {
       return _ThreadFooterComponent[key];
-    }
-  });
-});
-var _ThreadList = require("./ThreadList/ThreadList");
-Object.keys(_ThreadList).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (key in exports && exports[key] === _ThreadList[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _ThreadList[key];
     }
   });
 });

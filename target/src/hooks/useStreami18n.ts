@@ -5,7 +5,7 @@ import Dayjs from 'dayjs';
 import { useIsMountedRef } from './useIsMountedRef';
 
 import type { TranslatorFunctions } from '../contexts/translationContext/TranslationContext';
-import { Streami18n } from '../utils/i18n/Streami18n';
+import { Streami18n } from '../utils/Streami18n';
 
 export const useStreami18n = (i18nInstance?: Streami18n) => {
   const [translators, setTranslators] = useState<TranslatorFunctions>({
@@ -45,7 +45,6 @@ export const useStreami18n = (i18nInstance?: Streami18n) => {
       unsubscribeOnTFuncOverrideListener();
       unsubscribeOnLanguageChangeListener();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i18nInstance]);
 
   return translators;

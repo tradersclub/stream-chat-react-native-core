@@ -1,4 +1,5 @@
 import React from 'react';
+import { Alert } from 'react-native';
 
 import { useMessageActionHandlers } from './useMessageActionHandlers';
 
@@ -18,11 +19,12 @@ import {
   MessageFlag,
   Mute,
   Pin,
-  Resend,
+  SendUp,
   ThreadReply,
   Unpin,
   UserDelete,
 } from '../../../icons';
+import { setClipboardString } from '../../../native';
 import type { DefaultStreamChatGenerics } from '../../../types/types';
 import { removeReservedFields } from '../../../utils/removeReservedFields';
 import { MessageStatusTypes } from '../../../utils/utils';
@@ -38,7 +40,6 @@ export const useMessageActions = <
   deleteMessage: deleteMessageFromContext,
   deleteReaction,
   enforceUniqueReaction,
-  handleBan,
   handleBlock,
   handleCopy,
   handleDelete,
@@ -65,7 +66,6 @@ export const useMessageActions = <
   MessagesContextValue<StreamChatGenerics>,
   | 'deleteMessage'
   | 'sendReaction'
-  | 'handleBan'
   | 'handleBlock'
   | 'handleCopy'
   | 'handleDelete'
@@ -96,14 +96,12 @@ export const useMessageActions = <
   }) => {
   const {
     theme: {
-      colors: { accent_red, grey },
+      colors: { accent_blue, accent_red, grey },
     },
   } = useTheme();
   const {
-    handleCopyMessage,
     handleDeleteMessage,
     handleEditMessage,
-    handleFlagMessage,
     handleQuotedReplyMessage,
     handleResendMessage,
     handleToggleBanUser,
@@ -139,25 +137,6 @@ export const useMessageActions = <
     (mute) => mute.user.id === client.userID && mute.target.id === message.user?.id,
   );
 
-  const banUser: MessageActionType = {
-    action: async () => {
-      setOverlay('none');
-      if (message.user?.id) {
-        if (handleBan) {
-          handleBan(message);
-        }
-
-        await handleToggleBanUser();
-      }
-    },
-    actionType: 'banUser',
-    icon: <UserDelete pathFill={grey} />,
-    title: message.user?.banned ? t('Unban User') : t('Ban User'),
-  };
-
-  /**
-   * @deprecated use `banUser` instead
-   */
   const blockUser: MessageActionType = {
     action: async () => {
       setOverlay('none');
@@ -174,29 +153,50 @@ export const useMessageActions = <
     title: message.user?.banned ? t('Unblock User') : t('Block User'),
   };
 
-  const copyMessage: MessageActionType = {
-    action: () => {
-      setOverlay('none');
-      if (handleCopy) {
-        handleCopy(message);
-      }
-      handleCopyMessage();
-    },
-    actionType: 'copyMessage',
-    icon: <Copy pathFill={grey} />,
-    title: t('Copy Message'),
-  };
+  const copyMessage: MessageActionType | undefined =
+    setClipboardString !== null
+      ? {
+          action: () => {
+            setOverlay('none');
+            if (handleCopy) {
+              handleCopy(message);
+            }
+            setClipboardString(message.text || '');
+          },
+          actionType: 'copyMessage',
+          icon: <Copy pathFill={grey} />,
+          title: t('Copy Message'),
+        }
+      : undefined;
 
   const deleteMessage: MessageActionType = {
     action: () => {
-      setOverlay('none');
-      if (handleDelete) {
-        handleDelete(message);
+      setOverlay('alert');
+      if (message.id) {
+        Alert.alert(
+          t('Delete Message'),
+          t('Are you sure you want to permanently delete this message?'),
+          [
+            { onPress: () => setOverlay('none'), text: t('Cancel') },
+            {
+              onPress: async () => {
+                setOverlay('none');
+                if (handleDelete) {
+                  handleDelete(message);
+                }
+
+                await handleDeleteMessage();
+              },
+              style: 'destructive',
+              text: t('Delete'),
+            },
+          ],
+          { cancelable: false },
+        );
       }
-      handleDeleteMessage();
     },
     actionType: 'deleteMessage',
-    icon: <Delete fill={accent_red} size={24} />,
+    icon: <Delete fill={accent_red} size={32} />,
     title: t('Delete Message'),
     titleStyle: { color: accent_red },
   };
@@ -223,7 +223,7 @@ export const useMessageActions = <
       handleTogglePinMessage();
     },
     actionType: 'pinMessage',
-    icon: <Pin pathFill={grey} size={24} />,
+    icon: <Pin height={23} pathFill={grey} width={24} />,
     title: t('Pin to Conversation'),
   };
 
@@ -242,12 +242,51 @@ export const useMessageActions = <
 
   const flagMessage: MessageActionType = {
     action: () => {
-      setOverlay('none');
-      if (handleFlag) {
-        handleFlag(message);
+      setOverlay('alert');
+      if (message.id) {
+        Alert.alert(
+          t('Flag Message'),
+          t('Do you want to send a copy of this message to a moderator for further investigation?'),
+          [
+            { onPress: () => setOverlay('none'), text: t('Cancel') },
+            {
+              onPress: async () => {
+                try {
+                  if (handleFlag) {
+                    handleFlag(message);
+                  }
+                  await client.flagMessage(message.id);
+                  Alert.alert(
+                    t('Message flagged'),
+                    t('The message has been reported to a moderator.'),
+                    [
+                      {
+                        onPress: () => setOverlay('none'),
+                        text: t('Ok'),
+                      },
+                    ],
+                  );
+                } catch (_) {
+                  Alert.alert(
+                    t('Cannot Flag Message'),
+                    t(
+                      'Flag action failed either due to a network issue or the message is already flagged',
+                    ),
+                    [
+                      {
+                        onPress: () => setOverlay('none'),
+                        text: t('Ok'),
+                      },
+                    ],
+                  );
+                }
+              },
+              text: t('Flag'),
+            },
+          ],
+          { cancelable: false },
+        );
       }
-
-      handleFlagMessage();
     },
     actionType: 'flagMessage',
     icon: <MessageFlag pathFill={grey} />,
@@ -306,7 +345,7 @@ export const useMessageActions = <
       await handleResendMessage();
     },
     actionType: 'retry',
-    icon: <Resend pathFill={grey} />,
+    icon: <SendUp fill={accent_blue} size={32} />,
     title: t('Resend'),
   };
 
@@ -324,7 +363,6 @@ export const useMessageActions = <
   };
 
   return {
-    banUser,
     blockUser,
     copyMessage,
     deleteMessage,

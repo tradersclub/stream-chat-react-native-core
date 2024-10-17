@@ -30,10 +30,10 @@ var getChannels = function getChannels(_ref) {
   });
   return channels.map(function (c) {
     return Object.assign({}, (0, _mapStorableToChannel.mapStorableToChannel)(c), {
-      members: cidVsMembers[c.cid] || [],
-      messages: cidVsMessages[c.cid] || [],
+      members: cidVsMembers[c.cid],
+      messages: cidVsMessages[c.cid],
       pinned_messages: [],
-      read: cidVsReads[c.cid] || []
+      read: cidVsReads[c.cid]
     });
   });
 };

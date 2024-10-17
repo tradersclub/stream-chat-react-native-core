@@ -28,6 +28,5 @@ export const useSyncDatabase = <
     return () => {
       listener?.unsubscribe();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client, initialisedDatabase]);
 };

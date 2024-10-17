@@ -1,7 +1,6 @@
-import type { FormatMessageResponse, MessageResponse, ReactionResponse } from 'stream-chat';
+import type { ReactionResponse } from 'stream-chat';
 import type { PreparedQueries } from '../types';
-export declare const insertReaction: ({ flush, message, reaction, }: {
-    message: MessageResponse | FormatMessageResponse;
+export declare const insertReaction: ({ flush, reaction, }: {
     reaction: ReactionResponse;
     flush?: boolean | undefined;
 }) => PreparedQueries[];

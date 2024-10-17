@@ -10,6 +10,23 @@ var _TranslationContext = require("../../contexts/translationContext/Translation
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/Indicators/LoadingErrorIndicator.tsx";
+var styles = _reactNative.StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    height: '100%',
+    justifyContent: 'center',
+    width: '100%'
+  },
+  errorText: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginTop: 20
+  },
+  retryText: {
+    fontSize: 30,
+    fontWeight: '600'
+  }
+});
 var LoadingErrorWrapper = function LoadingErrorWrapper(props) {
   var children = props.children,
     onPress = props.onPress,
@@ -69,21 +86,4 @@ var LoadingErrorIndicator = function LoadingErrorIndicator(props) {
 };
 exports.LoadingErrorIndicator = LoadingErrorIndicator;
 LoadingErrorIndicator.displayName = 'LoadingErrorIndicator{loadingErrorIndicator}';
-var styles = _reactNative.StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    height: '100%',
-    justifyContent: 'center',
-    width: '100%'
-  },
-  errorText: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginTop: 20
-  },
-  retryText: {
-    fontSize: 30,
-    fontWeight: '600'
-  }
-});
 //# sourceMappingURL=LoadingErrorIndicator.js.map

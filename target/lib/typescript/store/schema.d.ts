@@ -73,8 +73,7 @@ export type Schema = {
         deletedAt: string;
         extraData: string;
         id: string;
-        messageTextUpdatedAt: string;
-        reactionGroups: string;
+        reactionCounts: string;
         type: MessageLabel;
         updatedAt: string;
         text?: string;

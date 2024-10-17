@@ -1,6 +1,6 @@
 import React from 'react';
 export type LoadingProps = {
-    listType?: 'channel' | 'message' | 'threads' | 'default';
+    listType?: 'channel' | 'message' | 'default';
     loadingText?: string;
 };
 /**

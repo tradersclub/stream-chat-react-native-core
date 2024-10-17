@@ -3,7 +3,6 @@ import type { DateSeparators } from './getDateSeparators';
 import type { PaginatedMessageListContextValue } from '../../../contexts/paginatedMessageListContext/PaginatedMessageListContext';
 import type { ThreadContextValue } from '../../../contexts/threadContext/ThreadContext';
 import type { DefaultStreamChatGenerics } from '../../../types/types';
-import { isEditedMessage } from '../../../utils/utils';
 import type { GroupType } from '../hooks/useMessageList';
 
 export type GetGroupStylesParams<
@@ -60,24 +59,22 @@ export const getGroupStyles = <
     const isTopMessage =
       !previousMessage ||
       previousMessage.type === 'system' ||
-      previousMessage.type === 'error' ||
       userId !== previousMessage?.user?.id ||
+      previousMessage.type === 'error' ||
       !!isPrevMessageTypeDeleted ||
       (!hideDateSeparators && dateSeparators[message.id]) ||
-      messageGroupStyles[previousMessage.id]?.includes('bottom') ||
-      isEditedMessage(previousMessage);
+      messageGroupStyles[previousMessage.id]?.includes('bottom');
 
     const isBottomMessage =
       !nextMessage ||
       nextMessage.type === 'system' ||
-      nextMessage.type === 'error' ||
       userId !== nextMessage?.user?.id ||
+      nextMessage.type === 'error' ||
       !!isNextMessageTypeDeleted ||
       (!hideDateSeparators && dateSeparators[nextMessage.id]) ||
       (maxTimeBetweenGroupedMessages !== undefined &&
         nextMessage.created_at.getTime() - message.created_at.getTime() >
-          maxTimeBetweenGroupedMessages) ||
-      isEditedMessage(message);
+          maxTimeBetweenGroupedMessages);
 
     /**
      * Add group styles key for top message

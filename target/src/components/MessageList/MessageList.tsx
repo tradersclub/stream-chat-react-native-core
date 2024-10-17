@@ -20,7 +20,7 @@ import { useShouldScrollToRecentOnNewOwnMessage } from './hooks/useShouldScrollT
 
 import { InlineLoadingMoreIndicator } from './InlineLoadingMoreIndicator';
 import { InlineLoadingMoreRecentIndicator } from './InlineLoadingMoreRecentIndicator';
-import { InlineLoadingMoreRecentThreadIndicator } from './InlineLoadingMoreRecentThreadIndicator';
+import { InlineLoadingMoreThreadIndicator } from './InlineLoadingMoreThreadIndicator';
 import { getLastReceivedMessage } from './utils/getLastReceivedMessage';
 
 import {
@@ -51,8 +51,13 @@ import {
 } from '../../contexts/paginatedMessageListContext/PaginatedMessageListContext';
 import { mergeThemes, ThemeProvider, useTheme } from '../../contexts/themeContext/ThemeContext';
 import { ThreadContextValue, useThreadContext } from '../../contexts/threadContext/ThreadContext';
+import {
+  isDayOrMoment,
+  TranslationContextValue,
+  useTranslationContext,
+} from '../../contexts/translationContext/TranslationContext';
 
-import { DefaultStreamChatGenerics, FileTypes } from '../../types/types';
+import type { DefaultStreamChatGenerics } from '../../types/types';
 
 const WAIT_FOR_SCROLL_TO_OFFSET_TIMEOUT = 150;
 const MAX_RETRIES_AFTER_SCROLL_FAILURE = 10;
@@ -73,6 +78,7 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   flex: { flex: 1 },
+  invert: { transform: [{ scaleY: -1 }] },
   invertAndroid: {
     // Invert the Y AND X axis to prevent a react native issue that can lead to ANRs on android 13
     // details: https://github.com/Expensify/App/pull/12820
@@ -87,6 +93,10 @@ const styles = StyleSheet.create({
     top: 0,
   },
 });
+
+const InvertedCellRendererComponent = (props: React.PropsWithChildren<unknown>) => (
+  <View {...props} style={styles.invertAndroid} />
+);
 
 const keyExtractor = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
@@ -147,10 +157,8 @@ type MessageListPropsWithContext<
     | 'TypingIndicator'
     | 'TypingIndicatorContainer'
   > &
-  Pick<
-    ThreadContextValue<StreamChatGenerics>,
-    'loadMoreRecentThread' | 'loadMoreThread' | 'thread' | 'threadInstance'
-  > & {
+  Pick<ThreadContextValue<StreamChatGenerics>, 'loadMoreThread' | 'thread'> &
+  Pick<TranslationContextValue, 't' | 'tDateTimeParser'> & {
     /**
      * Besides existing (default) UX behavior of underlying FlatList of MessageList component, if you want
      * to attach some additional props to underlying FlatList, you can add it to following prop.
@@ -224,9 +232,9 @@ const MessageListWithContext = <
 >(
   props: MessageListPropsWithContext<StreamChatGenerics>,
 ) => {
-  const LoadingMoreRecentIndicator = props.threadList
-    ? InlineLoadingMoreRecentThreadIndicator
-    : InlineLoadingMoreRecentIndicator;
+  const LoadingMoreIndicator = props.threadList
+    ? InlineLoadingMoreThreadIndicator
+    : InlineLoadingMoreIndicator;
   const {
     additionalFlatListProps,
     channel,
@@ -237,9 +245,9 @@ const MessageListWithContext = <
     disableTypingIndicator,
     EmptyStateIndicator,
     FlatList,
-    FooterComponent = InlineLoadingMoreIndicator,
+    FooterComponent = LoadingMoreIndicator,
     hasNoMoreRecentMessagesToLoad,
-    HeaderComponent = LoadingMoreRecentIndicator,
+    HeaderComponent = InlineLoadingMoreRecentIndicator,
     hideStickyDateHeader,
     initialScrollToFirstUnreadMessage,
     InlineDateSeparator,
@@ -252,7 +260,6 @@ const MessageListWithContext = <
     LoadingIndicator,
     loadMore,
     loadMoreRecent,
-    loadMoreRecentThread,
     loadMoreThread,
     markRead,
     Message,
@@ -272,8 +279,8 @@ const MessageListWithContext = <
     setTargetedMessage,
     StickyHeader,
     targetedMessage,
+    tDateTimeParser,
     thread,
-    threadInstance,
     threadList = false,
     TypingIndicator,
     TypingIndicatorContainer,
@@ -291,7 +298,6 @@ const MessageListWithContext = <
 
   const modifiedTheme = useMemo(
     () => mergeThemes({ style: myMessageTheme, theme }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [myMessageThemeString, theme],
   );
 
@@ -471,7 +477,6 @@ const MessageListWithContext = <
     if (getShouldMarkReadAutomatically()) {
       markRead();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, scrollToBottomButtonVisible, isInitialScrollDone]);
 
   useEffect(() => {
@@ -538,7 +543,6 @@ const MessageListWithContext = <
 
     messageListLengthBeforeUpdate.current = messageListLengthAfterUpdate;
     topMessageBeforeUpdate.current = topMessageAfterUpdate;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     threadList,
     hasNoMoreRecentMessagesToLoad,
@@ -586,7 +590,6 @@ const MessageListWithContext = <
         }, 150); // flatlist might take a bit to update, so a small delay is needed
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rawMessageList, threadList]);
 
   // TODO: do not apply on RN 0.73 and above
@@ -609,17 +612,14 @@ const MessageListWithContext = <
       const isLatestMessageSetShown = !!channel.state.messageSets.find(
         (set) => set.isCurrent && set.isLatest,
       );
-
+      const msg = processedMessageList?.[messageArrayIndex];
       if (!isLatestMessageSetShown) {
-        const msg = processedMessageList?.[messageArrayIndex];
         if (
           channel.state.latestMessages.length !== 0 &&
           unreadCount > channel.state.latestMessages.length
         ) {
           return messageArrayIndex <= unreadCount - channel.state.latestMessages.length - 1;
-        }
-        // The `msg` can be undefined here, since `messageArrayIndex` can be out of bounds hence we add a check for `msg`.
-        else if (lastRead && msg?.created_at) {
+        } else if (lastRead && msg.created_at) {
           return lastRead < msg.created_at;
         }
         return false;
@@ -635,7 +635,7 @@ const MessageListWithContext = <
 
     if (message.type === 'system') {
       return (
-        <View style={[shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined]}>
+        <>
           <View testID={`message-list-item-${index}`}>
             <MessageSystem
               message={message}
@@ -643,7 +643,7 @@ const MessageListWithContext = <
             />
           </View>
           {insertInlineUnreadIndicator && <InlineUnreadIndicator />}
-        </View>
+        </>
       );
     }
 
@@ -667,14 +667,9 @@ const MessageListWithContext = <
     );
     return wrapMessageInTheme ? (
       <>
+        {shouldApplyAndroidWorkaround && renderDateSeperator}
         <ThemeProvider mergedStyle={modifiedTheme}>
-          <View
-            style={[shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined]}
-            testID={`message-list-item-${index}`}
-          >
-            {shouldApplyAndroidWorkaround && renderDateSeperator}
-            {renderMessage}
-          </View>
+          <View testID={`message-list-item-${index}`}>{renderMessage}</View>
         </ThemeProvider>
         {!shouldApplyAndroidWorkaround && renderDateSeperator}
         {/* Adding indicator below the messages, since the list is inverted */}
@@ -682,10 +677,7 @@ const MessageListWithContext = <
       </>
     ) : (
       <>
-        <View
-          style={[shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined]}
-          testID={`message-list-item-${index}`}
-        >
+        <View testID={`message-list-item-${index}`}>
           {shouldApplyAndroidWorkaround && renderDateSeperator}
           {renderMessage}
         </View>
@@ -749,13 +741,7 @@ const MessageListWithContext = <
     if (onEndReachedInPromise.current) {
       await onEndReachedInPromise.current;
     }
-    onStartReachedInPromise.current = (
-      threadList && !!threadInstance && loadMoreRecentThread
-        ? loadMoreRecentThread({ limit })
-        : loadMoreRecent(limit)
-    )
-      .then(callback)
-      .catch(onError);
+    onStartReachedInPromise.current = loadMoreRecent(limit).then(callback).catch(onError);
   };
 
   /**
@@ -982,10 +968,7 @@ const MessageListWithContext = <
           viewPosition: 0.5, // try to place message in the center of the screen
         });
       }
-      // the message we want to scroll to has not been loaded in the state yet
-      loadChannelAroundMessage({ messageId: messageIdToScroll });
     }, 50);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetedMessage, initialScrollToFirstUnreadMessage]);
 
   const messagesWithImages =
@@ -995,7 +978,7 @@ const MessageListWithContext = <
       if (!isMessageTypeDeleted && message.attachments) {
         return message.attachments.some(
           (attachment) =>
-            attachment.type === FileTypes.Image &&
+            attachment.type === 'image' &&
             !attachment.title_link &&
             !attachment.og_scrape_url &&
             (attachment.image_url || attachment.thumb_url),
@@ -1031,7 +1014,6 @@ const MessageListWithContext = <
     ) {
       setMessages(messagesWithImages as MessageType<StreamChatGenerics>[]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     imageString,
     isListActive,
@@ -1040,6 +1022,18 @@ const MessageListWithContext = <
     threadExists,
     threadList,
   ]);
+
+  const stickyHeaderFormatDate =
+    stickyHeaderDate?.getFullYear() === new Date().getFullYear() ? 'MMM D' : 'MMM D, YYYY';
+  const tStickyHeaderDate =
+    stickyHeaderDate && !hideStickyDateHeader ? tDateTimeParser(stickyHeaderDate) : null;
+
+  const stickyHeaderDateString = useMemo(() => {
+    if (tStickyHeaderDate === null || hideStickyDateHeader) return null;
+    if (isDayOrMoment(tStickyHeaderDate)) return tStickyHeaderDate.format(stickyHeaderFormatDate);
+
+    return new Date(tStickyHeaderDate).toDateString();
+  }, [tStickyHeaderDate, stickyHeaderFormatDate, hideStickyDateHeader]);
 
   const dismissImagePicker = () => {
     if (!hasMoved && selectedPicker) {
@@ -1078,6 +1072,22 @@ const MessageListWithContext = <
       });
   }
 
+  const renderListEmptyComponent = useCallback(
+    () => (
+      <View
+        style={[
+          styles.flex,
+          { backgroundColor: white_snow },
+          shouldApplyAndroidWorkaround ? styles.invertAndroid : styles.invert,
+        ]}
+        testID='empty-state'
+      >
+        <EmptyStateIndicator listType='message' />
+      </View>
+    ),
+    [EmptyStateIndicator, shouldApplyAndroidWorkaround],
+  );
+
   const ListFooterComponent = useCallback(
     () => (
       <View style={shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined}>
@@ -1096,28 +1106,21 @@ const MessageListWithContext = <
     [shouldApplyAndroidWorkaround, HeaderComponent],
   );
 
-  const ItemSeparatorComponent = additionalFlatListProps?.ItemSeparatorComponent;
-  const WrappedItemSeparatorComponent = useCallback(
-    () => (
-      <View style={[shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined]}>
-        {ItemSeparatorComponent ? <ItemSeparatorComponent /> : null}
-      </View>
-    ),
-    [ItemSeparatorComponent, shouldApplyAndroidWorkaround],
-  );
+  const StickyHeaderComponent = () => {
+    if (!stickyHeaderDateString) return null;
+    if (StickyHeader) return <StickyHeader dateString={stickyHeaderDateString} />;
+    if (messageListLengthAfterUpdate) return <DateHeader dateString={stickyHeaderDateString} />;
+    return null;
+  };
 
   // We need to omit the style related props from the additionalFlatListProps and add them directly instead of spreading
   let additionalFlatListPropsExcludingStyle:
-    | Omit<
-        NonNullable<typeof additionalFlatListProps>,
-        'style' | 'contentContainerStyle' | 'ItemSeparatorComponent'
-      >
+    | Omit<NonNullable<typeof additionalFlatListProps>, 'style' | 'contentContainerStyle'>
     | undefined;
 
   if (additionalFlatListProps) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { contentContainerStyle, ItemSeparatorComponent, style, ...rest } =
-      additionalFlatListProps;
+    const { contentContainerStyle, style, ...rest } = additionalFlatListProps;
     additionalFlatListPropsExcludingStyle = rest;
   }
 
@@ -1136,66 +1139,59 @@ const MessageListWithContext = <
       style={[styles.container, { backgroundColor: white_snow }, container]}
       testID='message-flat-list-wrapper'
     >
-      {/* Don't show the empty list indicator for Thread messages */}
-      {processedMessageList.length === 0 && !thread ? (
-        <View style={[styles.flex, { backgroundColor: white_snow }]} testID='empty-state'>
-          {EmptyStateIndicator ? <EmptyStateIndicator listType='message' /> : null}
-        </View>
-      ) : (
-        <FlatList
-          contentContainerStyle={[
-            styles.contentContainer,
-            additionalFlatListProps?.contentContainerStyle,
-            contentContainer,
-          ]}
-          /** Disables the MessageList UI. Which means, message actions, reactions won't work. */
-          data={processedMessageList}
-          extraData={disabled || !hasNoMoreRecentMessagesToLoad}
-          inverted={shouldApplyAndroidWorkaround ? false : inverted}
-          ItemSeparatorComponent={WrappedItemSeparatorComponent}
-          keyboardShouldPersistTaps='handled'
-          keyExtractor={keyExtractor}
-          ListFooterComponent={ListFooterComponent}
-          /**
+      <FlatList
+        CellRendererComponent={
+          shouldApplyAndroidWorkaround ? InvertedCellRendererComponent : undefined
+        }
+        contentContainerStyle={[
+          styles.contentContainer,
+          additionalFlatListProps?.contentContainerStyle,
+          contentContainer,
+        ]}
+        /** Disables the MessageList UI. Which means, message actions, reactions won't work. */
+        data={processedMessageList}
+        extraData={disabled || !hasNoMoreRecentMessagesToLoad}
+        inverted={shouldApplyAndroidWorkaround ? false : inverted}
+        keyboardShouldPersistTaps='handled'
+        keyExtractor={keyExtractor}
+        ListEmptyComponent={renderListEmptyComponent}
+        ListFooterComponent={ListFooterComponent}
+        /**
           if autoscrollToTopThreshold is 10, we scroll to recent if before new list update it was already at the bottom (10 offset or below)
           minIndexForVisible = 1 means that beyond item at index 1 will not change position on list updates
           minIndexForVisible is not used when autoscrollToTopThreshold = 10
         */
-          ListHeaderComponent={ListHeaderComponent}
-          maintainVisibleContentPosition={{
-            autoscrollToTopThreshold: autoscrollToRecent ? 10 : undefined,
-            minIndexForVisible: 1,
-          }}
-          maxToRenderPerBatch={30}
-          onMomentumScrollEnd={onUserScrollEvent}
-          onScroll={handleScroll}
-          onScrollBeginDrag={onScrollBeginDrag}
-          onScrollEndDrag={onScrollEndDrag}
-          onScrollToIndexFailed={onScrollToIndexFailedRef.current}
-          onTouchEnd={dismissImagePicker}
-          onViewableItemsChanged={onViewableItemsChanged.current}
-          ref={refCallback}
-          renderItem={renderItem}
-          scrollEnabled={overlay === 'none'}
-          showsVerticalScrollIndicator={!shouldApplyAndroidWorkaround}
-          style={[
-            styles.listContainer,
-            listContainer,
-            additionalFlatListProps?.style,
-            shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined,
-          ]}
-          testID='message-flat-list'
-          viewabilityConfig={flatListViewabilityConfig}
-          {...additionalFlatListPropsExcludingStyle}
-        />
-      )}
-
+        ListHeaderComponent={ListHeaderComponent}
+        maintainVisibleContentPosition={{
+          autoscrollToTopThreshold: autoscrollToRecent ? 10 : undefined,
+          minIndexForVisible: 1,
+        }}
+        maxToRenderPerBatch={30}
+        onMomentumScrollEnd={onUserScrollEvent}
+        onScroll={handleScroll}
+        onScrollBeginDrag={onScrollBeginDrag}
+        onScrollEndDrag={onScrollEndDrag}
+        onScrollToIndexFailed={onScrollToIndexFailedRef.current}
+        onTouchEnd={dismissImagePicker}
+        onViewableItemsChanged={onViewableItemsChanged.current}
+        ref={refCallback}
+        renderItem={renderItem}
+        scrollEnabled={overlay === 'none'}
+        showsVerticalScrollIndicator={!shouldApplyAndroidWorkaround}
+        style={[
+          styles.listContainer,
+          listContainer,
+          additionalFlatListProps?.style,
+          shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined,
+        ]}
+        testID='message-flat-list'
+        viewabilityConfig={flatListViewabilityConfig}
+        {...additionalFlatListPropsExcludingStyle}
+      />
       {!loading && (
         <>
           <View style={styles.stickyHeader}>
-            {messageListLengthAfterUpdate && StickyHeader ? (
-              <StickyHeader date={stickyHeaderDate} DateHeader={DateHeader} />
-            ) : null}
+            <StickyHeaderComponent />
           </View>
           {!disableTypingIndicator && TypingIndicator && (
             <TypingIndicatorContainer>
@@ -1264,8 +1260,8 @@ export const MessageList = <
   const { hasNoMoreRecentMessagesToLoad, loadMore, loadMoreRecent } =
     usePaginatedMessageListContext<StreamChatGenerics>();
   const { overlay } = useOverlayContext();
-  const { loadMoreRecentThread, loadMoreThread, thread, threadInstance } =
-    useThreadContext<StreamChatGenerics>();
+  const { loadMoreThread, thread } = useThreadContext<StreamChatGenerics>();
+  const { t, tDateTimeParser } = useTranslationContext();
 
   return (
     <MessageListWithContext
@@ -1292,7 +1288,6 @@ export const MessageList = <
         LoadingIndicator,
         loadMore,
         loadMoreRecent,
-        loadMoreRecentThread,
         loadMoreThread,
         markRead,
         Message,
@@ -1308,9 +1303,10 @@ export const MessageList = <
         setSelectedPicker,
         setTargetedMessage,
         StickyHeader,
+        t,
         targetedMessage,
+        tDateTimeParser,
         thread,
-        threadInstance,
         threadList,
         TypingIndicator,
         TypingIndicatorContainer,

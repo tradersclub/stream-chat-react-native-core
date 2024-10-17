@@ -81,7 +81,7 @@ export type AttachmentPickerContextValue = {
 };
 export declare const AttachmentPickerContext: React.Context<AttachmentPickerContextValue>;
 export declare const AttachmentPickerProvider: ({ children, value, }: React.PropsWithChildren<{
-    value?: (Pick<AttachmentPickerContextValue, "closePicker" | "CameraSelectorIcon" | "FileSelectorIcon" | "ImageSelectorIcon" | "openPicker"> & Partial<Pick<AttachmentPickerContextValue, "bottomInset" | "topInset">>) | undefined;
+    value?: (Pick<AttachmentPickerContextValue, "CameraSelectorIcon" | "closePicker" | "FileSelectorIcon" | "ImageSelectorIcon" | "openPicker"> & Partial<Pick<AttachmentPickerContextValue, "bottomInset" | "topInset">>) | undefined;
 }>) => React.JSX.Element;
 export declare const useAttachmentPickerContext: () => AttachmentPickerContextValue;
 /**

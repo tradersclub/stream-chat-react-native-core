@@ -6,6 +6,10 @@ import Animated from 'react-native-reanimated';
 import dayjs from 'dayjs';
 
 import {
+  ChannelContextValue,
+  useChannelContext,
+} from '../../../../contexts/channelContext/ChannelContext';
+import {
   MessageInputContextValue,
   useMessageInputContext,
 } from '../../../../contexts/messageInputContext/MessageInputContext';
@@ -17,41 +21,42 @@ import type { DefaultStreamChatGenerics } from '../../../../types/types';
 
 type AudioRecorderPropsWithContext<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
-> = Pick<MessageInputContextValue<StreamChatGenerics>, 'asyncMessagesMultiSendEnabled'> & {
-  /**
-   * Function to stop and delete the voice recording.
-   */
-  deleteVoiceRecording: () => Promise<void>;
-  /**
-   * Boolean used to show if the voice recording state is locked. This makes sure the mic button shouldn't be pressed any longer.
-   * When the mic is locked the `AudioRecordingInProgress` component shows up.
-   */
-  micLocked: boolean;
-  /**
-   * The current voice recording that is in progress.
-   */
-  recording: AudioRecordingReturnType;
-  /**
-   * Boolean to determine if the recording has been stopped.
-   */
-  recordingStopped: boolean;
-  /**
-   * Function to stop the ongoing voice recording.
-   */
-  stopVoiceRecording: () => Promise<void>;
-  /**
-   * Function to upload the voice recording.
-   */
-  uploadVoiceRecording: (multiSendEnabled: boolean) => Promise<void>;
-  /**
-   * The duration of the voice recording.
-   */
-  recordingDuration?: number;
-  /**
-   * Style used in slide to cancel container.
-   */
-  slideToCancelStyle?: StyleProp<ViewStyle>;
-};
+> = Pick<ChannelContextValue<StreamChatGenerics>, 'disabled'> &
+  Pick<MessageInputContextValue<StreamChatGenerics>, 'asyncMessagesMultiSendEnabled'> & {
+    /**
+     * Function to stop and delete the voice recording.
+     */
+    deleteVoiceRecording: () => Promise<void>;
+    /**
+     * Boolean used to show if the voice recording state is locked. This makes sure the mic button shouldn't be pressed any longer.
+     * When the mic is locked the `AudioRecordingInProgress` component shows up.
+     */
+    micLocked: boolean;
+    /**
+     * The current voice recording that is in progress.
+     */
+    recording: AudioRecordingReturnType;
+    /**
+     * Boolean to determine if the recording has been stopped.
+     */
+    recordingStopped: boolean;
+    /**
+     * Function to stop the ongoing voice recording.
+     */
+    stopVoiceRecording: () => Promise<void>;
+    /**
+     * Function to upload the voice recording.
+     */
+    uploadVoiceRecording: (multiSendEnabled: boolean) => Promise<void>;
+    /**
+     * The duration of the voice recording.
+     */
+    recordingDuration?: number;
+    /**
+     * Style used in slide to cancel container.
+     */
+    slideToCancelStyle?: StyleProp<ViewStyle>;
+  };
 
 const StopRecording = ({
   stopVoiceRecordingHandler,
@@ -105,8 +110,10 @@ const UploadRecording = ({
 
 const DeleteRecording = ({
   deleteVoiceRecordingHandler,
+  disabled,
 }: {
   deleteVoiceRecordingHandler: () => Promise<void>;
+  disabled?: boolean;
 }) => {
   const {
     theme: {
@@ -118,6 +125,7 @@ const DeleteRecording = ({
   } = useTheme();
   return (
     <Pressable
+      disabled={disabled}
       onPress={deleteVoiceRecordingHandler}
       style={[styles.deleteContainer, deleteContainer]}
       testID='delete-button'
@@ -135,6 +143,7 @@ const AudioRecorderWithContext = <
   const {
     asyncMessagesMultiSendEnabled,
     deleteVoiceRecording,
+    disabled,
     micLocked,
     recordingDuration,
     recordingStopped,
@@ -156,7 +165,7 @@ const AudioRecorderWithContext = <
     if (recordingStopped) {
       return (
         <>
-          <DeleteRecording deleteVoiceRecordingHandler={deleteVoiceRecording} />
+          <DeleteRecording deleteVoiceRecordingHandler={deleteVoiceRecording} disabled={disabled} />
           <UploadRecording
             asyncMessagesMultiSendEnabled={asyncMessagesMultiSendEnabled}
             uploadVoiceRecordingHandler={uploadVoiceRecording}
@@ -180,7 +189,7 @@ const AudioRecorderWithContext = <
   } else {
     return (
       <>
-        <View style={[styles.micContainer, micContainer]} testID='recording-active-container'>
+        <View style={[styles.micContainer, micContainer]}>
           <Mic fill={recordingDuration !== 0 ? accent_red : grey_dark} size={32} {...micIcon} />
           <Text style={[styles.durationLabel, { color: grey_dark }]}>
             {recordingDuration ? dayjs.duration(recordingDuration).format('mm:ss') : null}
@@ -203,6 +212,7 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
 ) => {
   const {
     asyncMessagesMultiSendEnabled: prevAsyncMessagesMultiSendEnabled,
+    disabled: prevDisabled,
     micLocked: prevMicLocked,
     recording: prevRecording,
     recordingDuration: prevRecordingDuration,
@@ -210,6 +220,7 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
   } = prevProps;
   const {
     asyncMessagesMultiSendEnabled: nextAsyncMessagesMultiSendEnabled,
+    disabled: nextDisabled,
     micLocked: nextMicLocked,
     recording: nextRecording,
     recordingDuration: nextRecordingDuration,
@@ -219,6 +230,9 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
   const asyncMessagesMultiSendEnabledEqual =
     prevAsyncMessagesMultiSendEnabled === nextAsyncMessagesMultiSendEnabled;
   if (!asyncMessagesMultiSendEnabledEqual) return false;
+
+  const disabledEqual = prevDisabled === nextDisabled;
+  if (!disabledEqual) return false;
 
   const micLockedEqual = prevMicLocked === nextMicLocked;
   if (!micLockedEqual) return false;
@@ -261,12 +275,14 @@ export const AudioRecorder = <
 >(
   props: AudioRecorderProps<StreamChatGenerics>,
 ) => {
+  const { disabled = false } = useChannelContext<StreamChatGenerics>();
   const { asyncMessagesMultiSendEnabled } = useMessageInputContext<StreamChatGenerics>();
 
   return (
     <MemoizedAudioRecorder
       {...{
         asyncMessagesMultiSendEnabled,
+        disabled,
       }}
       {...props}
     />

@@ -3,7 +3,6 @@ import React, { PropsWithChildren, useContext } from 'react';
 import type { Attachment } from 'stream-chat';
 
 import type { ActionHandler } from '../../components/Attachment/Attachment';
-import { ReactionSummary } from '../../components/Message/hooks/useProcessReactions';
 import type {
   MessageTouchableHandlerPayload,
   TouchableHandlerPayload,
@@ -19,6 +18,11 @@ import { DEFAULT_BASE_CONTEXT_VALUE } from '../utils/defaultBaseContextValue';
 import { getDisplayName } from '../utils/getDisplayName';
 
 export type Alignment = 'right' | 'left';
+
+export type Reactions = {
+  own: boolean;
+  type: string;
+}[];
 
 export type MessageContextValue<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
@@ -38,53 +42,17 @@ export type MessageContextValue<
   groupStyles: GroupType[];
   /** Handler for actions. Actions in combination with attachments can be used to build [commands](https://getstream.io/chat/docs/#channel_commands). */
   handleAction: ActionHandler;
-  /**
-   * @deprecated
-   * @returns Promise<void>
-   */
-  handleCopyMessage: () => void;
-  /**
-   * @deprecated
-   * @returns Promise<void>
-   */
-  handleDeleteMessage: () => void;
-  /**
-   * @deprecated
-   * @returns Promise<void>
-   */
+  handleDeleteMessage: () => Promise<void>;
   handleEditMessage: () => void;
-  /**
-   * @deprecated
-   * @returns Promise<void>
-   */
-  handleFlagMessage: () => void;
-  /**
-   * @deprecated
-   * @returns Promise<void>
-   */
   handleQuotedReplyMessage: () => void;
-  /**
-   * @deprecated
-   * @returns Promise<void>
-   */
   handleResendMessage: () => Promise<void>;
-  /**
-   * @deprecated
-   * @returns Promise<void>
-   */
   handleToggleBanUser: () => Promise<void>;
-  /**
-   * @deprecated
-   * @returns Promise<void>
-   */
   handleToggleMuteUser: () => Promise<void>;
   handleToggleReaction: (reactionType: string) => Promise<void>;
   /** Whether or not message has reactions */
   hasReactions: boolean;
   /** The images attached to a message */
   images: Attachment<StreamChatGenerics>[];
-  /** Boolean that determines if the edited message is pressed. */
-  isEditedMessageOpen: boolean;
   /** Whether or not this is the active user's message */
   isMyMessage: boolean;
   /** Whether or not this is the last message in a group of messages */
@@ -122,10 +90,8 @@ export type MessageContextValue<
   onPressIn: ((payload: TouchableHandlerPayload) => void) | null;
   /** The images attached to a message */
   otherAttachments: Attachment<StreamChatGenerics>[];
-  reactions: ReactionSummary[];
-  /** React set state function to set the state of `isEditedMessageOpen` */
-  setIsEditedMessageOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  showMessageOverlay: (isMessageActionsVisible?: boolean, error?: boolean) => void;
+  reactions: Reactions;
+  showMessageOverlay: (messageReactions?: boolean, error?: boolean) => void;
   showMessageStatus: boolean;
   /** Whether or not the Message is part of a Thread */
   threadList: boolean;
@@ -142,7 +108,7 @@ export type MessageContextValue<
   preventPress?: boolean;
   /** Whether or not the avatar show show next to Message */
   showAvatar?: boolean;
-} & Pick<ChannelContextValue<StreamChatGenerics>, 'channel' | 'members'>;
+} & Pick<ChannelContextValue<StreamChatGenerics>, 'channel' | 'disabled' | 'members'>;
 
 export const MessageContext = React.createContext(
   DEFAULT_BASE_CONTEXT_VALUE as MessageContextValue,

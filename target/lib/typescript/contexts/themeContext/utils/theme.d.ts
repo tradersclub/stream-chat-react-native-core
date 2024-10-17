@@ -24,8 +24,6 @@ export declare const Colors: {
     static_black: string;
     static_white: string;
     targetedMessageBackground: string;
-    text_high_emphasis: string;
-    text_low_emphasis: string;
     transparent: string;
     white: string;
     white_smoke: string;
@@ -166,8 +164,6 @@ export type Theme = {
         channelContainer: ViewStyle;
         channelDetails: TextStyle;
         channelTitle: TextStyle;
-        messageContainer: ViewStyle;
-        messageTitle: TextStyle;
     };
     groupAvatar: {
         container: ViewStyle;
@@ -319,11 +315,6 @@ export type Theme = {
         inputBoxContainer: ViewStyle;
         micButtonContainer: ViewStyle;
         moreOptionsButton: ViewStyle;
-        nativeAttachmentPicker: {
-            buttonContainer: ViewStyle;
-            buttonDimmerStyle: ViewStyle;
-            container: ViewStyle;
-        };
         optionsContainer: ViewStyle;
         replyContainer: ViewStyle;
         searchIcon: IconProps;
@@ -456,8 +447,6 @@ export type Theme = {
             deletedContainerInner: ViewStyle;
             deletedMetaText: TextStyle;
             deletedText: MarkdownStyle;
-            editedLabel: TextStyle;
-            editedTimestampContainer: ViewStyle;
             errorContainer: ViewStyle;
             errorIcon: IconProps;
             errorIconContainer: ViewStyle;
@@ -478,7 +467,6 @@ export type Theme = {
             wrapper: ViewStyle;
             receiverMessageBackgroundColor?: ColorValue;
             senderMessageBackgroundColor?: ColorValue;
-            timestampText?: TextStyle;
         };
         file: {
             container: ViewStyle;
@@ -505,12 +493,6 @@ export type Theme = {
             moreImagesContainer: ViewStyle;
             moreImagesText: TextStyle;
             thumbnail: ViewStyle;
-            imageBorderRadius?: {
-                borderBottomLeftRadius: number;
-                borderBottomRightRadius: number;
-                borderTopLeftRadius: number;
-                borderTopRightRadius: number;
-            };
         };
         giphy: {
             buttonContainer: ViewStyle;
@@ -545,8 +527,7 @@ export type Theme = {
             middleIcon: ViewStyle;
             radius: number;
             reactionBubble: ViewStyle;
-            reactionContainer: ViewStyle;
-            reactionCount: TextStyle;
+            reactionBubbleBackground: ViewStyle;
             reactionSize: number;
             strokeSize: number;
         };
@@ -582,9 +563,6 @@ export type Theme = {
             actionContainer: ViewStyle;
             icon: ViewStyle;
             title: TextStyle;
-        };
-        messageActionsList: {
-            container: ViewStyle;
         };
         padding: number;
         reactions: {
@@ -635,23 +613,6 @@ export type Theme = {
             backgroundGradientStop?: string;
             threadHeight?: number;
         };
-    };
-    threadListItem: {
-        boldText: TextStyle;
-        contentRow: ViewStyle;
-        contentTextWrapper: ViewStyle;
-        dateText: TextStyle;
-        headerRow: ViewStyle;
-        infoRow: ViewStyle;
-        lastReplyText: TextStyle;
-        parentMessageText: TextStyle;
-        touchableWrapper: ViewStyle;
-        unreadBubbleText: TextStyle;
-        unreadBubbleWrapper: ViewStyle;
-    };
-    threadListUnreadBanner: {
-        text: TextStyle;
-        touchableWrapper: ViewStyle;
     };
     typingIndicator: {
         container: ViewStyle;

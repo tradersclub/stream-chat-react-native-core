@@ -24,7 +24,6 @@ import { ImageGallery } from '../ImageGallery';
 jest.mock('../../../native.ts', () => {
   const View = require('react-native/Libraries/Components/View/View');
   return {
-    isImageMediaLibraryAvailable: jest.fn(() => true),
     isVideoPackageAvailable: jest.fn(() => true),
     NetInfo: {
       addEventListener: jest.fn(),
@@ -83,7 +82,7 @@ describe('ImageGallery', () => {
         videoItemComponent,
         'handleLoad',
         `photoId-${message.id}-${attachment.asset_url}`,
-        10 * 1000,
+        10,
       );
     });
 
@@ -144,7 +143,7 @@ describe('ImageGallery', () => {
         videoItemComponent,
         'handleProgress',
         `photoId-${message.id}-${attachment.asset_url}`,
-        0.3 * 1000,
+        0.3,
       );
     });
 
@@ -170,7 +169,7 @@ describe('ImageGallery', () => {
 
     act(() => {
       fireEvent(videoItemComponent, 'handleLoad', {
-        duration: 10 * 1000,
+        duration: 10,
       });
       fireEvent(videoItemComponent, 'handleProgress', {
         currentTime: undefined,
@@ -203,7 +202,7 @@ describe('ImageGallery', () => {
         videoItemComponent,
         'handleLoad',
         `photoId-${message.id}-${attachment.asset_url}`,
-        10 * 1000,
+        10,
       );
       fireEvent(videoItemComponent, 'handleEnd');
     });

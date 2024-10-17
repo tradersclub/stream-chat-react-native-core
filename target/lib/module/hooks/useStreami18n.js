@@ -7,7 +7,7 @@ var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/sli
 var _react = require("react");
 var _dayjs = _interopRequireDefault(require("dayjs"));
 var _useIsMountedRef = require("./useIsMountedRef");
-var _Streami18n = require("../utils/i18n/Streami18n");
+var _Streami18n = require("../utils/Streami18n");
 var useStreami18n = function useStreami18n(i18nInstance) {
   var _useState = (0, _react.useState)({
       t: function t(key) {

@@ -31,7 +31,7 @@ var AnimatedGalleryImage = _react["default"].memo(function (props) {
     vw = _useViewport.vw;
   var screenWidth = vw(100);
   var halfScreenWidth = vw(50);
-  var animatedGalleryImageStyle = (0, _reactNativeReanimated.useAnimatedStyle)(function () {
+  var AnimatedGalleryImageStyle = (0, _reactNativeReanimated.useAnimatedStyle)(function () {
     var xScaleOffset = -7 * screenWidth * (0.5 + index);
     var yScaleOffset = -screenHeight * 3.5;
     return {
@@ -61,7 +61,7 @@ var AnimatedGalleryImage = _react["default"].memo(function (props) {
     source: {
       uri: photo.uri
     },
-    style: [animatedGalleryImageStyle, {
+    style: [style, AnimatedGalleryImageStyle, {
       transform: [{
         scaleX: -1
       }, {
@@ -71,7 +71,7 @@ var AnimatedGalleryImage = _react["default"].memo(function (props) {
       }, {
         scale: oneEighth
       }]
-    }, style]
+    }]
   });
 }, function (prevProps, nextProps) {
   if (prevProps.selected === nextProps.selected && prevProps.shouldRender === nextProps.shouldRender && prevProps.photo.uri === nextProps.photo.uri && prevProps.previous === nextProps.previous && prevProps.index === nextProps.index && prevProps.screenHeight === nextProps.screenHeight) {

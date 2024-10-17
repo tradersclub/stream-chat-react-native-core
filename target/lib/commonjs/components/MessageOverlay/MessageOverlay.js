@@ -337,14 +337,23 @@ var MessageOverlayWithContext = function MessageOverlayWithContext(props) {
             showScreen: showScreen
           }, messageActionProps, {
             message: message
-          })), !!messageReactionTitle && (0, _jsxRuntime.jsx)(OverlayReactions, {
+          })), !!messageReactionTitle && message.latest_reactions && message.latest_reactions.length > 0 ? (0, _jsxRuntime.jsx)(OverlayReactions, {
             alignment: alignment,
-            messageId: message.id,
             OverlayReactionsAvatar: OverlayReactionsAvatar,
+            reactions: message.latest_reactions.map(function (reaction) {
+              var _reaction$user, _reaction$user2, _reaction$user3, _reaction$user4;
+              return {
+                alignment: clientId && clientId === ((_reaction$user = reaction.user) == null ? void 0 : _reaction$user.id) ? 'right' : 'left',
+                id: (reaction == null ? void 0 : (_reaction$user2 = reaction.user) == null ? void 0 : _reaction$user2.id) || '',
+                image: reaction == null ? void 0 : (_reaction$user3 = reaction.user) == null ? void 0 : _reaction$user3.image,
+                name: (reaction == null ? void 0 : (_reaction$user4 = reaction.user) == null ? void 0 : _reaction$user4.name) || reaction.user_id || '',
+                type: reaction.type
+              };
+            }),
             showScreen: showScreen,
             supportedReactions: messagesContext == null ? void 0 : messagesContext.supportedReactions,
             title: messageReactionTitle
-          })]
+          }) : null]
         })
       })
     });

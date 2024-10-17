@@ -1,6 +1,6 @@
 import React from 'react';
 export type EmptyStateProps = {
-    listType?: 'channel' | 'message' | 'threads' | 'default';
+    listType?: 'channel' | 'message' | 'default';
 };
-export declare const EmptyStateIndicator: ({ listType }: EmptyStateProps) => React.JSX.Element;
+export declare const EmptyStateIndicator: ({ listType }: EmptyStateProps) => React.JSX.Element | null;
 //# sourceMappingURL=EmptyStateIndicator.d.ts.map

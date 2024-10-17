@@ -38,7 +38,6 @@ export function useShouldScrollToRecentOnNewOwnMessage<
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rawMessageList]);
 
   return isMyOwnNewMessageRef;

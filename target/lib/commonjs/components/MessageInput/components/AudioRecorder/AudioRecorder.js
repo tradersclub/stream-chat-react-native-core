@@ -9,6 +9,7 @@ var _react = _interopRequireDefault(require("react"));
 var _reactNative = require("react-native");
 var _reactNativeReanimated = _interopRequireDefault(require("react-native-reanimated"));
 var _dayjs = _interopRequireDefault(require("dayjs"));
+var _ChannelContext = require("../../../../contexts/channelContext/ChannelContext");
 var _MessageInputContext = require("../../../../contexts/messageInputContext/MessageInputContext");
 var _ThemeContext = require("../../../../contexts/themeContext/ThemeContext");
 var _icons = require("../../../../icons");
@@ -62,7 +63,8 @@ var UploadRecording = function UploadRecording(_ref2) {
   });
 };
 var DeleteRecording = function DeleteRecording(_ref4) {
-  var deleteVoiceRecordingHandler = _ref4.deleteVoiceRecordingHandler;
+  var deleteVoiceRecordingHandler = _ref4.deleteVoiceRecordingHandler,
+    disabled = _ref4.disabled;
   var _useTheme3 = (0, _ThemeContext.useTheme)(),
     _useTheme3$theme = _useTheme3.theme,
     accent_blue = _useTheme3$theme.colors.accent_blue,
@@ -70,6 +72,7 @@ var DeleteRecording = function DeleteRecording(_ref4) {
     deleteContainer = _useTheme3$theme$mess.deleteContainer,
     deleteIcon = _useTheme3$theme$mess.deleteIcon;
   return (0, _jsxRuntime.jsx)(_reactNative.Pressable, {
+    disabled: disabled,
     onPress: deleteVoiceRecordingHandler,
     style: [styles.deleteContainer, deleteContainer],
     testID: "delete-button",
@@ -82,6 +85,7 @@ var DeleteRecording = function DeleteRecording(_ref4) {
 var AudioRecorderWithContext = function AudioRecorderWithContext(props) {
   var asyncMessagesMultiSendEnabled = props.asyncMessagesMultiSendEnabled,
     deleteVoiceRecording = props.deleteVoiceRecording,
+    disabled = props.disabled,
     micLocked = props.micLocked,
     recordingDuration = props.recordingDuration,
     recordingStopped = props.recordingStopped,
@@ -102,7 +106,8 @@ var AudioRecorderWithContext = function AudioRecorderWithContext(props) {
     if (recordingStopped) {
       return (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
         children: [(0, _jsxRuntime.jsx)(DeleteRecording, {
-          deleteVoiceRecordingHandler: deleteVoiceRecording
+          deleteVoiceRecordingHandler: deleteVoiceRecording,
+          disabled: disabled
         }), (0, _jsxRuntime.jsx)(UploadRecording, {
           asyncMessagesMultiSendEnabled: asyncMessagesMultiSendEnabled,
           uploadVoiceRecordingHandler: uploadVoiceRecording
@@ -128,7 +133,6 @@ var AudioRecorderWithContext = function AudioRecorderWithContext(props) {
     return (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
       children: [(0, _jsxRuntime.jsxs)(_reactNative.View, {
         style: [styles.micContainer, micContainer],
-        testID: "recording-active-container",
         children: [(0, _jsxRuntime.jsx)(_icons.Mic, Object.assign({
           fill: recordingDuration !== 0 ? accent_red : grey_dark,
           size: 32
@@ -155,17 +159,21 @@ var AudioRecorderWithContext = function AudioRecorderWithContext(props) {
 };
 var areEqual = function areEqual(prevProps, nextProps) {
   var prevAsyncMessagesMultiSendEnabled = prevProps.asyncMessagesMultiSendEnabled,
+    prevDisabled = prevProps.disabled,
     prevMicLocked = prevProps.micLocked,
     prevRecording = prevProps.recording,
     prevRecordingDuration = prevProps.recordingDuration,
     prevRecordingStopped = prevProps.recordingStopped;
   var nextAsyncMessagesMultiSendEnabled = nextProps.asyncMessagesMultiSendEnabled,
+    nextDisabled = nextProps.disabled,
     nextMicLocked = nextProps.micLocked,
     nextRecording = nextProps.recording,
     nextRecordingDuration = nextProps.recordingDuration,
     nextRecordingStopped = nextProps.recordingStopped;
   var asyncMessagesMultiSendEnabledEqual = prevAsyncMessagesMultiSendEnabled === nextAsyncMessagesMultiSendEnabled;
   if (!asyncMessagesMultiSendEnabledEqual) return false;
+  var disabledEqual = prevDisabled === nextDisabled;
+  if (!disabledEqual) return false;
   var micLockedEqual = prevMicLocked === nextMicLocked;
   if (!micLockedEqual) return false;
   var recordingEqual = prevRecording === nextRecording;
@@ -178,10 +186,14 @@ var areEqual = function areEqual(prevProps, nextProps) {
 };
 var MemoizedAudioRecorder = _react["default"].memo(AudioRecorderWithContext, areEqual);
 var AudioRecorder = function AudioRecorder(props) {
+  var _useChannelContext = (0, _ChannelContext.useChannelContext)(),
+    _useChannelContext$di = _useChannelContext.disabled,
+    disabled = _useChannelContext$di === void 0 ? false : _useChannelContext$di;
   var _useMessageInputConte = (0, _MessageInputContext.useMessageInputContext)(),
     asyncMessagesMultiSendEnabled = _useMessageInputConte.asyncMessagesMultiSendEnabled;
   return (0, _jsxRuntime.jsx)(MemoizedAudioRecorder, Object.assign({
-    asyncMessagesMultiSendEnabled: asyncMessagesMultiSendEnabled
+    asyncMessagesMultiSendEnabled: asyncMessagesMultiSendEnabled,
+    disabled: disabled
   }, props));
 };
 exports.AudioRecorder = AudioRecorder;

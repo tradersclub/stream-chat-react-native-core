@@ -2,7 +2,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setUser = exports.getTestClientWithUser = exports.getTestClient = exports.getRandomInt = void 0;
+exports.getTestClientWithUser = exports.getTestClient = exports.getRandomInt = void 0;
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 var _streamChat = require("stream-chat");
@@ -19,7 +19,6 @@ var setUser = function setUser(client, user) {
     resolve();
   });
 };
-exports.setUser = setUser;
 function mockClient(client) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var _options$disableAppSe = options.disableAppSettings,

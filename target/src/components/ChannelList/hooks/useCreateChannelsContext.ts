@@ -80,7 +80,6 @@ export const useCreateChannelsContext = <
       setFlatListRef,
       Skeleton,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       channelValueString,
       error,

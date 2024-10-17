@@ -76,9 +76,7 @@ var areEqual = function areEqual(prevProps, nextProps) {
     nextMessage = nextProps.message,
     nextMyMessageTheme = nextProps.myMessageTheme,
     nextOnlyEmojis = nextProps.onlyEmojis;
-  var messageStatusEqual = prevMessage.status === nextMessage.status;
-  if (!messageStatusEqual) return false;
-  var messageTextEqual = prevMessage.text === nextMessage.text && prevMessage.i18n === nextMessage.i18n;
+  var messageTextEqual = prevMessage.text === nextMessage.text;
   if (!messageTextEqual) return false;
   var onlyEmojisEqual = prevOnlyEmojis === nextOnlyEmojis;
   if (!onlyEmojisEqual) return false;

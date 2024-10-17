@@ -166,7 +166,6 @@ export const ChannelsStateProvider = <
       setState,
       state,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [state],
   );
 

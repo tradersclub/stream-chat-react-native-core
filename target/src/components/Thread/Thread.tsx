@@ -23,12 +23,7 @@ type ThreadPropsWithContext<
   Pick<MessagesContextValue<StreamChatGenerics>, 'MessageList'> &
   Pick<
     ThreadContextValue<StreamChatGenerics>,
-    | 'closeThread'
-    | 'loadMoreThread'
-    | 'parentMessagePreventPress'
-    | 'reloadThread'
-    | 'thread'
-    | 'threadInstance'
+    'closeThread' | 'loadMoreThread' | 'reloadThread' | 'thread'
   > & {
     /**
      * Additional props for underlying MessageInput component.
@@ -73,15 +68,10 @@ const ThreadWithContext = <
     MessageInput = DefaultMessageInput,
     MessageList,
     onThreadDismount,
-    parentMessagePreventPress = true,
     thread,
-    threadInstance,
   } = props;
 
   useEffect(() => {
-    if (threadInstance?.activate) {
-      threadInstance.activate();
-    }
     const loadMoreThreadAsync = async () => {
       await loadMoreThread();
     };
@@ -89,29 +79,26 @@ const ThreadWithContext = <
     if (thread?.id && thread.reply_count) {
       loadMoreThreadAsync();
     }
+  }, []);
 
-    return () => {
-      if (threadInstance?.deactivate) {
-        threadInstance.deactivate();
-      }
+  useEffect(
+    () => () => {
       if (closeThreadOnDismount) {
         closeThread();
       }
       if (onThreadDismount) {
         onThreadDismount();
       }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    },
+    [],
+  );
 
   if (!thread) return null;
 
   return (
     <React.Fragment key={`thread-${thread.id}`}>
       <MessageList
-        FooterComponent={() => (
-          <ThreadFooterComponent parentMessagePreventPress={parentMessagePreventPress} />
-        )}
+        FooterComponent={ThreadFooterComponent}
         threadList
         {...additionalMessageListProps}
       />
@@ -145,7 +132,7 @@ export const Thread = <
   const { client } = useChatContext<StreamChatGenerics>();
   const { threadList } = useChannelContext<StreamChatGenerics>();
   const { MessageList } = useMessagesContext<StreamChatGenerics>();
-  const { closeThread, loadMoreThread, reloadThread, thread, threadInstance } =
+  const { closeThread, loadMoreThread, reloadThread, thread } =
     useThreadContext<StreamChatGenerics>();
 
   if (thread?.id && !threadList) {
@@ -163,7 +150,6 @@ export const Thread = <
         MessageList,
         reloadThread,
         thread,
-        threadInstance,
       }}
       {...props}
     />

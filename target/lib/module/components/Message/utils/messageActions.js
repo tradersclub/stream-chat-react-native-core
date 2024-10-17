@@ -2,16 +2,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.messageActions = void 0;
-var _native = require("../../../native");
 var messageActions = function messageActions(_ref) {
-  var banUser = _ref.banUser,
-    blockUser = _ref.blockUser,
+  var blockUser = _ref.blockUser,
     copyMessage = _ref.copyMessage,
     deleteMessage = _ref.deleteMessage,
     editMessage = _ref.editMessage,
     error = _ref.error,
     flagMessage = _ref.flagMessage,
-    isMessageActionsVisible = _ref.isMessageActionsVisible,
     isMyMessage = _ref.isMyMessage,
     isThreadMessage = _ref.isThreadMessage,
     message = _ref.message,
@@ -22,8 +19,8 @@ var messageActions = function messageActions(_ref) {
     retry = _ref.retry,
     threadReply = _ref.threadReply,
     unpinMessage = _ref.unpinMessage;
-  if (messageReactions || !isMessageActionsVisible) {
-    return [];
+  if (messageReactions) {
+    return undefined;
   }
   var actions = [];
   if (error && isMyMessage) {
@@ -38,7 +35,7 @@ var messageActions = function messageActions(_ref) {
   if (isMyMessage && ownCapabilities.updateOwnMessage || !isMyMessage && ownCapabilities.updateAnyMessage) {
     actions.push(editMessage);
   }
-  if (_native.setClipboardString !== null && message.text && !error) {
+  if (copyMessage !== undefined && message.text && !error) {
     actions.push(copyMessage);
   }
   if (!isMyMessage && ownCapabilities.flagMessage) {
@@ -51,7 +48,7 @@ var messageActions = function messageActions(_ref) {
     actions.push(unpinMessage);
   }
   if (!isMyMessage && ownCapabilities.banChannelMembers) {
-    actions.push(banUser || blockUser);
+    actions.push(blockUser);
   }
   if (isMyMessage && ownCapabilities.deleteOwnMessage || !isMyMessage && ownCapabilities.deleteAnyMessage) {
     actions.push(deleteMessage);

@@ -2,7 +2,6 @@ import React, { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useS
 import { KeyboardAvoidingViewProps, StyleSheet, Text, View } from 'react-native';
 
 import debounce from 'lodash/debounce';
-import omit from 'lodash/omit';
 import throttle from 'lodash/throttle';
 
 import { lookup } from 'mime-types';
@@ -18,7 +17,6 @@ import {
   StreamChat,
   Event as StreamEvent,
   Message as StreamMessage,
-  Thread,
 } from 'stream-chat';
 
 import { useCreateChannelContext } from './hooks/useCreateChannelContext';
@@ -61,11 +59,7 @@ import {
   SuggestionsProvider,
 } from '../../contexts/suggestionsContext/SuggestionsContext';
 import { useTheme } from '../../contexts/themeContext/ThemeContext';
-import {
-  ThreadContextValue,
-  ThreadProvider,
-  ThreadType,
-} from '../../contexts/threadContext/ThreadContext';
+import { ThreadContextValue, ThreadProvider } from '../../contexts/threadContext/ThreadContext';
 import {
   TranslationContextValue,
   useTranslationContext,
@@ -80,9 +74,9 @@ import {
   ThumbsUpReaction,
   WutReaction,
 } from '../../icons';
-import { FlatList as FlatListDefault, isImagePickerAvailable, pickDocument } from '../../native';
+import { FlatList as FlatListDefault, pickDocument } from '../../native';
 import * as dbApi from '../../store/apis';
-import { DefaultStreamChatGenerics, FileTypes } from '../../types/types';
+import type { DefaultStreamChatGenerics } from '../../types/types';
 import { addReactionToLocalState } from '../../utils/addReactionToLocalState';
 import { compressedImageURI } from '../../utils/compressImage';
 import { DBSyncManager } from '../../utils/DBSyncManager';
@@ -92,7 +86,6 @@ import { removeReservedFields } from '../../utils/removeReservedFields';
 import {
   defaultEmojiSearchIndex,
   generateRandomId,
-  getFileNameFromPath,
   isBouncedMessage,
   isLocalUrl,
   MessageStatusTypes,
@@ -125,7 +118,6 @@ import { MessageAvatar as MessageAvatarDefault } from '../Message/MessageSimple/
 import { MessageBounce as MessageBounceDefault } from '../Message/MessageSimple/MessageBounce';
 import { MessageContent as MessageContentDefault } from '../Message/MessageSimple/MessageContent';
 import { MessageDeleted as MessageDeletedDefault } from '../Message/MessageSimple/MessageDeleted';
-import { MessageEditedTimestamp as MessageEditedTimestampDefault } from '../Message/MessageSimple/MessageEditedTimestamp';
 import { MessageError as MessageErrorDefault } from '../Message/MessageSimple/MessageError';
 import { MessageFooter as MessageFooterDefault } from '../Message/MessageSimple/MessageFooter';
 import { MessagePinnedHeader as MessagePinnedHeaderDefault } from '../Message/MessageSimple/MessagePinnedHeader';
@@ -133,7 +125,6 @@ import { MessageReplies as MessageRepliesDefault } from '../Message/MessageSimpl
 import { MessageRepliesAvatars as MessageRepliesAvatarsDefault } from '../Message/MessageSimple/MessageRepliesAvatars';
 import { MessageSimple as MessageSimpleDefault } from '../Message/MessageSimple/MessageSimple';
 import { MessageStatus as MessageStatusDefault } from '../Message/MessageSimple/MessageStatus';
-import { MessageTimestamp as MessageTimestampDefault } from '../Message/MessageSimple/MessageTimestamp';
 import { ReactionList as ReactionListDefault } from '../Message/MessageSimple/ReactionList';
 import { AttachButton as AttachButtonDefault } from '../MessageInput/AttachButton';
 import { CommandsButton as CommandsButtonDefault } from '../MessageInput/CommandsButton';
@@ -163,7 +154,6 @@ import { MessageList as MessageListDefault } from '../MessageList/MessageList';
 import { MessageSystem as MessageSystemDefault } from '../MessageList/MessageSystem';
 import { NetworkDownIndicator as NetworkDownIndicatorDefault } from '../MessageList/NetworkDownIndicator';
 import { ScrollToBottomButton as ScrollToBottomButtonDefault } from '../MessageList/ScrollToBottomButton';
-import { StickyHeader as StickyHeaderDefault } from '../MessageList/StickyHeader';
 import { TypingIndicator as TypingIndicatorDefault } from '../MessageList/TypingIndicator';
 import { TypingIndicatorContainer as TypingIndicatorContainerDefault } from '../MessageList/TypingIndicatorContainer';
 import { OverlayReactionList as OverlayReactionListDefault } from '../MessageOverlay/OverlayReactionList';
@@ -272,11 +262,11 @@ export type ChannelPropsWithContext<
       | 'FileAttachmentGroup'
       | 'FlatList'
       | 'forceAlignMessages'
+      | 'formatDate'
       | 'Gallery'
       | 'getMessagesGroupStyles'
       | 'Giphy'
       | 'giphyVersion'
-      | 'handleBan'
       | 'handleBlock'
       | 'handleCopy'
       | 'handleDelete'
@@ -302,7 +292,6 @@ export type ChannelPropsWithContext<
       | 'MessageContent'
       | 'messageContentOrder'
       | 'MessageDeleted'
-      | 'MessageEditedTimestamp'
       | 'MessageError'
       | 'MessageFooter'
       | 'MessageHeader'
@@ -314,7 +303,6 @@ export type ChannelPropsWithContext<
       | 'MessageStatus'
       | 'MessageSystem'
       | 'MessageText'
-      | 'MessageTimestamp'
       | 'myMessageTheme'
       | 'onLongPressMessage'
       | 'onPressInMessage'
@@ -331,9 +319,10 @@ export type ChannelPropsWithContext<
       | 'VideoThumbnail'
     >
   > &
-  Partial<Pick<ThreadContextValue<StreamChatGenerics>, 'allowThreadMessagesInChannel'>> & {
+  Partial<
+    Pick<ThreadContextValue<StreamChatGenerics>, 'allowThreadMessagesInChannel' | 'thread'>
+  > & {
     shouldSyncChannel: boolean;
-    thread: ThreadType<StreamChatGenerics>;
     /**
      * Additional props passed to keyboard avoiding view
      */
@@ -480,13 +469,12 @@ const ChannelWithContext = <
     FileUploadPreview = FileUploadPreviewDefault,
     FlatList = FlatListDefault,
     forceAlignMessages,
+    formatDate,
     Gallery = GalleryDefault,
     getMessagesGroupStyles,
     Giphy = GiphyDefault,
     giphyEnabled,
     giphyVersion = 'fixed_height',
-    handleAttachButtonPress,
-    handleBan,
     handleBlock,
     handleCopy,
     handleDelete,
@@ -498,7 +486,6 @@ const ChannelWithContext = <
     handleReaction,
     handleRetry,
     handleThreadReply,
-    hasCameraPicker = isImagePickerAvailable(),
     hasCommands = true,
     // If pickDocument isn't available, default to hiding the file picker
     hasFilePicker = pickDocument !== null,
@@ -540,7 +527,6 @@ const ChannelWithContext = <
     MessageContent = MessageContentDefault,
     messageContentOrder = ['quoted_reply', 'gallery', 'files', 'text', 'attachments'],
     MessageDeleted = MessageDeletedDefault,
-    MessageEditedTimestamp = MessageEditedTimestampDefault,
     MessageError = MessageErrorDefault,
     MessageFooter = MessageFooterDefault,
     MessageHeader,
@@ -554,7 +540,6 @@ const ChannelWithContext = <
     MessageStatus = MessageStatusDefault,
     MessageSystem = MessageSystemDefault,
     MessageText,
-    MessageTimestamp = MessageTimestampDefault,
     MoreOptionsButton = MoreOptionsButtonDefault,
     myMessageTheme,
     NetworkDownIndicator = NetworkDownIndicatorDefault,
@@ -586,10 +571,10 @@ const ChannelWithContext = <
     ShowThreadMessageInChannelButton = ShowThreadMessageInChannelButtonDefault,
     StartAudioRecordingButton = AudioRecordingButtonDefault,
     stateUpdateThrottleInterval = defaultThrottleInterval,
-    StickyHeader = StickyHeaderDefault,
+    StickyHeader,
     supportedReactions = reactionData,
     t,
-    thread: threadFromProps,
+    thread: threadProps,
     threadList,
     threadMessages,
     typing,
@@ -602,8 +587,6 @@ const ChannelWithContext = <
     watchers,
   } = props;
 
-  const { thread: threadProps, threadInstance } = threadFromProps;
-
   const {
     theme: {
       channel: { selectChannel },
@@ -615,14 +598,16 @@ const ChannelWithContext = <
   const [error, setError] = useState<Error | boolean>(false);
   const [hasMore, setHasMore] = useState(true);
   const [lastRead, setLastRead] = useState<ChannelContextValue<StreamChatGenerics>['lastRead']>();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(!channel?.state.messages.length);
   const [loadingMore, setLoadingMore] = useState(false);
 
   const [loadingMoreRecent, setLoadingMoreRecent] = useState(false);
   const [quotedMessage, setQuotedMessage] = useState<boolean | MessageType<StreamChatGenerics>>(
     false,
   );
-  const [thread, setThread] = useState<MessageType<StreamChatGenerics> | null>(threadProps || null);
+  const [thread, setThread] = useState<ThreadContextValue<StreamChatGenerics>['thread']>(
+    threadProps || null,
+  );
   const [threadHasMore, setThreadHasMore] = useState(true);
   const [threadLoadingMore, setThreadLoadingMore] = useState(false);
 
@@ -660,27 +645,21 @@ const ChannelWithContext = <
        * Also there is no use case from UX perspective, why one would need loading uninitialized channel at particular message.
        * If the channel is not initiated, then we need to do channel.watch, which is more expensive for backend than channel.query.
        */
+      let channelLoaded = false;
       if (!channel.initialized) {
         await loadChannel();
+        channelLoaded = true;
       }
 
       if (messageId) {
         loadChannelAroundMessage({ messageId });
-      }
-      // The condition, where if the count of unread messages is greater than 4, then scroll to the first unread message.
-      else if (
+      } else if (
         initialScrollToFirstUnreadMessage &&
         channel.countUnread() > scrollToFirstUnreadThreshold
       ) {
         loadChannelAtFirstUnreadMessage();
-      }
-      // If the messageId is undefined and the last message and the current message id do not match we load the channel at the very bottom.
-      else if (
-        channel.state.messages?.[channel.state.messages.length - 1]?.id !==
-          channel.state.latestMessages?.[channel.state.latestMessages.length - 1]?.id &&
-        !messageId
-      ) {
-        await loadChannel();
+      } else if (!channelLoaded) {
+        loadChannel();
       }
     };
 
@@ -693,7 +672,6 @@ const ChannelWithContext = <
       loadMoreFinished.cancel();
       loadMoreThreadFinished.cancel();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelId, messageId]);
 
   const threadPropsExists = !!threadProps;
@@ -707,7 +685,6 @@ const ChannelWithContext = <
     } else {
       setThread(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [threadPropsExists, shouldSyncChannel]);
 
   const handleAppBackground = useCallback(() => {
@@ -720,7 +697,6 @@ const ChannelWithContext = <
         type: 'typing.stop',
       } as StreamEvent<StreamChatGenerics>);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thread?.id, channelId]);
 
   useAppStateListener(undefined, handleAppBackground);
@@ -825,7 +801,6 @@ const ChannelWithContext = <
     return () => {
       channelSubscriptions.forEach((s) => s.unsubscribe());
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelId, shouldSyncChannel]);
 
   // subscribe to the generic all channel event
@@ -842,7 +817,7 @@ const ChannelWithContext = <
             setThreadMessages(updatedThreadMessages);
           }
 
-          if (channel && thread?.id && event.message?.id === thread.id && !threadInstance) {
+          if (channel && thread?.id && event.message?.id === thread.id) {
             const updatedThread = channel.state.formatMessage(event.message);
             setThread(updatedThread);
           }
@@ -863,7 +838,6 @@ const ChannelWithContext = <
     };
     const { unsubscribe } = channel.on(handleEvent);
     return unsubscribe;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelId, thread?.id, shouldSyncChannel]);
 
   // subscribe to channel.deleted event
@@ -875,7 +849,6 @@ const ChannelWithContext = <
     });
 
     return unsubscribe;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelId]);
 
   useEffect(() => {
@@ -885,7 +858,6 @@ const ChannelWithContext = <
 
     const { unsubscribe } = client.on('notification.mark_read', handleEvent);
     return unsubscribe;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const channelQueryCallRef = useRef(
@@ -1081,7 +1053,6 @@ const ChannelWithContext = <
       // now restart it since its done
       restartSetsMergeFuncRef.current();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetedMessage]);
 
   /**
@@ -1122,10 +1093,6 @@ const ChannelWithContext = <
       isCurrent: false,
       isLatest: true,
       messages: [],
-      pagination: {
-        hasNext: true,
-        hasPrev: true,
-      },
     });
   });
 
@@ -1200,19 +1167,15 @@ const ChannelWithContext = <
   });
 
   const loadChannel = () =>
-    channelQueryCallRef.current(
-      async () => {
-        if (!channel?.initialized || !channel.state.isUpToDate) {
-          await channel?.watch();
-        } else {
-          await channel.state.loadMessageIntoState('latest');
-        }
-      },
-      () => {
+    channelQueryCallRef.current(async () => {
+      if (!channel?.initialized || !channel.state.isUpToDate) {
+        await channel?.watch();
         channel?.state.setIsUpToDate(true);
         setHasNoMoreRecentMessagesToLoad(true);
-      },
-    );
+      } else {
+        await channel.state.loadMessageIntoState('latest');
+      }
+    });
 
   const reloadThread = async () => {
     if (!channel || !thread?.id) return;
@@ -1231,7 +1194,7 @@ const ChannelWithContext = <
       loadMoreThreadFinished(updatedHasMore, updatedThreadMessages);
       const { messages } = await channel.getMessagesById([parentID]);
       const [threadMessage] = messages;
-      if (threadMessage && !threadInstance) {
+      if (threadMessage) {
         const formattedMessage = channel.state.formatMessage(threadMessage);
         setThread(formattedMessage);
       }
@@ -1389,7 +1352,6 @@ const ChannelWithContext = <
     return () => {
       connectionChangedSubscription.unsubscribe();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enableOfflineSupport, shouldSyncChannel]);
 
   const reloadChannel = () =>
@@ -1601,12 +1563,12 @@ const ChannelWithContext = <
         const file = attachment.originalFile;
         // check if image_url is not a remote url
         if (
-          attachment.type === FileTypes.Image &&
+          attachment.type === 'image' &&
           image?.uri &&
           attachment.image_url &&
           isLocalUrl(attachment.image_url)
         ) {
-          const filename = image.name ?? getFileNameFromPath(image.uri);
+          const filename = image.name ?? image.uri.replace(/^(file:\/\/|content:\/\/)/, '');
           // if any upload is in progress, cancel it
           const controller = uploadAbortControllerRef.current.get(filename);
           if (controller) {
@@ -1629,10 +1591,10 @@ const ChannelWithContext = <
         }
 
         if (
-          (attachment.type === FileTypes.File ||
-            attachment.type === FileTypes.Audio ||
-            attachment.type === FileTypes.VoiceRecording ||
-            attachment.type === FileTypes.Video) &&
+          (attachment.type === 'file' ||
+            attachment.type === 'audio' ||
+            attachment.type === 'voiceRecording' ||
+            attachment.type === 'video') &&
           attachment.asset_url &&
           isLocalUrl(attachment.asset_url) &&
           file?.uri
@@ -1668,28 +1630,40 @@ const ChannelWithContext = <
   ) => {
     try {
       const updatedMessage = await uploadPendingAttachments(message);
-      const extraFields = omit(updatedMessage, [
-        '__html',
-        'attachments',
-        'created_at',
-        'deleted_at',
-        'html',
-        'id',
-        'latest_reactions',
-        'mentioned_users',
-        'own_reactions',
-        'parent_id',
-        'quoted_message',
-        'reaction_counts',
-        'reaction_groups',
-        'reactions',
-        'status',
-        'text',
-        'type',
-        'updated_at',
-        'user',
-      ]);
-      const { attachments, id, mentioned_users, parent_id, text } = updatedMessage;
+      const {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        __html,
+        attachments,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        created_at,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        deleted_at,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        html,
+        id,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        latest_reactions,
+        mentioned_users,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        own_reactions,
+        parent_id,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        quoted_message,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        reaction_counts,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        reactions,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        status,
+        text,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        type,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        updated_at,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        user,
+        ...extraFields
+      } = updatedMessage;
       if (!channel.id) return;
 
       const mentionedUserIds = mentioned_users?.map((user) => user.id) || [];
@@ -1723,15 +1697,11 @@ const ChannelWithContext = <
         } else {
           updateMessage(messageResponse.message);
         }
-
-        threadInstance?.upsertReplyLocally?.({ message: messageResponse.message });
       }
     } catch (err) {
       console.log(err);
       message.status = MessageStatusTypes.FAILED;
-      const updatedMessage = { ...message, cid: channel.cid };
-      updateMessage(updatedMessage);
-      threadInstance?.upsertReplyLocally?.({ message: updatedMessage });
+      updateMessage({ ...message, cid: channel.cid });
 
       if (enableOfflineSupport) {
         dbApi.updateMessage({
@@ -1759,7 +1729,6 @@ const ChannelWithContext = <
       commands: [],
       messageInput: '',
     });
-    threadInstance?.upsertReplyLocally?.({ message: messagePreview });
 
     if (enableOfflineSupport) {
       // While sending a message, we add the message to local db with failed status, so that
@@ -1859,7 +1828,6 @@ const ChannelWithContext = <
      * Where the deps are [channelId, hasMore, loadingMoreRecent, loadingMore]
      * and only those deps should be used here because of that
      */
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [channelId, hasMore, loadingMore],
   );
 
@@ -1931,7 +1899,6 @@ const ChannelWithContext = <
      * Where the deps are [channelId, hasMore, loadingMoreRecent, loadingMore, hasNoMoreRecentMessagesToLoad]
      * and and only those deps should be used here because of that
      */
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [channelId, hasNoMoreRecentMessagesToLoad],
   );
 
@@ -2021,7 +1988,7 @@ const ChannelWithContext = <
 
     setMessages(channel.state.messages);
 
-    const sendReactionResponse = await DBSyncManager.queueTask<StreamChatGenerics>({
+    await DBSyncManager.queueTask<StreamChatGenerics>({
       client,
       task: {
         channelId: channel.id,
@@ -2031,11 +1998,7 @@ const ChannelWithContext = <
         type: 'send-reaction',
       },
     });
-    if (sendReactionResponse?.message) {
-      threadInstance?.upsertReplyLocally?.({ message: sendReactionResponse.message });
-    }
   };
-
   const deleteMessage: MessagesContextValue<StreamChatGenerics>['deleteMessage'] = async (
     message,
   ) => {
@@ -2056,15 +2019,12 @@ const ChannelWithContext = <
       DBSyncManager.dropPendingTasks({ messageId: message.id });
       removeMessage(message);
     } else {
-      const updatedMessage = {
+      updateMessage({
         ...message,
         cid: channel.cid,
         deleted_at: new Date().toISOString(),
         type: 'deleted',
-      };
-      updateMessage(updatedMessage);
-
-      threadInstance?.upsertReplyLocally({ message: updatedMessage });
+      });
 
       const data = await DBSyncManager.queueTask<StreamChatGenerics>({
         client,
@@ -2124,18 +2084,11 @@ const ChannelWithContext = <
    */
   const openThread: ThreadContextValue<StreamChatGenerics>['openThread'] = useCallback(
     (message) => {
+      const newThreadMessages = message?.id ? channel?.state?.threads[message.id] || [] : [];
       setThread(message);
-
-      if (channel.initialized) {
-        channel.markRead({ thread_id: message.id });
-      }
-      // This was causing inconsistencies within the thread state as well as being responsible
-      // of threads essentially never unloading (due to all of the previous threads + 50 loading
-      // every time we'd run this). It seemingly has no impact (other than a performance boost)
-      // and having it was causing issues with the Threads V2 architecture.
-      // setThreadMessages(newThreadMessages);
+      setThreadMessages(newThreadMessages);
     },
-    [channel, setThread],
+    [setThread, setThreadMessages],
   );
 
   const closeThread: ThreadContextValue<StreamChatGenerics>['closeThread'] = useCallback(() => {
@@ -2248,17 +2201,6 @@ const ChannelWithContext = <
     watchers,
   });
 
-  // This is mainly a hack to get around an issue with sendMessage not being passed correctly as a
-  // useMemo() dependency. The easy fix is to add it to the dependency array, however that would mean
-  // that this (very used) context is essentially going to cause rerenders on pretty much every Channel
-  // render, since sendMessage is an inline function. Wrapping it in useCallback() is one way to fix it
-  // but it is definitely not trivial, especially considering it depends on other inline functions that
-  // are not wrapped in a useCallback() themselves hence creating a huge cascading change. Can be removed
-  // once our memoization issues are fixed in most places in the app or we move to a reactive state store.
-  const sendMessageRef =
-    useRef<InputMessageInputContextValue<StreamChatGenerics>['sendMessage']>(sendMessage);
-  sendMessageRef.current = sendMessage;
-
   const inputMessageInputContext = useCreateInputMessageInputContext<StreamChatGenerics>({
     additionalTextInputProps,
     asyncMessagesLockDistance,
@@ -2281,14 +2223,13 @@ const ChannelWithContext = <
     CommandsButton,
     compressImageQuality,
     CooldownTimer,
+    disabled: disabledValue,
     doDocUploadRequest,
     doImageUploadRequest,
     editing,
     editMessage,
     emojiSearchIndex,
     FileUploadPreview,
-    handleAttachButtonPress,
-    hasCameraPicker,
     hasCommands,
     hasFilePicker,
     hasImagePicker,
@@ -2309,7 +2250,7 @@ const ChannelWithContext = <
     quotedMessage,
     SendButton,
     sendImageAsync,
-    sendMessage: (...args) => sendMessageRef.current(...args),
+    sendMessage,
     SendMessageDisallowedIndicator,
     setInputRef,
     setQuotedMessageState,
@@ -2354,11 +2295,11 @@ const ChannelWithContext = <
     FileAttachmentIcon,
     FlatList,
     forceAlignMessages,
+    formatDate,
     Gallery,
     getMessagesGroupStyles,
     Giphy,
     giphyVersion,
-    handleBan,
     handleBlock,
     handleCopy,
     handleDelete,
@@ -2385,7 +2326,6 @@ const ChannelWithContext = <
     MessageContent,
     messageContentOrder,
     MessageDeleted,
-    MessageEditedTimestamp,
     MessageError,
     MessageFooter,
     MessageHeader,
@@ -2397,7 +2337,6 @@ const ChannelWithContext = <
     MessageStatus,
     MessageSystem,
     MessageText,
-    MessageTimestamp,
     myMessageTheme,
     onLongPressMessage,
     onPressInMessage,
@@ -2436,7 +2375,6 @@ const ChannelWithContext = <
     setThreadLoadingMore,
     thread,
     threadHasMore,
-    threadInstance,
     threadLoadingMore,
     threadMessages,
   });
@@ -2509,18 +2447,7 @@ export const Channel = <
   const { client, enableOfflineSupport } = useChatContext<StreamChatGenerics>();
   const { t } = useTranslationContext();
 
-  const threadFromProps = props?.thread;
-  const threadMessage = (
-    threadFromProps?.threadInstance ? threadFromProps.thread : threadFromProps
-  ) as MessageType<StreamChatGenerics>;
-  const threadInstance = threadFromProps?.threadInstance as Thread;
-
-  const thread: ThreadType<StreamChatGenerics> = {
-    thread: threadMessage,
-    threadInstance,
-  };
-
-  const shouldSyncChannel = threadMessage?.id ? !!props.threadList : true;
+  const shouldSyncChannel = props.thread?.id ? !!props.threadList : true;
 
   const {
     members,
@@ -2539,7 +2466,7 @@ export const Channel = <
     watchers,
   } = useChannelState<StreamChatGenerics>(
     props.channel,
-    props.threadList ? threadMessage?.id : undefined,
+    props.threadList ? props.thread?.id : undefined,
   );
 
   return (
@@ -2562,7 +2489,6 @@ export const Channel = <
         setTyping,
         setWatcherCount,
         setWatchers,
-        thread,
         threadMessages,
         typing,
         watcherCount,

@@ -26,19 +26,10 @@ export const parseLinksFromText = (input: string): LinkInfo[] => {
   const links = find(strippedInput, 'url');
   const emails = find(strippedInput, 'email');
 
-  const result: LinkInfo[] = [...links, ...emails].map(({ href, value }) => {
-    let hrefWithProtocol = href;
-    // Matching these: https://reactnative.dev/docs/0.73/linking?syntax=ios#built-in-url-schemes
-    const pattern = new RegExp(/^(mailto:|tel:|sms:|\S+:\/\/)/);
-    if (!pattern.test(hrefWithProtocol)) {
-      hrefWithProtocol = 'http://' + hrefWithProtocol;
-    }
-
-    return {
-      raw: value,
-      url: hrefWithProtocol,
-    };
-  });
+  const result: LinkInfo[] = [...links, ...emails].map(({ href, value }) => ({
+    raw: value,
+    url: href,
+  }));
 
   return result;
 };

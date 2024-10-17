@@ -31,8 +31,6 @@ jest.mock('../../../native.ts', () => {
 
   return {
     isAudioPackageAvailable: jest.fn(() => true),
-    isImageMediaLibraryAvailable: jest.fn(() => true),
-    isImagePickerAvailable: jest.fn(() => true),
     NetInfo: {
       addEventListener: jest.fn(),
       fetch: jest.fn(),

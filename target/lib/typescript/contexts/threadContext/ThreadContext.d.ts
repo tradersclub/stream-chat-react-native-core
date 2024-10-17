@@ -1,11 +1,7 @@
 import React, { PropsWithChildren } from 'react';
-import { ChannelState, Thread } from 'stream-chat';
+import type { ChannelState } from 'stream-chat';
 import type { MessageType } from '../../components/MessageList/hooks/useMessageList';
 import type { DefaultStreamChatGenerics, UnknownType } from '../../types/types';
-export type ThreadType<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = {
-    thread: MessageType<StreamChatGenerics>;
-    threadInstance: Thread;
-};
 export type ThreadContextValue<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = {
     allowThreadMessagesInChannel: boolean;
     closeThread: () => void;
@@ -15,17 +11,8 @@ export type ThreadContextValue<StreamChatGenerics extends DefaultStreamChatGener
     setThreadLoadingMore: React.Dispatch<React.SetStateAction<boolean>>;
     thread: MessageType<StreamChatGenerics> | null;
     threadHasMore: boolean;
+    threadLoadingMore: boolean;
     threadMessages: ChannelState<StreamChatGenerics>['threads'][string];
-    loadMoreRecentThread?: (opts: {
-        limit?: number;
-    }) => Promise<void>;
-    /**
-     * Boolean to enable/disable parent message press
-     */
-    parentMessagePreventPress?: boolean;
-    threadInstance?: Thread | null;
-    threadLoadingMore?: boolean;
-    threadLoadingMoreRecent?: boolean;
 };
 export declare const ThreadContext: React.Context<ThreadContextValue<DefaultStreamChatGenerics>>;
 export declare const ThreadProvider: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>({ children, value, }: React.PropsWithChildren<{

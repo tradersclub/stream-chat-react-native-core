@@ -32,7 +32,7 @@ import {
 import { useTheme } from '../../contexts/themeContext/ThemeContext';
 import { useLoadingImage } from '../../hooks/useLoadingImage';
 import { isVideoPackageAvailable } from '../../native';
-import { DefaultStreamChatGenerics, FileTypes } from '../../types/types';
+import type { DefaultStreamChatGenerics } from '../../types/types';
 import { getUrlWithoutParams } from '../../utils/utils';
 
 export type GalleryPropsWithContext<
@@ -141,7 +141,6 @@ const GalleryWithContext = <
         images: imagesAndVideos,
         sizeConfig,
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [imagesAndVideosValue],
   );
 
@@ -290,7 +289,7 @@ const GalleryThumbnail = <
     theme: {
       colors: { overlay },
       messageSimple: {
-        gallery: { image, imageBorderRadius, imageContainer, moreImagesContainer, moreImagesText },
+        gallery: { image, imageContainer, moreImagesContainer, moreImagesText },
       },
     },
   } = useTheme();
@@ -312,7 +311,7 @@ const GalleryThumbnail = <
   const defaultOnPress = () => {
     // If the url is defined then only try to open the file.
     if (thumbnail.url) {
-      if (thumbnail.type === FileTypes.Video && !isVideoPackageAvailable()) {
+      if (thumbnail.type === 'video' && !isVideoPackageAvailable()) {
         // This condition is kinda unreachable, since we render videos as file attachment if the video
         // library is not installed. But doesn't hurt to have extra safeguard, in case of some customizations.
         openUrlSafely(thumbnail.url);
@@ -364,10 +363,10 @@ const GalleryThumbnail = <
       testID={`gallery-${invertedDirections ? 'row' : 'column'}-${colIndex}-item-${rowIndex}`}
       {...additionalTouchableProps}
     >
-      {thumbnail.type === FileTypes.Video ? (
+      {thumbnail.type === 'video' ? (
         <VideoThumbnail
           style={[
-            imageBorderRadius ?? borderRadius,
+            borderRadius,
             {
               height: thumbnail.height - 1,
               width: thumbnail.width - 1,
@@ -379,7 +378,7 @@ const GalleryThumbnail = <
       ) : (
         <View style={styles.imageContainerStyle}>
           <GalleryImageThumbnail
-            borderRadius={imageBorderRadius ?? borderRadius}
+            borderRadius={borderRadius}
             ImageLoadingFailedIndicator={ImageLoadingFailedIndicator}
             ImageLoadingIndicator={ImageLoadingIndicator}
             thumbnail={thumbnail}

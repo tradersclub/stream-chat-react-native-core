@@ -133,11 +133,7 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
     onlyEmojis: nextOnlyEmojis,
   } = nextProps;
 
-  const messageStatusEqual = prevMessage.status === nextMessage.status;
-  if (!messageStatusEqual) return false;
-
-  const messageTextEqual =
-    prevMessage.text === nextMessage.text && prevMessage.i18n === nextMessage.i18n;
+  const messageTextEqual = prevMessage.text === nextMessage.text;
   if (!messageTextEqual) return false;
 
   const onlyEmojisEqual = prevOnlyEmojis === nextOnlyEmojis;

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import type { MessageContextValue } from '../../../contexts/messageContext/MessageContext';
 import type { DefaultStreamChatGenerics } from '../../../types/types';
-import { stringifyMessage } from '../../../utils/utils';
+import { isMessageWithStylesReadByAndDateSeparator } from '../../MessageList/hooks/useMessageList';
 
 export const useCreateMessageContext = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
@@ -10,14 +10,13 @@ export const useCreateMessageContext = <
   actionsEnabled,
   alignment,
   channel,
+  disabled,
   files,
   goToMessage,
   groupStyles,
   handleAction,
-  handleCopyMessage,
   handleDeleteMessage,
   handleEditMessage,
-  handleFlagMessage,
   handleQuotedReplyMessage,
   handleResendMessage,
   handleToggleBanUser,
@@ -25,7 +24,6 @@ export const useCreateMessageContext = <
   handleToggleReaction,
   hasReactions,
   images,
-  isEditedMessageOpen,
   isMyMessage,
   lastGroupMessage,
   lastReceivedId,
@@ -41,7 +39,6 @@ export const useCreateMessageContext = <
   otherAttachments,
   preventPress,
   reactions,
-  setIsEditedMessageOpen,
   showAvatar,
   showMessageOverlay,
   showMessageStatus,
@@ -49,9 +46,14 @@ export const useCreateMessageContext = <
   videos,
 }: MessageContextValue<StreamChatGenerics>) => {
   const groupStylesLength = groupStyles.length;
-  const reactionsValue = reactions.map(({ count, own, type }) => `${own}${type}${count}`).join();
-  const stringifiedMessage = stringifyMessage(message);
-
+  const reactionsValue = reactions.map(({ own, type }) => `${own}${type}`).join();
+  const latestReactions = message.latest_reactions ? message.latest_reactions : undefined;
+  const readBy = isMessageWithStylesReadByAndDateSeparator(message) && message.readBy;
+  const messageValue = `${
+    latestReactions ? latestReactions.map(({ type, user }) => `${type}${user?.id}`).join() : ''
+  }${message.updated_at}${message.deleted_at}${readBy}${message.status}${message.type}${
+    message.text
+  }${message.reply_count}`;
   const membersValue = JSON.stringify(members);
   const myMessageThemeString = useMemo(() => JSON.stringify(myMessageTheme), [myMessageTheme]);
 
@@ -62,14 +64,13 @@ export const useCreateMessageContext = <
       actionsEnabled,
       alignment,
       channel,
+      disabled,
       files,
       goToMessage,
       groupStyles,
       handleAction,
-      handleCopyMessage,
       handleDeleteMessage,
       handleEditMessage,
-      handleFlagMessage,
       handleQuotedReplyMessage,
       handleResendMessage,
       handleToggleBanUser,
@@ -77,7 +78,6 @@ export const useCreateMessageContext = <
       handleToggleReaction,
       hasReactions,
       images,
-      isEditedMessageOpen,
       isMyMessage,
       lastGroupMessage,
       lastReceivedId,
@@ -93,26 +93,24 @@ export const useCreateMessageContext = <
       otherAttachments,
       preventPress,
       reactions,
-      setIsEditedMessageOpen,
       showAvatar,
       showMessageOverlay,
       showMessageStatus,
       threadList,
       videos,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       actionsEnabled,
       quotedMessageDeletedValue,
       alignment,
+      disabled,
       goToMessage,
       groupStylesLength,
       hasReactions,
-      isEditedMessageOpen,
       lastGroupMessage,
       lastReceivedId,
       membersValue,
-      stringifiedMessage,
+      messageValue,
       myMessageThemeString,
       reactionsValue,
       showAvatar,

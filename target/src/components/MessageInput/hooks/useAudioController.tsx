@@ -12,7 +12,7 @@ import {
   SoundReturnType,
   triggerHaptic,
 } from '../../../native';
-import { File, FileTypes } from '../../../types/types';
+import { File } from '../../../types/types';
 import { resampleWaveformData } from '../utils/audioSampling';
 import { normalizeAudioLevel } from '../utils/normalizeAudioLevel';
 
@@ -38,12 +38,10 @@ export const useAudioController = () => {
   // For playback support in Expo CLI apps
   const soundRef = useRef<SoundReturnType | null>(null);
 
-  // This effect stop the player from playing and stops audio recording on
-  // the audio SDK side on unmount.
+  // Effect to stop the player when the component unmounts
   useEffect(
     () => () => {
       stopVoicePlayer();
-      stopSDKVoiceRecording();
     },
     [],
   );
@@ -84,7 +82,6 @@ export const useAudioController = () => {
   };
 
   const onVoicePlayerPlayPause = async () => {
-    if (!Audio) return;
     if (paused) {
       if (progress === 0) await startVoicePlayer();
       else {
@@ -106,7 +103,6 @@ export const useAudioController = () => {
    * Function to start playing voice recording to preview it after recording.
    */
   const startVoicePlayer = async () => {
-    if (!Audio) return;
     if (!recording) return;
     // For Native CLI
     if (Audio.startPlayer)
@@ -134,15 +130,16 @@ export const useAudioController = () => {
    * Function to stop playing voice recording.
    */
   const stopVoicePlayer = async () => {
-    if (!Audio) return;
     // For Native CLI
     if (Audio.stopPlayer) {
       await Audio.stopPlayer();
     }
     // For Expo CLI
-    if (soundRef.current?.stopAsync && soundRef.current?.unloadAsync) {
-      await soundRef.current.stopAsync();
-      await soundRef.current?.unloadAsync();
+    if (recording && typeof recording !== 'string') {
+      if (soundRef.current?.stopAsync && soundRef.current?.unloadAsync) {
+        await soundRef.current.stopAsync();
+        await soundRef.current?.unloadAsync();
+      }
     }
   };
 
@@ -164,7 +161,7 @@ export const useAudioController = () => {
    * Function to start voice recording.
    */
   const startVoiceRecording = async () => {
-    if (!Audio) return;
+    setRecordingStatus('recording');
     const recordingInfo = await Audio.startRecording(
       {
         isMeteringEnabled: true,
@@ -179,7 +176,6 @@ export const useAudioController = () => {
         recording.setProgressUpdateInterval(Platform.OS === 'android' ? 100 : 60);
       }
       setRecording(recording);
-      setRecordingStatus('recording');
       await stopVoicePlayer();
     } else {
       setPermissionsGranted(false);
@@ -189,20 +185,20 @@ export const useAudioController = () => {
   };
 
   /**
-   * A function that takes care of stopping the voice recording from the library's
-   * side only. Meant to be used as a pure function (during unmounting for instance)
-   * hence this approach.
-   */
-  const stopSDKVoiceRecording = async () => {
-    if (!Audio) return;
-    await Audio.stopRecording();
-  };
-
-  /**
    * Function to stop voice recording.
    */
   const stopVoiceRecording = async () => {
-    await stopSDKVoiceRecording();
+    if (recording) {
+      // For Expo CLI
+      if (typeof recording !== 'string') {
+        await recording.stopAndUnloadAsync();
+        await Audio.stopRecording();
+      }
+      // For RN CLI
+      else {
+        await Audio.stopRecording();
+      }
+    }
     setRecordingStatus('stopped');
   };
 
@@ -249,14 +245,11 @@ export const useAudioController = () => {
 
     const resampledWaveformData = resampleWaveformData(waveformData, 100);
 
-    const clearFilter = new RegExp('[.:]', 'g');
-    const date = new Date().toISOString().replace(clearFilter, '_');
-
     const file: File = {
       duration: durationInSeconds,
       mimeType: 'audio/aac',
-      name: `audio_recording_${date}.aac`,
-      type: FileTypes.VoiceRecording,
+      name: `audio_recording_${new Date().toISOString()}.aac`,
+      type: 'voiceRecording',
       uri: typeof recording !== 'string' ? (recording?.getURI() as string) : (recording as string),
       waveform_data: resampledWaveformData,
     };

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BackHandler, Keyboard, Platform, StyleSheet } from 'react-native';
 
 import BottomSheet, { BottomSheetFlatList } from '@gorhom/bottom-sheet';
@@ -118,10 +118,6 @@ export const AttachmentPicker = React.forwardRef(
         setLoadingPhotos(true);
         const endCursor = endCursorRef.current;
         try {
-          if (!getPhotos) {
-            setPhotos([]);
-            setIosLimited(false);
-          }
           const results = await getPhotos({
             after: endCursor,
             first: numberOfAttachmentImagesToLoadPerCall ?? 60,
@@ -137,7 +133,6 @@ export const AttachmentPicker = React.forwardRef(
         }
         setLoadingPhotos(false);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentIndex, selectedPicker, loadingPhotos]);
 
     // we need to use ref here to avoid running effect when getMorePhotos changes
@@ -146,8 +141,6 @@ export const AttachmentPicker = React.forwardRef(
 
     useEffect(() => {
       if (selectedPicker !== 'images') return;
-
-      if (!oniOS14GalleryLibrarySelectionChange) return;
       // ios 14 library selection change event is fired when user reselects the images that are permitted to be readable by the app
       const { unsubscribe } = oniOS14GalleryLibrarySelectionChange(() => {
         // we reset the cursor and has next page to true to facilitate fetching of the first page of photos again
@@ -173,7 +166,6 @@ export const AttachmentPicker = React.forwardRef(
       const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
 
       return () => backHandler.remove();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedPicker, closePicker]);
 
     useEffect(() => {
@@ -198,7 +190,6 @@ export const AttachmentPicker = React.forwardRef(
           Keyboard.removeListener(keyboardShowEvent, onKeyboardOpenHandler);
         }
       };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [closePicker, selectedPicker]);
 
     useEffect(() => {
@@ -211,7 +202,6 @@ export const AttachmentPicker = React.forwardRef(
           setPhotoError(false);
         }
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentIndex, loadingPhotos]);
 
     useEffect(() => {
@@ -256,11 +246,15 @@ export const AttachmentPicker = React.forwardRef(
      * Snap points changing cause a rerender of the position,
      * this is an issue if you are calling close on the bottom sheet.
      */
-    const snapPoints = [initialSnapPoint, finalSnapPoint];
+    const snapPoints = useMemo(
+      () => [initialSnapPoint, finalSnapPoint],
+      [initialSnapPoint, finalSnapPoint],
+    );
 
     return (
       <>
         <BottomSheet
+          containerHeight={fullScreenHeight}
           enablePanDownToClose={true}
           handleComponent={
             /**

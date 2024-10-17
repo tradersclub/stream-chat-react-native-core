@@ -32,14 +32,8 @@ var ThreadWithContext = function ThreadWithContext(props) {
     MessageInput = _props$MessageInput === void 0 ? _MessageInput.MessageInput : _props$MessageInput,
     MessageList = props.MessageList,
     onThreadDismount = props.onThreadDismount,
-    _props$parentMessageP = props.parentMessagePreventPress,
-    parentMessagePreventPress = _props$parentMessageP === void 0 ? true : _props$parentMessageP,
-    thread = props.thread,
-    threadInstance = props.threadInstance;
+    thread = props.thread;
   (0, _react.useEffect)(function () {
-    if (threadInstance != null && threadInstance.activate) {
-      threadInstance.activate();
-    }
     var loadMoreThreadAsync = function () {
       var _ref = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee() {
         return _regenerator["default"].wrap(function _callee$(_context) {
@@ -60,10 +54,9 @@ var ThreadWithContext = function ThreadWithContext(props) {
     if (thread != null && thread.id && thread.reply_count) {
       loadMoreThreadAsync();
     }
+  }, []);
+  (0, _react.useEffect)(function () {
     return function () {
-      if (threadInstance != null && threadInstance.deactivate) {
-        threadInstance.deactivate();
-      }
       if (closeThreadOnDismount) {
         closeThread();
       }
@@ -75,11 +68,7 @@ var ThreadWithContext = function ThreadWithContext(props) {
   if (!thread) return null;
   return (0, _jsxRuntime.jsxs)(_react["default"].Fragment, {
     children: [(0, _jsxRuntime.jsx)(MessageList, Object.assign({
-      FooterComponent: function FooterComponent() {
-        return (0, _jsxRuntime.jsx)(_ThreadFooterComponent.ThreadFooterComponent, {
-          parentMessagePreventPress: parentMessagePreventPress
-        });
-      },
+      FooterComponent: _ThreadFooterComponent.ThreadFooterComponent,
       threadList: true
     }, additionalMessageListProps)), (0, _jsxRuntime.jsx)(MessageInput, Object.assign({
       additionalTextInputProps: {
@@ -101,8 +90,7 @@ var Thread = function Thread(props) {
     closeThread = _useThreadContext.closeThread,
     loadMoreThread = _useThreadContext.loadMoreThread,
     reloadThread = _useThreadContext.reloadThread,
-    thread = _useThreadContext.thread,
-    threadInstance = _useThreadContext.threadInstance;
+    thread = _useThreadContext.thread;
   if (thread != null && thread.id && !threadList) {
     throw new Error('Please add a threadList prop to your Channel component when rendering a thread list. Check our Channel documentation for more info: https://getstream.io/chat/docs/sdk/reactnative/core-components/channel/#threadlist');
   }
@@ -112,8 +100,7 @@ var Thread = function Thread(props) {
     loadMoreThread: loadMoreThread,
     MessageList: MessageList,
     reloadThread: reloadThread,
-    thread: thread,
-    threadInstance: threadInstance
+    thread: thread
   }, props));
 };
 exports.Thread = Thread;

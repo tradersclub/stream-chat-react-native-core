@@ -5,6 +5,19 @@ import { useTheme } from '../../contexts/themeContext/ThemeContext';
 import { useTranslationContext } from '../../contexts/translationContext/TranslationContext';
 import { Spinner } from '../Spinner/Spinner';
 
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
+  loadingText: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginTop: 20,
+  },
+});
+
 type LoadingIndicatorWrapperProps = { text: string };
 
 const LoadingIndicatorWrapper = ({ text }: LoadingIndicatorWrapperProps) => {
@@ -26,7 +39,7 @@ const LoadingIndicatorWrapper = ({ text }: LoadingIndicatorWrapperProps) => {
 };
 
 export type LoadingProps = {
-  listType?: 'channel' | 'message' | 'threads' | 'default';
+  listType?: 'channel' | 'message' | 'default';
   loadingText?: string;
 };
 
@@ -47,24 +60,9 @@ export const LoadingIndicator = (props: LoadingProps) => {
       return <LoadingIndicatorWrapper text={t('Loading channels...')} />;
     case 'message':
       return <LoadingIndicatorWrapper text={t('Loading messages...')} />;
-    case 'threads':
-      return <LoadingIndicatorWrapper text={t('Loading threads...')} />;
     default:
       return <LoadingIndicatorWrapper text={t('Loading...')} />;
   }
 };
 
 LoadingIndicator.displayName = 'LoadingIndicator{loadingIndicator}';
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-  },
-  loadingText: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginTop: 20,
-  },
-});

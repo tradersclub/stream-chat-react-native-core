@@ -48,7 +48,7 @@ import {
 import { useTheme } from '../../contexts/themeContext/ThemeContext';
 import { useViewport } from '../../hooks/useViewport';
 import { isVideoPackageAvailable, VideoType } from '../../native';
-import { DefaultStreamChatGenerics, FileTypes } from '../../types/types';
+import type { DefaultStreamChatGenerics } from '../../types/types';
 import { getResizedImageUrl } from '../../utils/getResizedImageUrl';
 import { getUrlOfImageAttachment } from '../../utils/getUrlOfImageAttachment';
 import { getGiphyMimeType } from '../Attachment/utils/getGiphyMimeType';
@@ -160,7 +160,6 @@ export const ImageGallery = <
   const quarterScreenHeight = fullWindowHeight / 4;
   const snapPoints = React.useMemo(
     () => [(fullWindowHeight * 3) / 4, fullWindowHeight - imageGalleryGridHandleHeight],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
@@ -194,7 +193,6 @@ export const ImageGallery = <
   useEffect(() => {
     Keyboard.dismiss();
     showScreen();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
@@ -241,15 +239,15 @@ export const ImageGallery = <
       cur.attachments
         ?.filter(
           (attachment) =>
-            (attachment.type === FileTypes.Giphy &&
+            (attachment.type === 'giphy' &&
               (attachment.giphy?.[giphyVersion]?.url ||
                 attachment.thumb_url ||
                 attachment.image_url)) ||
-            (attachment.type === FileTypes.Image &&
+            (attachment.type === 'image' &&
               !attachment.title_link &&
               !attachment.og_scrape_url &&
               getUrlOfImageAttachment(attachment)) ||
-            (isVideoPackageAvailable() && attachment.type === FileTypes.Video),
+            (isVideoPackageAvailable() && attachment.type === 'video'),
         )
         .reverse() || [];
 
@@ -297,7 +295,6 @@ export const ImageGallery = <
 
   useEffect(() => {
     setImageGalleryAttachments(photos);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
@@ -327,7 +324,6 @@ export const ImageGallery = <
     );
 
     runOnUI(updatePosition)(newIndex);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMessage, photoLength]);
 
   /**
@@ -348,14 +344,13 @@ export const ImageGallery = <
       const imageHeight = Math.floor(height * (fullWindowWidth / width));
       setCurrentImageHeight(imageHeight > fullWindowHeight ? fullWindowHeight : imageHeight);
     } else if (photo?.uri) {
-      if (photo.type === FileTypes.Image) {
+      if (photo.type === 'image') {
         Image.getSize(photo.uri, (width, height) => {
           const imageHeight = Math.floor(height * (fullWindowWidth / width));
           setCurrentImageHeight(imageHeight > fullWindowHeight ? fullWindowHeight : imageHeight);
         });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uriForCurrentImage]);
 
   const { onDoubleTap, onPan, onPinch, onSingleTap } = useImageGalleryGestures({
@@ -558,7 +553,7 @@ export const ImageGallery = <
                     <Animated.View style={StyleSheet.absoluteFill}>
                       <Animated.View style={[styles.animatedContainer, pagerStyle, pager]}>
                         {imageGalleryAttachments.map((photo, i) =>
-                          photo.type === FileTypes.Video ? (
+                          photo.type === 'video' ? (
                             <AnimatedGalleryVideo
                               attachmentId={photo.id}
                               handleEnd={handleEnd}

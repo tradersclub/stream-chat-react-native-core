@@ -45,15 +45,4 @@ Object.keys(_useScreenDimensions).forEach(function (key) {
     }
   });
 });
-var _useStateStore = require("./useStateStore");
-Object.keys(_useStateStore).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (key in exports && exports[key] === _useStateStore[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _useStateStore[key];
-    }
-  });
-});
 //# sourceMappingURL=index.js.map

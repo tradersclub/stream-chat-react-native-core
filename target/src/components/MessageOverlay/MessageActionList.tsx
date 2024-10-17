@@ -57,9 +57,6 @@ const MessageActionListWithContext = <
   const {
     theme: {
       colors: { white_snow },
-      overlay: {
-        messageActionsList: { container },
-      },
     },
   } = useTheme();
 
@@ -93,12 +90,7 @@ const MessageActionListWithContext = <
         width.value = layout.width;
         height.value = layout.height;
       }}
-      style={[
-        styles.container,
-        { backgroundColor: white_snow, minWidth: vw(65) },
-        showScreenStyle,
-        container,
-      ]}
+      style={[styles.container, { backgroundColor: white_snow, minWidth: vw(65) }, showScreenStyle]}
       testID='message-action-list'
     >
       {messageActions?.map((messageAction, index) => (

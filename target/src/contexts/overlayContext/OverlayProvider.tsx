@@ -30,7 +30,6 @@ import { OverlayBackdrop } from '../../components/MessageOverlay/OverlayBackdrop
 import { useStreami18n } from '../../hooks/useStreami18n';
 
 import { useViewport } from '../../hooks/useViewport';
-import { isImageMediaLibraryAvailable } from '../../native';
 import type { DefaultStreamChatGenerics } from '../../types/types';
 import { AttachmentPickerProvider } from '../attachmentPickerContext/AttachmentPickerContext';
 import { ImageGalleryProvider } from '../imageGalleryContext/ImageGalleryContext';
@@ -189,7 +188,6 @@ export const OverlayProvider = <
     } else {
       overlayOpacity.value = withTiming(0);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [overlay]);
 
   const attachmentPickerContext = {
@@ -255,9 +253,7 @@ export const OverlayProvider = <
                     overlayOpacity={overlayOpacity}
                   />
                 )}
-                {isImageMediaLibraryAvailable() ? (
-                  <AttachmentPicker ref={bottomSheetRef} {...attachmentPickerProps} />
-                ) : null}
+                <AttachmentPicker ref={bottomSheetRef} {...attachmentPickerProps} />
               </ThemeProvider>
             </ImageGalleryProvider>
           </AttachmentPickerProvider>

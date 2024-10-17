@@ -9,13 +9,12 @@ var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/
 var _react = _interopRequireDefault(require("react"));
 var _reactNative = require("react-native");
 var _bottomSheet = require("@gorhom/bottom-sheet");
+var _dayjs = _interopRequireDefault(require("dayjs"));
 var _mimeTypes = require("mime-types");
-var _contexts = require("../../../contexts");
 var _ThemeContext = require("../../../contexts/themeContext/ThemeContext");
 var _useViewport3 = require("../../../hooks/useViewport");
 var _icons = require("../../../icons");
 var _native = require("../../../native");
-var _utils = require("../../../utils/utils");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/AttachmentPicker/components/AttachmentPickerItem.tsx";
@@ -30,8 +29,6 @@ var AttachmentVideo = function AttachmentVideo(props) {
     setSelectedFiles = props.setSelectedFiles;
   var _useViewport = (0, _useViewport3.useViewport)(),
     vw = _useViewport.vw;
-  var _useTranslationContex = (0, _contexts.useTranslationContext)(),
-    t = _useTranslationContex.t;
   var _useTheme = (0, _ThemeContext.useTheme)(),
     _useTheme$theme = _useTheme.theme,
     _useTheme$theme$attac = _useTheme$theme.attachmentPicker,
@@ -43,7 +40,14 @@ var AttachmentVideo = function AttachmentVideo(props) {
     white = _useTheme$theme$color.white;
   var videoDuration = asset.duration,
     uri = asset.uri;
-  var durationLabel = (0, _utils.getDurationLabelFromDuration)(videoDuration);
+  var ONE_HOUR_IN_SECONDS = 3600;
+  var durationLabel = '00:00';
+  if (videoDuration) {
+    var isDurationLongerThanHour = videoDuration / ONE_HOUR_IN_SECONDS >= 1;
+    var formattedDurationParam = isDurationLongerThanHour ? 'HH:mm:ss' : 'mm:ss';
+    var formattedVideoDuration = _dayjs["default"].duration(videoDuration, 'second').format(formattedDurationParam);
+    durationLabel = formattedVideoDuration;
+  }
   var size = vw(100) / (numberOfAttachmentPickerImageColumns || 3) - 2;
   var patchVideoFile = function () {
     var _ref = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee(files) {
@@ -51,7 +55,7 @@ var AttachmentVideo = function AttachmentVideo(props) {
       return _regenerator["default"].wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
-            _context.t0 = _reactNative.Platform.OS === 'ios' && asset.id && _native.getLocalAssetUri;
+            _context.t0 = _reactNative.Platform.OS === 'ios' && asset.id;
             if (!_context.t0) {
               _context.next = 5;
               break;
@@ -92,7 +96,7 @@ var AttachmentVideo = function AttachmentVideo(props) {
               _context2.next = 3;
               break;
             }
-            _reactNative.Alert.alert(t('Maximum number of files reached'));
+            _reactNative.Alert.alert('Maximum number of files reached');
             return _context2.abrupt("return");
           case 3:
             _context2.next = 5;
@@ -144,9 +148,9 @@ var AttachmentVideo = function AttachmentVideo(props) {
           pathFill: white,
           width: 25
         }), videoDuration ? (0, _jsxRuntime.jsx)(_reactNative.Text, {
-          style: [{
+          style: [styles.durationText, durationText, {
             color: white
-          }, styles.durationText, durationText],
+          }],
           children: durationLabel
         }) : null]
       })]
@@ -170,8 +174,6 @@ var AttachmentImage = function AttachmentImage(props) {
     overlay = _useTheme2$theme.colors.overlay;
   var _useViewport2 = (0, _useViewport3.useViewport)(),
     vw = _useViewport2.vw;
-  var _useTranslationContex2 = (0, _contexts.useTranslationContext)(),
-    t = _useTranslationContex2.t;
   var size = vw(100) / (numberOfAttachmentPickerImageColumns || 3) - 2;
   var uri = asset.uri;
   var patchImageFile = function () {
@@ -180,7 +182,7 @@ var AttachmentImage = function AttachmentImage(props) {
       return _regenerator["default"].wrap(function _callee3$(_context3) {
         while (1) switch (_context3.prev = _context3.next) {
           case 0:
-            _context3.t0 = _reactNative.Platform.OS === 'ios' && asset.id && _native.getLocalAssetUri;
+            _context3.t0 = _reactNative.Platform.OS === 'ios' && asset.id;
             if (!_context3.t0) {
               _context3.next = 5;
               break;
@@ -215,7 +217,7 @@ var AttachmentImage = function AttachmentImage(props) {
               _context4.next = 3;
               break;
             }
-            _reactNative.Alert.alert(t('Maximum number of files reached'));
+            _reactNative.Alert.alert('Maximum number of files reached');
             return _context4.abrupt("return");
           case 3:
             _context4.next = 5;

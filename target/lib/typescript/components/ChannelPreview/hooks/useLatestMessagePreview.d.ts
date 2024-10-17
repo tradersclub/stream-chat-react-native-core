@@ -2,13 +2,13 @@ import type { Channel, ChannelState, MessageResponse } from 'stream-chat';
 import type { DefaultStreamChatGenerics } from '../../../types/types';
 type LatestMessage<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = ReturnType<ChannelState<StreamChatGenerics>['formatMessage']> | MessageResponse<StreamChatGenerics>;
 export type LatestMessagePreview<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = {
+    created_at: string | number | Date;
     messageObject: LatestMessage<StreamChatGenerics> | undefined;
     previews: {
         bold: boolean;
         text: string;
     }[];
     status: number;
-    created_at?: string | Date;
 };
 export declare enum MessageReadStatus {
     NOT_SENT_BY_CURRENT_USER = 0,

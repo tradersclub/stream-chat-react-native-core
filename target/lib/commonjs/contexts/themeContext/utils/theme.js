@@ -26,8 +26,6 @@ var Colors = {
   static_black: '#000000',
   static_white: '#ffffff',
   targetedMessageBackground: '#FBF4DD',
-  text_high_emphasis: '#080707',
-  text_low_emphasis: '#7E828B',
   transparent: 'transparent',
   white: '#FFFFFF',
   white_smoke: '#F2F2F2',
@@ -139,9 +137,7 @@ var defaultTheme = {
   emptyStateIndicator: {
     channelContainer: {},
     channelDetails: {},
-    channelTitle: {},
-    messageContainer: {},
-    messageTitle: {}
+    channelTitle: {}
   },
   groupAvatar: {
     container: {},
@@ -292,11 +288,6 @@ var defaultTheme = {
     inputBoxContainer: {},
     micButtonContainer: {},
     moreOptionsButton: {},
-    nativeAttachmentPicker: {
-      buttonContainer: {},
-      buttonDimmerStyle: {},
-      container: {}
-    },
     optionsContainer: {},
     replyContainer: {},
     searchIcon: {},
@@ -420,8 +411,8 @@ var defaultTheme = {
         videoContainer: {}
       },
       playIcon: {
-        height: 32,
-        width: 32
+        height: 24,
+        width: 24
       }
     },
     container: {},
@@ -443,8 +434,6 @@ var defaultTheme = {
           fontWeight: '400'
         }
       },
-      editedLabel: {},
-      editedTimestampContainer: {},
       errorContainer: {
         paddingRight: 12,
         paddingTop: 0
@@ -481,7 +470,6 @@ var defaultTheme = {
           }
         }
       },
-      timestampText: {},
       wrapper: {}
     },
     file: {
@@ -501,7 +489,6 @@ var defaultTheme = {
       gridHeight: 195,
       gridWidth: 256,
       image: {},
-      imageBorderRadius: undefined,
       imageContainer: {},
       maxHeight: 300,
       maxWidth: 256,
@@ -544,8 +531,7 @@ var defaultTheme = {
       middleIcon: {},
       radius: 2,
       reactionBubble: {},
-      reactionContainer: {},
-      reactionCount: {},
+      reactionBubbleBackground: {},
       reactionSize: 24,
       strokeSize: 1
     },
@@ -589,9 +575,6 @@ var defaultTheme = {
       actionContainer: {},
       icon: {},
       title: {}
-    },
-    messageActionsList: {
-      container: {}
     },
     padding: 8,
     reactions: {
@@ -639,23 +622,6 @@ var defaultTheme = {
     newThread: {
       text: {}
     }
-  },
-  threadListItem: {
-    boldText: {},
-    contentRow: {},
-    contentTextWrapper: {},
-    dateText: {},
-    headerRow: {},
-    infoRow: {},
-    lastReplyText: {},
-    parentMessageText: {},
-    touchableWrapper: {},
-    unreadBubbleText: {},
-    unreadBubbleWrapper: {}
-  },
-  threadListUnreadBanner: {
-    text: {},
-    touchableWrapper: {}
   },
   typingIndicator: {
     container: {},

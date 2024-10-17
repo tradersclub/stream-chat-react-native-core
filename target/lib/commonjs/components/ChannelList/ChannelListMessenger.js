@@ -128,6 +128,11 @@ var ChannelListMessengerWithContext = function ChannelListMessengerWithContext(p
       onEndReachedCalledDuringCurrentScrollRef.current = true;
     }
   };
+  if (loadingChannels) {
+    return (0, _jsxRuntime.jsx)(LoadingIndicator, {
+      listType: "channel"
+    });
+  }
   return (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
     children: [(0, _jsxRuntime.jsx)(_reactNative.FlatList, Object.assign({
       contentContainerStyle: [styles.flatListContentContainer, {
@@ -148,9 +153,11 @@ var ChannelListMessengerWithContext = function ChannelListMessengerWithContext(p
       onMomentumScrollBegin: function onMomentumScrollBegin() {
         return onEndReachedCalledDuringCurrentScrollRef.current = false;
       },
-      onRefresh: refreshList,
       ref: setFlatListRef,
-      refreshing: refreshing,
+      refreshControl: (0, _jsxRuntime.jsx)(_reactNative.RefreshControl, {
+        onRefresh: refreshList,
+        refreshing: refreshing
+      }),
       renderItem: renderItem,
       style: [styles.flatList, {
         backgroundColor: white_snow

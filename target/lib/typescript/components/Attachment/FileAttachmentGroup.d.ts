@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 import { MessageContextValue } from '../../contexts/messageContext/MessageContext';
 import { MessagesContextValue } from '../../contexts/messagesContext/MessagesContext';
-import { DefaultStreamChatGenerics } from '../../types/types';
+import type { DefaultStreamChatGenerics } from '../../types/types';
 export type FileAttachmentGroupPropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<MessageContextValue<StreamChatGenerics>, 'files'> & Pick<MessagesContextValue<StreamChatGenerics>, 'Attachment' | 'AudioAttachment'> & {
     /**
      * The unique id for the message with file attachments

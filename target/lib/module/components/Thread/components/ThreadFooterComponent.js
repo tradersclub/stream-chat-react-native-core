@@ -3,7 +3,7 @@ var _typeof = require("@babel/runtime/helpers/typeof");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ThreadFooterComponent = exports.InlineLoadingMoreThreadIndicator = void 0;
+exports.ThreadFooterComponent = void 0;
 var _objectWithoutProperties2 = _interopRequireDefault(require("@babel/runtime/helpers/objectWithoutProperties"));
 var _react = _interopRequireDefault(require("react"));
 var _reactNative = require("react-native");
@@ -23,10 +23,6 @@ var styles = _reactNative.StyleSheet.create({
   absolute: {
     position: 'absolute'
   },
-  activityIndicatorContainer: {
-    padding: 10,
-    width: '100%'
-  },
   messagePadding: {
     paddingHorizontal: 8
   },
@@ -44,43 +40,25 @@ var styles = _reactNative.StyleSheet.create({
     marginVertical: 8
   }
 });
-var InlineLoadingMoreThreadIndicator = function InlineLoadingMoreThreadIndicator() {
-  var _useThreadContext = (0, _ThreadContext.useThreadContext)(),
-    threadLoadingMore = _useThreadContext.threadLoadingMore;
-  var _useTheme = (0, _ThemeContext.useTheme)(),
-    accent_blue = _useTheme.theme.colors.accent_blue;
-  if (!threadLoadingMore) {
-    return null;
-  }
-  return (0, _jsxRuntime.jsx)(_reactNative.View, {
-    style: styles.activityIndicatorContainer,
-    children: (0, _jsxRuntime.jsx)(_reactNative.ActivityIndicator, {
-      color: accent_blue,
-      size: "small"
-    })
-  });
-};
-exports.InlineLoadingMoreThreadIndicator = InlineLoadingMoreThreadIndicator;
 var ThreadFooterComponentWithContext = function ThreadFooterComponentWithContext(props) {
   var Message = props.Message,
-    parentMessagePreventPress = props.parentMessagePreventPress,
     thread = props.thread;
   var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
     t = _useTranslationContex.t;
   var _useViewport = (0, _useViewport2.useViewport)(),
     vw = _useViewport.vw;
-  var _useTheme2 = (0, _ThemeContext.useTheme)(),
-    _useTheme2$theme = _useTheme2.theme,
-    _useTheme2$theme$colo = _useTheme2$theme.colors,
-    bg_gradient_end = _useTheme2$theme$colo.bg_gradient_end,
-    bg_gradient_start = _useTheme2$theme$colo.bg_gradient_start,
-    grey = _useTheme2$theme$colo.grey,
-    _useTheme2$theme$thre = _useTheme2$theme.thread.newThread,
-    backgroundGradientStart = _useTheme2$theme$thre.backgroundGradientStart,
-    backgroundGradientStop = _useTheme2$theme$thre.backgroundGradientStop,
-    text = _useTheme2$theme$thre.text,
-    threadHeight = _useTheme2$theme$thre.threadHeight,
-    newThread = (0, _objectWithoutProperties2["default"])(_useTheme2$theme$thre, _excluded);
+  var _useTheme = (0, _ThemeContext.useTheme)(),
+    _useTheme$theme = _useTheme.theme,
+    _useTheme$theme$color = _useTheme$theme.colors,
+    bg_gradient_end = _useTheme$theme$color.bg_gradient_end,
+    bg_gradient_start = _useTheme$theme$color.bg_gradient_start,
+    grey = _useTheme$theme$color.grey,
+    _useTheme$theme$threa = _useTheme$theme.thread.newThread,
+    backgroundGradientStart = _useTheme$theme$threa.backgroundGradientStart,
+    backgroundGradientStop = _useTheme$theme$threa.backgroundGradientStop,
+    text = _useTheme$theme$threa.text,
+    threadHeight = _useTheme$theme$threa.threadHeight,
+    newThread = (0, _objectWithoutProperties2["default"])(_useTheme$theme$threa, _excluded);
   if (!thread) return null;
   var replyCount = thread.reply_count;
   return (0, _jsxRuntime.jsxs)(_reactNative.View, {
@@ -91,7 +69,7 @@ var ThreadFooterComponentWithContext = function ThreadFooterComponentWithContext
       children: (0, _jsxRuntime.jsx)(Message, {
         groupStyles: ['single'],
         message: thread,
-        preventPress: parentMessagePreventPress,
+        preventPress: true,
         threadList: true
       })
     }), (0, _jsxRuntime.jsxs)(_reactNative.View, {
@@ -133,15 +111,12 @@ var ThreadFooterComponentWithContext = function ThreadFooterComponentWithContext
           replyCount: replyCount
         })
       })]
-    }), (0, _jsxRuntime.jsx)(InlineLoadingMoreThreadIndicator, {})]
+    })]
   });
 };
 var areEqual = function areEqual(prevProps, nextProps) {
-  var prevParentMessagePreventPress = prevProps.parentMessagePreventPress,
-    prevThread = prevProps.thread;
-  var nextParentMessagePreventPress = nextProps.parentMessagePreventPress,
-    nextThread = nextProps.thread;
-  if (prevParentMessagePreventPress !== nextParentMessagePreventPress) return false;
+  var prevThread = prevProps.thread;
+  var nextThread = nextProps.thread;
   var threadEqual = (prevThread == null ? void 0 : prevThread.id) === (nextThread == null ? void 0 : nextThread.id) && (prevThread == null ? void 0 : prevThread.text) === (nextThread == null ? void 0 : nextThread.text) && (prevThread == null ? void 0 : prevThread.reply_count) === (nextThread == null ? void 0 : nextThread.reply_count);
   if (!threadEqual) return false;
   var latestReactionsEqual = prevThread && nextThread && Array.isArray(prevThread.latest_reactions) && Array.isArray(nextThread.latest_reactions) ? prevThread.latest_reactions.length === nextThread.latest_reactions.length && prevThread.latest_reactions.every(function (_ref, index) {
@@ -153,19 +128,15 @@ var areEqual = function areEqual(prevProps, nextProps) {
   return true;
 };
 var MemoizedThreadFooter = _react["default"].memo(ThreadFooterComponentWithContext, areEqual);
-var ThreadFooterComponent = function ThreadFooterComponent(props) {
+var ThreadFooterComponent = function ThreadFooterComponent() {
   var _useMessagesContext = (0, _MessagesContext.useMessagesContext)(),
     Message = _useMessagesContext.Message;
-  var _useThreadContext2 = (0, _ThreadContext.useThreadContext)(),
-    parentMessagePreventPress = _useThreadContext2.parentMessagePreventPress,
-    thread = _useThreadContext2.thread,
-    threadLoadingMore = _useThreadContext2.threadLoadingMore;
-  return (0, _jsxRuntime.jsx)(MemoizedThreadFooter, Object.assign({
+  var _useThreadContext = (0, _ThreadContext.useThreadContext)(),
+    thread = _useThreadContext.thread;
+  return (0, _jsxRuntime.jsx)(MemoizedThreadFooter, {
     Message: Message,
-    parentMessagePreventPress: parentMessagePreventPress,
-    thread: thread,
-    threadLoadingMore: threadLoadingMore
-  }, props));
+    thread: thread
+  });
 };
 exports.ThreadFooterComponent = ThreadFooterComponent;
 //# sourceMappingURL=ThreadFooterComponent.js.map

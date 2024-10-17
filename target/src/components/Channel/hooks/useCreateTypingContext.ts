@@ -14,7 +14,6 @@ export const useCreateTypingContext = <
     () => ({
       typing,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [typingValue],
   );
 

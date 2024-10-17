@@ -14,7 +14,7 @@ var _useMessageList2 = require("./hooks/useMessageList");
 var _useShouldScrollToRecentOnNewOwnMessage = require("./hooks/useShouldScrollToRecentOnNewOwnMessage");
 var _InlineLoadingMoreIndicator = require("./InlineLoadingMoreIndicator");
 var _InlineLoadingMoreRecentIndicator = require("./InlineLoadingMoreRecentIndicator");
-var _InlineLoadingMoreRecentThreadIndicator = require("./InlineLoadingMoreRecentThreadIndicator");
+var _InlineLoadingMoreThreadIndicator = require("./InlineLoadingMoreThreadIndicator");
 var _getLastReceivedMessage = require("./utils/getLastReceivedMessage");
 var _AttachmentPickerContext = require("../../contexts/attachmentPickerContext/AttachmentPickerContext");
 var _ChannelContext = require("../../contexts/channelContext/ChannelContext");
@@ -26,9 +26,9 @@ var _OverlayContext = require("../../contexts/overlayContext/OverlayContext");
 var _PaginatedMessageListContext = require("../../contexts/paginatedMessageListContext/PaginatedMessageListContext");
 var _ThemeContext = require("../../contexts/themeContext/ThemeContext");
 var _ThreadContext = require("../../contexts/threadContext/ThreadContext");
-var _types = require("../../types/types");
+var _TranslationContext = require("../../contexts/translationContext/TranslationContext");
 var _jsxRuntime = require("react/jsx-runtime");
-var _excluded = ["contentContainerStyle", "ItemSeparatorComponent", "style"];
+var _excluded = ["contentContainerStyle", "style"];
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/MessageList/MessageList.tsx";
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
@@ -48,6 +48,11 @@ var styles = _reactNative.StyleSheet.create({
   flex: {
     flex: 1
   },
+  invert: {
+    transform: [{
+      scaleY: -1
+    }]
+  },
   invertAndroid: {
     transform: [{
       scaleX: -1
@@ -64,6 +69,11 @@ var styles = _reactNative.StyleSheet.create({
     top: 0
   }
 });
+var InvertedCellRendererComponent = function InvertedCellRendererComponent(props) {
+  return (0, _jsxRuntime.jsx)(_reactNative.View, Object.assign({}, props, {
+    style: styles.invertAndroid
+  }));
+};
 var keyExtractor = function keyExtractor(item) {
   if (item.id) return item.id;
   if (item.created_at) return typeof item.created_at === 'string' ? item.created_at : item.created_at.toISOString();
@@ -74,7 +84,7 @@ var flatListViewabilityConfig = {
 };
 var MessageListWithContext = function MessageListWithContext(props) {
   var _getLastReceivedMessa;
-  var LoadingMoreRecentIndicator = props.threadList ? _InlineLoadingMoreRecentThreadIndicator.InlineLoadingMoreRecentThreadIndicator : _InlineLoadingMoreRecentIndicator.InlineLoadingMoreRecentIndicator;
+  var LoadingMoreIndicator = props.threadList ? _InlineLoadingMoreThreadIndicator.InlineLoadingMoreThreadIndicator : _InlineLoadingMoreIndicator.InlineLoadingMoreIndicator;
   var additionalFlatListProps = props.additionalFlatListProps,
     channel = props.channel,
     client = props.client,
@@ -85,10 +95,10 @@ var MessageListWithContext = function MessageListWithContext(props) {
     EmptyStateIndicator = props.EmptyStateIndicator,
     FlatList = props.FlatList,
     _props$FooterComponen = props.FooterComponent,
-    FooterComponent = _props$FooterComponen === void 0 ? _InlineLoadingMoreIndicator.InlineLoadingMoreIndicator : _props$FooterComponen,
+    FooterComponent = _props$FooterComponen === void 0 ? LoadingMoreIndicator : _props$FooterComponen,
     hasNoMoreRecentMessagesToLoad = props.hasNoMoreRecentMessagesToLoad,
     _props$HeaderComponen = props.HeaderComponent,
-    HeaderComponent = _props$HeaderComponen === void 0 ? LoadingMoreRecentIndicator : _props$HeaderComponen,
+    HeaderComponent = _props$HeaderComponen === void 0 ? _InlineLoadingMoreRecentIndicator.InlineLoadingMoreRecentIndicator : _props$HeaderComponen,
     hideStickyDateHeader = props.hideStickyDateHeader,
     initialScrollToFirstUnreadMessage = props.initialScrollToFirstUnreadMessage,
     InlineDateSeparator = props.InlineDateSeparator,
@@ -103,7 +113,6 @@ var MessageListWithContext = function MessageListWithContext(props) {
     LoadingIndicator = props.LoadingIndicator,
     loadMore = props.loadMore,
     loadMoreRecent = props.loadMoreRecent,
-    loadMoreRecentThread = props.loadMoreRecentThread,
     loadMoreThread = props.loadMoreThread,
     markRead = props.markRead,
     Message = props.Message,
@@ -123,8 +132,8 @@ var MessageListWithContext = function MessageListWithContext(props) {
     setTargetedMessage = props.setTargetedMessage,
     StickyHeader = props.StickyHeader,
     targetedMessage = props.targetedMessage,
+    tDateTimeParser = props.tDateTimeParser,
     thread = props.thread,
-    threadInstance = props.threadInstance,
     _props$threadList = props.threadList,
     threadList = _props$threadList === void 0 ? false : _props$threadList,
     TypingIndicator = props.TypingIndicator,
@@ -328,11 +337,11 @@ var MessageListWithContext = function MessageListWithContext(props) {
       var isLatestMessageSetShown = !!channel.state.messageSets.find(function (set) {
         return set.isCurrent && set.isLatest;
       });
+      var msg = processedMessageList == null ? void 0 : processedMessageList[messageArrayIndex];
       if (!isLatestMessageSetShown) {
-        var msg = processedMessageList == null ? void 0 : processedMessageList[messageArrayIndex];
         if (channel.state.latestMessages.length !== 0 && unreadCount > channel.state.latestMessages.length) {
           return messageArrayIndex <= unreadCount - channel.state.latestMessages.length - 1;
-        } else if (lastRead && msg != null && msg.created_at) {
+        } else if (lastRead && msg.created_at) {
           return lastRead < msg.created_at;
         }
         return false;
@@ -344,8 +353,7 @@ var MessageListWithContext = function MessageListWithContext(props) {
     var showUnreadUnderlay = !channel.muteStatus().muted && isCurrentMessageUnread && scrollToBottomButtonVisible;
     var insertInlineUnreadIndicator = showUnreadUnderlay && !isMessageUnread(index + 1);
     if (message.type === 'system') {
-      return (0, _jsxRuntime.jsxs)(_reactNative.View, {
-        style: [shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined],
+      return (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
         children: [(0, _jsxRuntime.jsx)(_reactNative.View, {
           testID: "message-list-item-".concat(index),
           children: (0, _jsxRuntime.jsx)(MessageSystem, {
@@ -375,17 +383,15 @@ var MessageListWithContext = function MessageListWithContext(props) {
       threadList: threadList
     });
     return wrapMessageInTheme ? (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
-      children: [(0, _jsxRuntime.jsx)(_ThemeContext.ThemeProvider, {
+      children: [shouldApplyAndroidWorkaround && renderDateSeperator, (0, _jsxRuntime.jsx)(_ThemeContext.ThemeProvider, {
         mergedStyle: modifiedTheme,
-        children: (0, _jsxRuntime.jsxs)(_reactNative.View, {
-          style: [shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined],
+        children: (0, _jsxRuntime.jsx)(_reactNative.View, {
           testID: "message-list-item-".concat(index),
-          children: [shouldApplyAndroidWorkaround && renderDateSeperator, renderMessage]
+          children: renderMessage
         })
       }), !shouldApplyAndroidWorkaround && renderDateSeperator, insertInlineUnreadIndicator && (0, _jsxRuntime.jsx)(InlineUnreadIndicator, {})]
     }) : (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
       children: [(0, _jsxRuntime.jsxs)(_reactNative.View, {
-        style: [shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined],
         testID: "message-list-item-".concat(index),
         children: [shouldApplyAndroidWorkaround && renderDateSeperator, renderMessage]
       }), !shouldApplyAndroidWorkaround && renderDateSeperator, insertInlineUnreadIndicator && (0, _jsxRuntime.jsx)(InlineUnreadIndicator, {})]
@@ -422,9 +428,7 @@ var MessageListWithContext = function MessageListWithContext(props) {
             _context.next = 8;
             return onEndReachedInPromise.current;
           case 8:
-            onStartReachedInPromise.current = (threadList && !!threadInstance && loadMoreRecentThread ? loadMoreRecentThread({
-              limit: limit
-            }) : loadMoreRecent(limit)).then(callback)["catch"](onError);
+            onStartReachedInPromise.current = loadMoreRecent(limit).then(callback)["catch"](onError);
           case 9:
           case "end":
             return _context.stop();
@@ -634,16 +638,13 @@ var MessageListWithContext = function MessageListWithContext(props) {
           viewPosition: 0.5
         });
       }
-      loadChannelAroundMessage({
-        messageId: messageIdToScroll
-      });
     }, 50);
   }, [targetedMessage, initialScrollToFirstUnreadMessage]);
   var messagesWithImages = legacyImageViewerSwipeBehaviour && processedMessageList.filter(function (message) {
     var isMessageTypeDeleted = message.type === 'deleted';
     if (!isMessageTypeDeleted && message.attachments) {
       return message.attachments.some(function (attachment) {
-        return attachment.type === _types.FileTypes.Image && !attachment.title_link && !attachment.og_scrape_url && (attachment.image_url || attachment.thumb_url);
+        return attachment.type === 'image' && !attachment.title_link && !attachment.og_scrape_url && (attachment.image_url || attachment.thumb_url);
       });
     }
     return false;
@@ -661,6 +662,13 @@ var MessageListWithContext = function MessageListWithContext(props) {
       setMessages(messagesWithImages);
     }
   }, [imageString, isListActive, legacyImageViewerSwipeBehaviour, numberOfMessagesWithImages, threadExists, threadList]);
+  var stickyHeaderFormatDate = (stickyHeaderDate == null ? void 0 : stickyHeaderDate.getFullYear()) === new Date().getFullYear() ? 'MMM D' : 'MMM D, YYYY';
+  var tStickyHeaderDate = stickyHeaderDate && !hideStickyDateHeader ? tDateTimeParser(stickyHeaderDate) : null;
+  var stickyHeaderDateString = (0, _react.useMemo)(function () {
+    if (tStickyHeaderDate === null || hideStickyDateHeader) return null;
+    if ((0, _TranslationContext.isDayOrMoment)(tStickyHeaderDate)) return tStickyHeaderDate.format(stickyHeaderFormatDate);
+    return new Date(tStickyHeaderDate).toDateString();
+  }, [tStickyHeaderDate, stickyHeaderFormatDate, hideStickyDateHeader]);
   var dismissImagePicker = function dismissImagePicker() {
     if (!hasMoved && selectedPicker) {
       setSelectedPicker(undefined);
@@ -690,6 +698,17 @@ var MessageListWithContext = function MessageListWithContext(props) {
       data: processedMessageList
     });
   }
+  var renderListEmptyComponent = (0, _react.useCallback)(function () {
+    return (0, _jsxRuntime.jsx)(_reactNative.View, {
+      style: [styles.flex, {
+        backgroundColor: white_snow
+      }, shouldApplyAndroidWorkaround ? styles.invertAndroid : styles.invert],
+      testID: "empty-state",
+      children: (0, _jsxRuntime.jsx)(EmptyStateIndicator, {
+        listType: "message"
+      })
+    });
+  }, [EmptyStateIndicator, shouldApplyAndroidWorkaround]);
   var ListFooterComponent = (0, _react.useCallback)(function () {
     return (0, _jsxRuntime.jsx)(_reactNative.View, {
       style: shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined,
@@ -702,17 +721,19 @@ var MessageListWithContext = function MessageListWithContext(props) {
       children: (0, _jsxRuntime.jsx)(HeaderComponent, {})
     });
   }, [shouldApplyAndroidWorkaround, HeaderComponent]);
-  var ItemSeparatorComponent = additionalFlatListProps == null ? void 0 : additionalFlatListProps.ItemSeparatorComponent;
-  var WrappedItemSeparatorComponent = (0, _react.useCallback)(function () {
-    return (0, _jsxRuntime.jsx)(_reactNative.View, {
-      style: [shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined],
-      children: ItemSeparatorComponent ? (0, _jsxRuntime.jsx)(ItemSeparatorComponent, {}) : null
+  var StickyHeaderComponent = function StickyHeaderComponent() {
+    if (!stickyHeaderDateString) return null;
+    if (StickyHeader) return (0, _jsxRuntime.jsx)(StickyHeader, {
+      dateString: stickyHeaderDateString
     });
-  }, [ItemSeparatorComponent, shouldApplyAndroidWorkaround]);
+    if (messageListLengthAfterUpdate) return (0, _jsxRuntime.jsx)(DateHeader, {
+      dateString: stickyHeaderDateString
+    });
+    return null;
+  };
   var additionalFlatListPropsExcludingStyle;
   if (additionalFlatListProps) {
     var contentContainerStyle = additionalFlatListProps.contentContainerStyle,
-      _ItemSeparatorComponent = additionalFlatListProps.ItemSeparatorComponent,
       style = additionalFlatListProps.style,
       rest = (0, _objectWithoutProperties2["default"])(additionalFlatListProps, _excluded);
     additionalFlatListPropsExcludingStyle = rest;
@@ -733,22 +754,15 @@ var MessageListWithContext = function MessageListWithContext(props) {
       backgroundColor: white_snow
     }, container],
     testID: "message-flat-list-wrapper",
-    children: [processedMessageList.length === 0 && !thread ? (0, _jsxRuntime.jsx)(_reactNative.View, {
-      style: [styles.flex, {
-        backgroundColor: white_snow
-      }],
-      testID: "empty-state",
-      children: EmptyStateIndicator ? (0, _jsxRuntime.jsx)(EmptyStateIndicator, {
-        listType: "message"
-      }) : null
-    }) : (0, _jsxRuntime.jsx)(FlatList, Object.assign({
+    children: [(0, _jsxRuntime.jsx)(FlatList, Object.assign({
+      CellRendererComponent: shouldApplyAndroidWorkaround ? InvertedCellRendererComponent : undefined,
       contentContainerStyle: [styles.contentContainer, additionalFlatListProps == null ? void 0 : additionalFlatListProps.contentContainerStyle, contentContainer],
       data: processedMessageList,
       extraData: disabled || !hasNoMoreRecentMessagesToLoad,
       inverted: shouldApplyAndroidWorkaround ? false : inverted,
-      ItemSeparatorComponent: WrappedItemSeparatorComponent,
       keyboardShouldPersistTaps: "handled",
       keyExtractor: keyExtractor,
+      ListEmptyComponent: renderListEmptyComponent,
       ListFooterComponent: ListFooterComponent,
       ListHeaderComponent: ListHeaderComponent,
       maintainVisibleContentPosition: {
@@ -773,10 +787,7 @@ var MessageListWithContext = function MessageListWithContext(props) {
     }, additionalFlatListPropsExcludingStyle)), !loading && (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
       children: [(0, _jsxRuntime.jsx)(_reactNative.View, {
         style: styles.stickyHeader,
-        children: messageListLengthAfterUpdate && StickyHeader ? (0, _jsxRuntime.jsx)(StickyHeader, {
-          date: stickyHeaderDate,
-          DateHeader: DateHeader
-        }) : null
+        children: (0, _jsxRuntime.jsx)(StickyHeaderComponent, {})
       }), !disableTypingIndicator && TypingIndicator && (0, _jsxRuntime.jsx)(TypingIndicatorContainer, {
         children: (0, _jsxRuntime.jsx)(TypingIndicator, {})
       }), (0, _jsxRuntime.jsx)(ScrollToBottomButton, {
@@ -836,10 +847,11 @@ var MessageList = function MessageList(props) {
   var _useOverlayContext = (0, _OverlayContext.useOverlayContext)(),
     overlay = _useOverlayContext.overlay;
   var _useThreadContext = (0, _ThreadContext.useThreadContext)(),
-    loadMoreRecentThread = _useThreadContext.loadMoreRecentThread,
     loadMoreThread = _useThreadContext.loadMoreThread,
-    thread = _useThreadContext.thread,
-    threadInstance = _useThreadContext.threadInstance;
+    thread = _useThreadContext.thread;
+  var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
+    t = _useTranslationContex.t,
+    tDateTimeParser = _useTranslationContex.tDateTimeParser;
   return (0, _jsxRuntime.jsx)(MessageListWithContext, Object.assign({
     channel: channel,
     client: client,
@@ -863,7 +875,6 @@ var MessageList = function MessageList(props) {
     LoadingIndicator: LoadingIndicator,
     loadMore: loadMore,
     loadMoreRecent: loadMoreRecent,
-    loadMoreRecentThread: loadMoreRecentThread,
     loadMoreThread: loadMoreThread,
     markRead: markRead,
     Message: Message,
@@ -879,9 +890,10 @@ var MessageList = function MessageList(props) {
     setSelectedPicker: setSelectedPicker,
     setTargetedMessage: setTargetedMessage,
     StickyHeader: StickyHeader,
+    t: t,
     targetedMessage: targetedMessage,
+    tDateTimeParser: tDateTimeParser,
     thread: thread,
-    threadInstance: threadInstance,
     threadList: threadList,
     TypingIndicator: TypingIndicator,
     TypingIndicatorContainer: TypingIndicatorContainer

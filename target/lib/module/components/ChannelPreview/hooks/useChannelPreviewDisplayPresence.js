@@ -39,7 +39,7 @@ var useChannelPreviewDisplayPresence = function useChannelPreviewDisplayPresence
     setDisplayPresence = _useState2[1];
   (0, _react.useEffect)(function () {
     setDisplayPresence(getChannelPreviewDisplayPresence(channel, client));
-  }, [channel, channelMemberOnline, client]);
+  }, [channelMemberOnline]);
   return displayPresence;
 };
 exports.useChannelPreviewDisplayPresence = useChannelPreviewDisplayPresence;

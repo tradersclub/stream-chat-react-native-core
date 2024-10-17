@@ -89,17 +89,6 @@ Object.keys(_Camera).forEach(function (key) {
     }
   });
 });
-var _ChatIcon = require("./ChatIcon");
-Object.keys(_ChatIcon).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (key in exports && exports[key] === _ChatIcon[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _ChatIcon[key];
-    }
-  });
-});
 var _Check = require("./Check");
 Object.keys(_Check).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -339,17 +328,6 @@ Object.keys(_GiphyIcon).forEach(function (key) {
     enumerable: true,
     get: function get() {
       return _GiphyIcon[key];
-    }
-  });
-});
-var _GiphyLightning = require("./GiphyLightning");
-Object.keys(_GiphyLightning).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (key in exports && exports[key] === _GiphyLightning[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _GiphyLightning[key];
     }
   });
 });
@@ -694,17 +672,6 @@ Object.keys(_Refresh).forEach(function (key) {
     }
   });
 });
-var _Resend = require("./Resend");
-Object.keys(_Resend).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (key in exports && exports[key] === _Resend[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _Resend[key];
-    }
-  });
-});
 var _RTF = require("./RTF");
 Object.keys(_RTF).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -1032,39 +999,6 @@ Object.keys(_ZIP).forEach(function (key) {
     enumerable: true,
     get: function get() {
       return _ZIP[key];
-    }
-  });
-});
-var _MessageBubble = require("./MessageBubble");
-Object.keys(_MessageBubble).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (key in exports && exports[key] === _MessageBubble[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _MessageBubble[key];
-    }
-  });
-});
-var _MessageBubbleEmpty = require("./MessageBubbleEmpty");
-Object.keys(_MessageBubbleEmpty).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (key in exports && exports[key] === _MessageBubbleEmpty[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _MessageBubbleEmpty[key];
-    }
-  });
-});
-var _Reload = require("./Reload");
-Object.keys(_Reload).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (key in exports && exports[key] === _Reload[key]) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _Reload[key];
     }
   });
 });

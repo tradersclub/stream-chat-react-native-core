@@ -44,6 +44,5 @@ export const useAddedToChannelNotification = <
 
     const listener = client?.on('notification.added_to_channel', handleEvent);
     return () => listener?.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };

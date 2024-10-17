@@ -27,8 +27,6 @@ export const Colors = {
   static_black: '#000000',
   static_white: '#ffffff',
   targetedMessageBackground: '#FBF4DD', // dark mode = #302D22
-  text_high_emphasis: '#080707',
-  text_low_emphasis: '#7E828B',
   transparent: 'transparent',
   white: '#FFFFFF',
   white_smoke: '#F2F2F2',
@@ -169,8 +167,6 @@ export type Theme = {
     channelContainer: ViewStyle;
     channelDetails: TextStyle;
     channelTitle: TextStyle;
-    messageContainer: ViewStyle;
-    messageTitle: TextStyle;
   };
   groupAvatar: {
     container: ViewStyle;
@@ -322,11 +318,6 @@ export type Theme = {
     inputBoxContainer: ViewStyle;
     micButtonContainer: ViewStyle;
     moreOptionsButton: ViewStyle;
-    nativeAttachmentPicker: {
-      buttonContainer: ViewStyle;
-      buttonDimmerStyle: ViewStyle;
-      container: ViewStyle;
-    };
     optionsContainer: ViewStyle;
     replyContainer: ViewStyle;
     searchIcon: IconProps;
@@ -459,8 +450,6 @@ export type Theme = {
       deletedContainerInner: ViewStyle;
       deletedMetaText: TextStyle;
       deletedText: MarkdownStyle;
-      editedLabel: TextStyle;
-      editedTimestampContainer: ViewStyle;
       errorContainer: ViewStyle;
       errorIcon: IconProps;
       errorIconContainer: ViewStyle;
@@ -481,7 +470,6 @@ export type Theme = {
       wrapper: ViewStyle;
       receiverMessageBackgroundColor?: ColorValue;
       senderMessageBackgroundColor?: ColorValue;
-      timestampText?: TextStyle;
     };
     file: {
       container: ViewStyle;
@@ -508,12 +496,6 @@ export type Theme = {
       moreImagesContainer: ViewStyle;
       moreImagesText: TextStyle;
       thumbnail: ViewStyle;
-      imageBorderRadius?: {
-        borderBottomLeftRadius: number;
-        borderBottomRightRadius: number;
-        borderTopLeftRadius: number;
-        borderTopRightRadius: number;
-      };
     };
     giphy: {
       buttonContainer: ViewStyle;
@@ -548,8 +530,7 @@ export type Theme = {
       middleIcon: ViewStyle;
       radius: number;
       reactionBubble: ViewStyle;
-      reactionContainer: ViewStyle;
-      reactionCount: TextStyle;
+      reactionBubbleBackground: ViewStyle;
       reactionSize: number;
       strokeSize: number;
     };
@@ -585,9 +566,6 @@ export type Theme = {
       actionContainer: ViewStyle;
       icon: ViewStyle;
       title: TextStyle;
-    };
-    messageActionsList: {
-      container: ViewStyle;
     };
     padding: number;
     reactions: {
@@ -638,23 +616,6 @@ export type Theme = {
       backgroundGradientStop?: string;
       threadHeight?: number;
     };
-  };
-  threadListItem: {
-    boldText: TextStyle;
-    contentRow: ViewStyle;
-    contentTextWrapper: ViewStyle;
-    dateText: TextStyle;
-    headerRow: ViewStyle;
-    infoRow: ViewStyle;
-    lastReplyText: TextStyle;
-    parentMessageText: TextStyle;
-    touchableWrapper: ViewStyle;
-    unreadBubbleText: TextStyle;
-    unreadBubbleWrapper: ViewStyle;
-  };
-  threadListUnreadBanner: {
-    text: TextStyle;
-    touchableWrapper: ViewStyle;
   };
   typingIndicator: {
     container: ViewStyle;
@@ -777,8 +738,6 @@ export const defaultTheme: Theme = {
     channelContainer: {},
     channelDetails: {},
     channelTitle: {},
-    messageContainer: {},
-    messageTitle: {},
   },
   groupAvatar: {
     container: {},
@@ -916,11 +875,6 @@ export const defaultTheme: Theme = {
     inputBoxContainer: {},
     micButtonContainer: {},
     moreOptionsButton: {},
-    nativeAttachmentPicker: {
-      buttonContainer: {},
-      buttonDimmerStyle: {},
-      container: {},
-    },
     optionsContainer: {},
     replyContainer: {},
     searchIcon: {},
@@ -1044,8 +998,8 @@ export const defaultTheme: Theme = {
         videoContainer: {},
       },
       playIcon: {
-        height: 32,
-        width: 32,
+        height: 24,
+        width: 24,
       },
     },
     container: {},
@@ -1067,8 +1021,6 @@ export const defaultTheme: Theme = {
           fontWeight: '400',
         },
       },
-      editedLabel: {},
-      editedTimestampContainer: {},
       errorContainer: {
         paddingRight: 12,
         paddingTop: 0,
@@ -1101,7 +1053,6 @@ export const defaultTheme: Theme = {
       textContainer: {
         onlyEmojiMarkdown: { text: { fontSize: 50 } },
       },
-      timestampText: {},
       wrapper: {},
     },
     file: {
@@ -1121,7 +1072,6 @@ export const defaultTheme: Theme = {
       gridHeight: 195,
       gridWidth: 256,
       image: {},
-      imageBorderRadius: undefined,
       imageContainer: {},
       maxHeight: 300,
       maxWidth: 256,
@@ -1164,8 +1114,7 @@ export const defaultTheme: Theme = {
       middleIcon: {},
       radius: 2, // not recommended to change this
       reactionBubble: {},
-      reactionContainer: {},
-      reactionCount: {},
+      reactionBubbleBackground: {},
       reactionSize: 24,
       strokeSize: 1, // not recommended to change this
     },
@@ -1209,9 +1158,6 @@ export const defaultTheme: Theme = {
       actionContainer: {},
       icon: {},
       title: {},
-    },
-    messageActionsList: {
-      container: {},
     },
     padding: 8,
     reactions: {
@@ -1259,23 +1205,6 @@ export const defaultTheme: Theme = {
     newThread: {
       text: {},
     },
-  },
-  threadListItem: {
-    boldText: {},
-    contentRow: {},
-    contentTextWrapper: {},
-    dateText: {},
-    headerRow: {},
-    infoRow: {},
-    lastReplyText: {},
-    parentMessageText: {},
-    touchableWrapper: {},
-    unreadBubbleText: {},
-    unreadBubbleWrapper: {},
-  },
-  threadListUnreadBanner: {
-    text: {},
-    touchableWrapper: {},
   },
   typingIndicator: {
     container: {},

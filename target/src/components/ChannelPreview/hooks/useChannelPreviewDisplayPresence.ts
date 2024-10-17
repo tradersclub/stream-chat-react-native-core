@@ -48,7 +48,7 @@ export const useChannelPreviewDisplayPresence = <
 
   useEffect(() => {
     setDisplayPresence(getChannelPreviewDisplayPresence(channel, client));
-  }, [channel, channelMemberOnline, client]);
+  }, [channelMemberOnline]);
 
   return displayPresence;
 };

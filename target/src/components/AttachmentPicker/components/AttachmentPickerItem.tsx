@@ -3,16 +3,15 @@ import React from 'react';
 import { Alert, ImageBackground, Platform, StyleSheet, Text, View } from 'react-native';
 
 import { TouchableOpacity } from '@gorhom/bottom-sheet';
+import dayjs from 'dayjs';
 import { lookup } from 'mime-types';
 
-import { useTranslationContext } from '../../../contexts';
-import { AttachmentPickerContextValue } from '../../../contexts/attachmentPickerContext/AttachmentPickerContext';
+import type { AttachmentPickerContextValue } from '../../../contexts/attachmentPickerContext/AttachmentPickerContext';
 import { useTheme } from '../../../contexts/themeContext/ThemeContext';
 import { useViewport } from '../../../hooks/useViewport';
 import { Recorder } from '../../../icons';
 import { getLocalAssetUri } from '../../../native';
 import type { Asset, File } from '../../../types/types';
-import { getDurationLabelFromDuration } from '../../../utils/utils';
 
 type AttachmentPickerItemType = Pick<
   AttachmentPickerContextValue,
@@ -24,6 +23,7 @@ type AttachmentPickerItemType = Pick<
   selected: boolean;
   numberOfAttachmentPickerImageColumns?: number;
 };
+
 type AttachmentImageProps = Omit<AttachmentPickerItemType, 'setSelectedFiles' | 'selectedFiles'>;
 
 type AttachmentVideoProps = Omit<AttachmentPickerItemType, 'setSelectedImages' | 'selectedImages'>;
@@ -40,7 +40,6 @@ const AttachmentVideo = (props: AttachmentVideoProps) => {
     setSelectedFiles,
   } = props;
   const { vw } = useViewport();
-  const { t } = useTranslationContext();
 
   const {
     theme: {
@@ -51,15 +50,25 @@ const AttachmentVideo = (props: AttachmentVideoProps) => {
 
   const { duration: videoDuration, uri } = asset;
 
-  const durationLabel = getDurationLabelFromDuration(videoDuration);
+  const ONE_HOUR_IN_SECONDS = 3600;
+
+  let durationLabel = '00:00';
+
+  if (videoDuration) {
+    const isDurationLongerThanHour = videoDuration / ONE_HOUR_IN_SECONDS >= 1;
+    const formattedDurationParam = isDurationLongerThanHour ? 'HH:mm:ss' : 'mm:ss';
+    const formattedVideoDuration = dayjs
+      .duration(videoDuration, 'second')
+      .format(formattedDurationParam);
+    durationLabel = formattedVideoDuration;
+  }
 
   const size = vw(100) / (numberOfAttachmentPickerImageColumns || 3) - 2;
 
   /* Patches video files with uri and mimetype */
   const patchVideoFile = async (files: File[]) => {
     // For the case of Expo CLI where you need to fetch the file uri from file id. Here it is only done for iOS since for android the file.uri is fine.
-    const localAssetURI =
-      Platform.OS === 'ios' && asset.id && getLocalAssetUri && (await getLocalAssetUri(asset.id));
+    const localAssetURI = Platform.OS === 'ios' && asset.id && (await getLocalAssetUri(asset.id));
     const uri = localAssetURI || asset.uri || '';
     // We need a mime-type to upload a video file.
     const mimeType = lookup(asset.name) || 'multipart/form-data';
@@ -78,7 +87,7 @@ const AttachmentVideo = (props: AttachmentVideoProps) => {
 
   const updateSelectedFiles = async () => {
     if (numberOfUploads >= maxNumberOfFiles) {
-      Alert.alert(t('Maximum number of files reached'));
+      Alert.alert('Maximum number of files reached');
       return;
     }
     const files = await patchVideoFile(selectedFiles);
@@ -117,7 +126,7 @@ const AttachmentVideo = (props: AttachmentVideoProps) => {
         <View style={styles.videoView}>
           <Recorder height={20} pathFill={white} width={25} />
           {videoDuration ? (
-            <Text style={[{ color: white }, styles.durationText, durationText]}>
+            <Text style={[styles.durationText, durationText, { color: white }]}>
               {durationLabel}
             </Text>
           ) : null}
@@ -145,7 +154,6 @@ const AttachmentImage = (props: AttachmentImageProps) => {
     },
   } = useTheme();
   const { vw } = useViewport();
-  const { t } = useTranslationContext();
 
   const size = vw(100) / (numberOfAttachmentPickerImageColumns || 3) - 2;
 
@@ -154,8 +162,7 @@ const AttachmentImage = (props: AttachmentImageProps) => {
   /* Patches image files with uri */
   const patchImageFile = async (images: Asset[]) => {
     // For the case of Expo CLI where you need to fetch the file uri from file id. Here it is only done for iOS since for android the file.uri is fine.
-    const localAssetURI =
-      Platform.OS === 'ios' && asset.id && getLocalAssetUri && (await getLocalAssetUri(asset.id));
+    const localAssetURI = Platform.OS === 'ios' && asset.id && (await getLocalAssetUri(asset.id));
     const uri = localAssetURI || asset.uri || '';
     return [
       ...images,
@@ -168,7 +175,7 @@ const AttachmentImage = (props: AttachmentImageProps) => {
 
   const updateSelectedImages = async () => {
     if (numberOfUploads >= maxNumberOfFiles) {
-      Alert.alert(t('Maximum number of files reached'));
+      Alert.alert('Maximum number of files reached');
       return;
     }
     const images = await patchImageFile(selectedImages);

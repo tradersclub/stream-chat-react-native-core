@@ -22,7 +22,7 @@ var QuickSqliteClient = (0, _createClass2["default"])(function QuickSqliteClient
   (0, _classCallCheck2["default"])(this, QuickSqliteClient);
 });
 exports.QuickSqliteClient = QuickSqliteClient;
-QuickSqliteClient.dbVersion = 5;
+QuickSqliteClient.dbVersion = 3;
 QuickSqliteClient.dbName = _constants.DB_NAME;
 QuickSqliteClient.dbLocation = _constants.DB_LOCATION;
 QuickSqliteClient.getDbVersion = function () {

@@ -54,7 +54,6 @@ export const ImageGalleryOverlay = (props: Props) => {
       opacity.value = 0;
       setFadedIn(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentBottomSheetIndex]);
 
   const showOverlayStyle = useAnimatedStyle<ViewStyle>(

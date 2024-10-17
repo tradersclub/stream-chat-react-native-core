@@ -5,7 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.useMessageDetailsForState = void 0;
 var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
 var _react = require("react");
-var _types = require("../../../types/types");
 var _utils = require("../../../utils/utils");
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -44,7 +43,7 @@ var useMessageDetailsForState = function useMessageDetailsForState(message, init
       setShowMoreOptions(false);
     }
   }, [text, imageUploads.length, fileUploads.length]);
-  var messageValue = message ? (0, _utils.stringifyMessage)(message) : '';
+  var messageValue = message === undefined ? '' : "".concat(message.id).concat(message.text).concat(message.updated_at);
   (0, _react.useEffect)(function () {
     if (message && Array.isArray(message == null ? void 0 : message.mentioned_users)) {
       var _mentionedUsers = message.mentioned_users.map(function (user) {
@@ -55,7 +54,7 @@ var useMessageDetailsForState = function useMessageDetailsForState(message, init
   }, [messageValue]);
   var mapAttachmentToFileUpload = function mapAttachmentToFileUpload(attachment) {
     var id = (0, _utils.generateRandomId)();
-    if (attachment.type === _types.FileTypes.Audio) {
+    if (attachment.type === 'audio') {
       return {
         file: {
           duration: attachment.duration,
@@ -68,21 +67,19 @@ var useMessageDetailsForState = function useMessageDetailsForState(message, init
         state: 'finished',
         url: attachment.asset_url
       };
-    } else if (attachment.type === _types.FileTypes.Video) {
+    } else if (attachment.type === 'video') {
       return {
         file: {
-          duration: attachment.duration,
           mimeType: attachment.mime_type,
           name: attachment.title || '',
-          size: attachment.file_size,
-          uri: attachment.asset_url
+          size: attachment.file_size
         },
         id: id,
         state: 'finished',
         thumb_url: attachment.thumb_url,
         url: attachment.asset_url
       };
-    } else if (attachment.type === _types.FileTypes.VoiceRecording) {
+    } else if (attachment.type === 'voiceRecording') {
       return {
         file: {
           duration: attachment.duration,
@@ -96,13 +93,12 @@ var useMessageDetailsForState = function useMessageDetailsForState(message, init
         state: 'finished',
         url: attachment.asset_url
       };
-    } else if (attachment.type === _types.FileTypes.File) {
+    } else if (attachment.type === 'file') {
       return {
         file: {
           mimeType: attachment.mime_type,
           name: attachment.title || '',
-          size: attachment.file_size,
-          uri: attachment.asset_url
+          size: attachment.file_size
         },
         id: id,
         state: 'finished',
@@ -113,8 +109,7 @@ var useMessageDetailsForState = function useMessageDetailsForState(message, init
         file: {
           mimeType: attachment.mime_type,
           name: attachment.title || '',
-          size: attachment.file_size,
-          uri: attachment.asset_url
+          size: attachment.file_size
         },
         id: id,
         state: 'finished',
@@ -133,15 +128,13 @@ var useMessageDetailsForState = function useMessageDetailsForState(message, init
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var attachment = _step.value;
-          if (attachment.type === _types.FileTypes.Image) {
+          if (attachment.type === 'image') {
             var id = (0, _utils.generateRandomId)();
             newImageUploads.push({
               file: {
-                height: attachment.original_height,
                 name: attachment.fallback,
                 size: attachment.file_size,
-                type: attachment.type,
-                width: attachment.original_width
+                type: attachment.type
               },
               id: id,
               state: 'finished',

@@ -42,32 +42,21 @@ var addReactionToLocalState = function addReactionToLocalState(_ref) {
     message.latest_reactions = message.latest_reactions.filter(function (r) {
       return r.user_id !== user.id;
     });
-    if (currentReaction && message.reaction_groups && message.reaction_groups[currentReaction.type] && message.reaction_groups[currentReaction.type].count > 0 && message.reaction_groups[currentReaction.type].sum_scores > 0) {
-      message.reaction_groups[currentReaction.type].count = message.reaction_groups[currentReaction.type].count - 1;
-      message.reaction_groups[currentReaction.type].sum_scores = message.reaction_groups[currentReaction.type].sum_scores - 1;
+    if (currentReaction && message.reaction_counts && message.reaction_counts[currentReaction.type] && message.reaction_counts[currentReaction.type] > 0) {
+      message.reaction_counts[currentReaction.type] = message.reaction_counts[currentReaction.type] - 1;
     }
-    if (!message.reaction_groups) {
-      message.reaction_groups = (0, _defineProperty2["default"])({}, reactionType, {
-        count: 1,
-        first_reaction_at: new Date().toISOString(),
-        last_reaction_at: new Date().toISOString(),
-        sum_scores: 1
-      });
+    if (!message.reaction_counts) {
+      message.reaction_counts = (0, _defineProperty2["default"])({}, reactionType, 1);
     } else {
-      if (!message.reaction_groups[reactionType]) {
-        message.reaction_groups[reactionType] = {
-          count: 1,
-          first_reaction_at: new Date().toISOString(),
-          last_reaction_at: new Date().toISOString(),
-          sum_scores: 1
-        };
-      } else {
-        message.reaction_groups[reactionType] = Object.assign({}, message.reaction_groups[reactionType], {
-          count: message.reaction_groups[reactionType].count + 1,
-          last_reaction_at: new Date().toISOString(),
-          sum_scores: message.reaction_groups[reactionType].sum_scores + 1
-        });
-      }
+      var _message$reaction_cou2;
+      message.reaction_counts[reactionType] = (((_message$reaction_cou2 = message.reaction_counts) == null ? void 0 : _message$reaction_cou2[reactionType]) || 0) + 1;
+    }
+  } else {
+    if (!message.reaction_counts) {
+      message.reaction_counts = (0, _defineProperty2["default"])({}, reactionType, 1);
+    } else {
+      var _message$reaction_cou4;
+      message.reaction_counts[reactionType] = (((_message$reaction_cou4 = message.reaction_counts) == null ? void 0 : _message$reaction_cou4[reactionType]) || 0) + 1;
     }
   }
   message.own_reactions = [].concat((0, _toConsumableArray2["default"])(message.own_reactions), [reaction]);
@@ -79,7 +68,6 @@ var addReactionToLocalState = function addReactionToLocalState(_ref) {
     });
   } else {
     (0, _insertReaction.insertReaction)({
-      message: message,
       reaction: reaction
     });
   }

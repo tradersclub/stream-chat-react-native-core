@@ -22,7 +22,7 @@ import {
   TranslationContextValue,
   useTranslationContext,
 } from '../../contexts/translationContext/TranslationContext';
-import { DefaultStreamChatGenerics, FileTypes } from '../../types/types';
+import type { DefaultStreamChatGenerics } from '../../types/types';
 import { getResizedImageUrl } from '../../utils/getResizedImageUrl';
 import { getTrimmedAttachmentTitle } from '../../utils/getTrimmedAttachmentTitle';
 import { hasOnlyEmojis } from '../../utils/utils';
@@ -94,36 +94,36 @@ const getMessageType = <
 ) => {
   let messageType;
 
-  const isLastAttachmentFile = lastAttachment.type === FileTypes.File;
+  const isLastAttachmentFile = lastAttachment.type === 'file';
 
-  const isLastAttachmentAudio = lastAttachment.type === FileTypes.Audio;
+  const isLastAttachmentAudio = lastAttachment.type === 'audio';
 
-  const isLastAttachmentVoiceRecording = lastAttachment.type === FileTypes.VoiceRecording;
+  const isLastAttachmentVoiceRecording = lastAttachment.type === 'voiceRecording';
 
-  const isLastAttachmentVideo = lastAttachment.type === FileTypes.Video;
+  const isLastAttachmentVideo = lastAttachment.type === 'video';
 
   const isLastAttachmentGiphy =
-    lastAttachment?.type === FileTypes.Giphy || lastAttachment?.type === FileTypes.Imgur;
+    lastAttachment?.type === 'giphy' || lastAttachment?.type === 'imgur';
 
   const isLastAttachmentImageOrGiphy =
-    lastAttachment?.type === FileTypes.Image &&
+    lastAttachment?.type === 'image' &&
     !lastAttachment?.title_link &&
     !lastAttachment?.og_scrape_url;
 
   const isLastAttachmentImage = lastAttachment?.image_url || lastAttachment?.thumb_url;
 
   if (isLastAttachmentFile) {
-    messageType = FileTypes.File;
+    messageType = 'file';
   } else if (isLastAttachmentVideo) {
-    messageType = FileTypes.Video;
+    messageType = 'video';
   } else if (isLastAttachmentAudio) {
-    messageType = FileTypes.Audio;
+    messageType = 'audio';
   } else if (isLastAttachmentVoiceRecording) {
-    messageType = FileTypes.VoiceRecording;
+    messageType = 'voiceRecording';
   } else if (isLastAttachmentImageOrGiphy) {
-    if (isLastAttachmentImage) messageType = FileTypes.Image;
+    if (isLastAttachmentImage) messageType = 'image';
     else messageType = undefined;
-  } else if (isLastAttachmentGiphy) messageType = FileTypes.Giphy;
+  } else if (isLastAttachmentGiphy) messageType = 'giphy';
   else messageType = 'other';
 
   return messageType;
@@ -184,10 +184,10 @@ const ReplyWithContext = <
   const hasImage =
     !error &&
     lastAttachment &&
-    messageType !== FileTypes.File &&
-    messageType !== FileTypes.Video &&
-    messageType !== FileTypes.Audio &&
-    messageType !== FileTypes.VoiceRecording &&
+    messageType !== 'file' &&
+    messageType !== 'video' &&
+    messageType !== 'audio' &&
+    messageType !== 'voiceRecording' &&
     (lastAttachment.image_url || lastAttachment.thumb_url || lastAttachment.og_scrape_url);
 
   const onlyEmojis = !lastAttachment && emojiOnlyText;
@@ -209,9 +209,7 @@ const ReplyWithContext = <
         ]}
       >
         {!error && lastAttachment ? (
-          messageType === FileTypes.File ||
-          messageType === FileTypes.Audio ||
-          messageType === FileTypes.VoiceRecording ? (
+          messageType === 'file' || messageType === 'voiceRecording' || messageType === 'audio' ? (
             <View
               style={[
                 styles.fileAttachmentContainer,
@@ -243,7 +241,7 @@ const ReplyWithContext = <
             />
           ) : null
         ) : null}
-        {messageType === FileTypes.Video && !lastAttachment.og_scrape_url ? (
+        {messageType === 'video' && !lastAttachment.og_scrape_url ? (
           <VideoThumbnail
             imageStyle={[styles.videoThumbnailImageStyle, videoThumbnailImageStyle]}
             style={[styles.videoThumbnailContainerStyle, videoThumbnailContainerStyle]}
@@ -266,13 +264,13 @@ const ReplyWithContext = <
                   ? quotedMessage.text.length > 170
                     ? `${quotedMessage.text.slice(0, 170)}...`
                     : quotedMessage.text
-                  : messageType === FileTypes.Image
+                  : messageType === 'image'
                   ? t('Photo')
-                  : messageType === FileTypes.Video
+                  : messageType === 'video'
                   ? t('Video')
-                  : messageType === FileTypes.File ||
-                    messageType === FileTypes.Audio ||
-                    messageType === FileTypes.VoiceRecording
+                  : messageType === 'file' ||
+                    messageType === 'audio' ||
+                    messageType === 'voiceRecording'
                   ? trimmedLastAttachmentTitle || ''
                   : '',
             }}
@@ -281,7 +279,7 @@ const ReplyWithContext = <
               textContainer: [
                 {
                   marginRight:
-                    hasImage || messageType === FileTypes.Video
+                    hasImage || messageType === 'video'
                       ? Number(
                           stylesProp.imageAttachment?.height ||
                             imageAttachment.height ||
@@ -292,9 +290,9 @@ const ReplyWithContext = <
                             imageAttachment.marginLeft ||
                             styles.imageAttachment.marginLeft,
                         )
-                      : messageType === FileTypes.File ||
-                        messageType === FileTypes.Audio ||
-                        messageType === FileTypes.VoiceRecording
+                      : messageType === 'file' ||
+                        messageType === 'audio' ||
+                        messageType === 'voiceRecording'
                       ? attachmentSize +
                         Number(
                           stylesProp.fileAttachmentContainer?.paddingLeft ||
@@ -309,7 +307,7 @@ const ReplyWithContext = <
               ],
             }}
           />
-          {messageType === FileTypes.Audio || messageType === FileTypes.VoiceRecording ? (
+          {messageType === 'audio' || messageType === 'voiceRecording' ? (
             <Text style={[styles.secondaryText, { color: grey }, secondaryText]}>
               {lastAttachment.duration
                 ? dayjs.duration(lastAttachment.duration, 'second').format('mm:ss')

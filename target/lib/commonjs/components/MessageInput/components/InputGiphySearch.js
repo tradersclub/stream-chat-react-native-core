@@ -2,7 +2,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.InputGiphySearch = void 0;
+exports.InputGiphySearchWithContext = exports.InputGiphySearch = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _reactNative = require("react-native");
 var _MessageInputContext = require("../../../contexts/messageInputContext/MessageInputContext");
@@ -24,30 +24,21 @@ var styles = _reactNative.StyleSheet.create({
     alignItems: 'center',
     borderRadius: 12,
     flexDirection: 'row',
+    height: 24,
     marginRight: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4
+    paddingHorizontal: 8
   },
   giphyText: {
     fontSize: 12,
     fontWeight: 'bold'
   }
 });
-var InputGiphySearch = function InputGiphySearch(_ref) {
-  var propAdditionalTextInputProps = _ref.additionalTextInputProps,
-    propCooldownEndsAt = _ref.cooldownEndsAt,
+var InputGiphySearchWithContext = function InputGiphySearchWithContext(_ref) {
+  var additionalTextInputProps = _ref.additionalTextInputProps,
+    cooldownEndsAt = _ref.cooldownEndsAt,
     disabled = _ref.disabled,
-    propSetGiphyActive = _ref.setGiphyActive,
-    propSetShowMoreOptions = _ref.setShowMoreOptions;
-  var _useMessageInputConte = (0, _MessageInputContext.useMessageInputContext)(),
-    contextAdditionalTextInputProps = _useMessageInputConte.additionalTextInputProps,
-    contextCooldownEndsAt = _useMessageInputConte.cooldownEndsAt,
-    contextSetGiphyActive = _useMessageInputConte.setGiphyActive,
-    contextSetShowMoreOptions = _useMessageInputConte.setShowMoreOptions;
-  var additionalTextInputProps = propAdditionalTextInputProps || contextAdditionalTextInputProps;
-  var cooldownEndsAt = propCooldownEndsAt || contextCooldownEndsAt;
-  var setGiphyActive = propSetGiphyActive || contextSetGiphyActive;
-  var setShowMoreOptions = propSetShowMoreOptions || contextSetShowMoreOptions;
+    setGiphyActive = _ref.setGiphyActive,
+    setShowMoreOptions = _ref.setShowMoreOptions;
   var _useCountdown = (0, _useCountdown2.useCountdown)(cooldownEndsAt),
     cooldownRemainingSeconds = _useCountdown.seconds;
   var _useTheme = (0, _ThemeContext.useTheme)(),
@@ -67,9 +58,10 @@ var InputGiphySearch = function InputGiphySearch(_ref) {
       style: [styles.giphyContainer, {
         backgroundColor: accent_blue
       }, giphyContainer],
-      children: [(0, _jsxRuntime.jsx)(_icons.GiphyLightning, {
-        fill: white,
-        size: 16
+      children: [(0, _jsxRuntime.jsx)(_icons.Lightning, {
+        height: 16,
+        pathFill: white,
+        width: 16
       }), (0, _jsxRuntime.jsx)(_reactNative.Text, {
         style: [styles.giphyText, {
           color: white
@@ -93,6 +85,28 @@ var InputGiphySearch = function InputGiphySearch(_ref) {
       })
     })]
   });
+};
+exports.InputGiphySearchWithContext = InputGiphySearchWithContext;
+var areEqual = function areEqual(prevProps, nextProps) {
+  var prevDisabled = prevProps.disabled;
+  var nextDisabled = nextProps.disabled;
+  var disabledEqual = prevDisabled === nextDisabled;
+  if (!disabledEqual) return false;
+  return true;
+};
+var MemoizedInputGiphySearch = _react["default"].memo(InputGiphySearchWithContext, areEqual);
+var InputGiphySearch = function InputGiphySearch(props) {
+  var _useMessageInputConte = (0, _MessageInputContext.useMessageInputContext)(),
+    additionalTextInputProps = _useMessageInputConte.additionalTextInputProps,
+    cooldownEndsAt = _useMessageInputConte.cooldownEndsAt,
+    setGiphyActive = _useMessageInputConte.setGiphyActive,
+    setShowMoreOptions = _useMessageInputConte.setShowMoreOptions;
+  return (0, _jsxRuntime.jsx)(MemoizedInputGiphySearch, Object.assign({
+    additionalTextInputProps: additionalTextInputProps,
+    cooldownEndsAt: cooldownEndsAt,
+    setGiphyActive: setGiphyActive,
+    setShowMoreOptions: setShowMoreOptions
+  }, props));
 };
 exports.InputGiphySearch = InputGiphySearch;
 InputGiphySearch.displayName = 'InputGiphySearch{messageInput}';

@@ -43,6 +43,5 @@ export const useChannelDeleted = <
 
     const listener = client?.on('channel.deleted', handleEvent);
     return () => listener?.unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };

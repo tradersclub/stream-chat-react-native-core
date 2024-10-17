@@ -158,8 +158,7 @@ var ChannelList = function ChannelList(props) {
     setChannels: setChannels
   });
   (0, _useUserPresence.useUserPresence)({
-    setChannels: setChannels,
-    setForceUpdate: setForceUpdate
+    setChannels: setChannels
   });
   var channelIdsStr = channels == null ? void 0 : channels.reduce(function (acc, channel) {
     return "".concat(acc).concat(channel.cid);

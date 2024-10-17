@@ -5,7 +5,7 @@ import type { AttachmentPickerProps } from '../../components/AttachmentPicker/At
 import type { ImageGalleryCustomComponents } from '../../components/ImageGallery/ImageGallery';
 import type { MessageType } from '../../components/MessageList/hooks/useMessageList';
 import type { DefaultStreamChatGenerics } from '../../types/types';
-import type { Streami18n } from '../../utils/i18n/Streami18n';
+import type { Streami18n } from '../../utils/Streami18n';
 import type { AttachmentPickerContextValue } from '../attachmentPickerContext/AttachmentPickerContext';
 import type { MessageOverlayContextValue } from '../messageOverlayContext/MessageOverlayContext';
 import type { DeepPartial } from '../themeContext/ThemeContext';
@@ -32,13 +32,6 @@ export type OverlayProviderProps<StreamChatGenerics extends DefaultStreamChatGen
     isMyMessage?: boolean;
     isThreadMessage?: boolean;
     message?: MessageType<StreamChatGenerics>;
-    /**
-     * @deprecated use the following instead:
-     *  messageActions={(params) => {
-     *    const actions = messageActions({ ...params, isMessageActionsVisible: false });
-     *    return actions;
-     *  }}
-     */
     messageReactions?: boolean;
     messageTextNumberOfLines?: number;
     numberOfImageGalleryGridColumns?: number;

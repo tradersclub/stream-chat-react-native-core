@@ -12,7 +12,6 @@ var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/sli
 var _react = _interopRequireWildcard(require("react"));
 var _reactNative = require("react-native");
 var _debounce = _interopRequireDefault(require("lodash/debounce"));
-var _omit = _interopRequireDefault(require("lodash/omit"));
 var _throttle = _interopRequireDefault(require("lodash/throttle"));
 var _mimeTypes = require("mime-types");
 var _streamChat = require("stream-chat");
@@ -40,7 +39,6 @@ var _useAppStateListener = require("../../hooks/useAppStateListener");
 var _icons = require("../../icons");
 var _native = require("../../native");
 var dbApi = _interopRequireWildcard(require("../../store/apis"));
-var _types = require("../../types/types");
 var _addReactionToLocalState = require("../../utils/addReactionToLocalState");
 var _compressImage = require("../../utils/compressImage");
 var _DBSyncManager = require("../../utils/DBSyncManager");
@@ -72,7 +70,6 @@ var _MessageAvatar = require("../Message/MessageSimple/MessageAvatar");
 var _MessageBounce = require("../Message/MessageSimple/MessageBounce");
 var _MessageContent = require("../Message/MessageSimple/MessageContent");
 var _MessageDeleted = require("../Message/MessageSimple/MessageDeleted");
-var _MessageEditedTimestamp = require("../Message/MessageSimple/MessageEditedTimestamp");
 var _MessageError = require("../Message/MessageSimple/MessageError");
 var _MessageFooter = require("../Message/MessageSimple/MessageFooter");
 var _MessagePinnedHeader = require("../Message/MessageSimple/MessagePinnedHeader");
@@ -80,7 +77,6 @@ var _MessageReplies = require("../Message/MessageSimple/MessageReplies");
 var _MessageRepliesAvatars = require("../Message/MessageSimple/MessageRepliesAvatars");
 var _MessageSimple = require("../Message/MessageSimple/MessageSimple");
 var _MessageStatus = require("../Message/MessageSimple/MessageStatus");
-var _MessageTimestamp = require("../Message/MessageSimple/MessageTimestamp");
 var _ReactionList = require("../Message/MessageSimple/ReactionList");
 var _AttachButton = require("../MessageInput/AttachButton");
 var _CommandsButton = require("../MessageInput/CommandsButton");
@@ -109,14 +105,14 @@ var _MessageList = require("../MessageList/MessageList");
 var _MessageSystem = require("../MessageList/MessageSystem");
 var _NetworkDownIndicator = require("../MessageList/NetworkDownIndicator");
 var _ScrollToBottomButton = require("../MessageList/ScrollToBottomButton");
-var _StickyHeader = require("../MessageList/StickyHeader");
 var _TypingIndicator = require("../MessageList/TypingIndicator");
 var _TypingIndicatorContainer = require("../MessageList/TypingIndicatorContainer");
 var _OverlayReactionList = require("../MessageOverlay/OverlayReactionList");
 var _Reply = require("../Reply/Reply");
 var _jsxRuntime = require("react/jsx-runtime");
 var _excluded = ["attachments", "mentioned_users", "parent_id", "text"],
-  _excluded2 = ["channel_mutes", "devices", "mutes"];
+  _excluded2 = ["channel_mutes", "devices", "mutes"],
+  _excluded3 = ["__html", "attachments", "created_at", "deleted_at", "html", "id", "latest_reactions", "mentioned_users", "own_reactions", "parent_id", "quoted_message", "reaction_counts", "reactions", "status", "text", "type", "updated_at", "user"];
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/Channel/Channel.tsx";
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
@@ -249,6 +245,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
     _props$FlatList = props.FlatList,
     FlatList = _props$FlatList === void 0 ? _native.FlatList : _props$FlatList,
     forceAlignMessages = props.forceAlignMessages,
+    formatDate = props.formatDate,
     _props$Gallery = props.Gallery,
     Gallery = _props$Gallery === void 0 ? _Gallery.Gallery : _props$Gallery,
     getMessagesGroupStyles = props.getMessagesGroupStyles,
@@ -257,8 +254,6 @@ var ChannelWithContext = function ChannelWithContext(props) {
     giphyEnabled = props.giphyEnabled,
     _props$giphyVersion = props.giphyVersion,
     giphyVersion = _props$giphyVersion === void 0 ? 'fixed_height' : _props$giphyVersion,
-    handleAttachButtonPress = props.handleAttachButtonPress,
-    handleBan = props.handleBan,
     handleBlock = props.handleBlock,
     handleCopy = props.handleCopy,
     handleDelete = props.handleDelete,
@@ -270,8 +265,6 @@ var ChannelWithContext = function ChannelWithContext(props) {
     handleReaction = props.handleReaction,
     handleRetry = props.handleRetry,
     handleThreadReply = props.handleThreadReply,
-    _props$hasCameraPicke = props.hasCameraPicker,
-    hasCameraPicker = _props$hasCameraPicke === void 0 ? (0, _native.isImagePickerAvailable)() : _props$hasCameraPicke,
     _props$hasCommands = props.hasCommands,
     hasCommands = _props$hasCommands === void 0 ? true : _props$hasCommands,
     _props$hasFilePicker = props.hasFilePicker,
@@ -339,8 +332,6 @@ var ChannelWithContext = function ChannelWithContext(props) {
     messageContentOrder = _props$messageContent === void 0 ? ['quoted_reply', 'gallery', 'files', 'text', 'attachments'] : _props$messageContent,
     _props$MessageDeleted = props.MessageDeleted,
     MessageDeleted = _props$MessageDeleted === void 0 ? _MessageDeleted.MessageDeleted : _props$MessageDeleted,
-    _props$MessageEditedT = props.MessageEditedTimestamp,
-    MessageEditedTimestamp = _props$MessageEditedT === void 0 ? _MessageEditedTimestamp.MessageEditedTimestamp : _props$MessageEditedT,
     _props$MessageError = props.MessageError,
     MessageError = _props$MessageError === void 0 ? _MessageError.MessageError : _props$MessageError,
     _props$MessageFooter = props.MessageFooter,
@@ -363,8 +354,6 @@ var ChannelWithContext = function ChannelWithContext(props) {
     _props$MessageSystem = props.MessageSystem,
     MessageSystem = _props$MessageSystem === void 0 ? _MessageSystem.MessageSystem : _props$MessageSystem,
     MessageText = props.MessageText,
-    _props$MessageTimesta = props.MessageTimestamp,
-    MessageTimestamp = _props$MessageTimesta === void 0 ? _MessageTimestamp.MessageTimestamp : _props$MessageTimesta,
     _props$MoreOptionsBut = props.MoreOptionsButton,
     MoreOptionsButton = _props$MoreOptionsBut === void 0 ? _MoreOptionsButton.MoreOptionsButton : _props$MoreOptionsBut,
     myMessageTheme = props.myMessageTheme,
@@ -410,12 +399,11 @@ var ChannelWithContext = function ChannelWithContext(props) {
     StartAudioRecordingButton = _props$StartAudioReco === void 0 ? _AudioRecordingButton.AudioRecordingButton : _props$StartAudioReco,
     _props$stateUpdateThr = props.stateUpdateThrottleInterval,
     stateUpdateThrottleInterval = _props$stateUpdateThr === void 0 ? defaultThrottleInterval : _props$stateUpdateThr,
-    _props$StickyHeader = props.StickyHeader,
-    StickyHeader = _props$StickyHeader === void 0 ? _StickyHeader.StickyHeader : _props$StickyHeader,
+    StickyHeader = props.StickyHeader,
     _props$supportedReact = props.supportedReactions,
     supportedReactions = _props$supportedReact === void 0 ? reactionData : _props$supportedReact,
     t = props.t,
-    threadFromProps = props.thread,
+    threadProps = props.thread,
     threadList = props.threadList,
     threadMessages = props.threadMessages,
     typing = props.typing,
@@ -431,8 +419,6 @@ var ChannelWithContext = function ChannelWithContext(props) {
     VideoThumbnail = _props$VideoThumbnail === void 0 ? _VideoThumbnail.VideoThumbnail : _props$VideoThumbnail,
     watcherCount = props.watcherCount,
     watchers = props.watchers;
-  var threadProps = threadFromProps.thread,
-    threadInstance = threadFromProps.threadInstance;
   var _useTheme = (0, _ThemeContext.useTheme)(),
     _useTheme$theme = _useTheme.theme,
     selectChannel = _useTheme$theme.channel.selectChannel,
@@ -457,7 +443,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
     _useState10 = (0, _slicedToArray2["default"])(_useState9, 2),
     lastRead = _useState10[0],
     setLastRead = _useState10[1];
-  var _useState11 = (0, _react.useState)(false),
+  var _useState11 = (0, _react.useState)(!(channel != null && channel.state.messages.length)),
     _useState12 = (0, _slicedToArray2["default"])(_useState11, 2),
     loading = _useState12[0],
     setLoading = _useState12[1];
@@ -500,7 +486,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
   (0, _react.useEffect)(function () {
     var initChannel = function () {
       var _ref = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee() {
-        var _channel$state$messag, _channel$state$messag2, _channel$state$latest, _channel$state$latest2;
+        var channelLoaded;
         return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
@@ -510,38 +496,26 @@ var ChannelWithContext = function ChannelWithContext(props) {
               }
               return _context.abrupt("return");
             case 2:
+              channelLoaded = false;
               if (channel.initialized) {
-                _context.next = 5;
+                _context.next = 7;
                 break;
               }
-              _context.next = 5;
+              _context.next = 6;
               return loadChannel();
-            case 5:
-              if (!messageId) {
-                _context.next = 9;
-                break;
+            case 6:
+              channelLoaded = true;
+            case 7:
+              if (messageId) {
+                loadChannelAroundMessage({
+                  messageId: messageId
+                });
+              } else if (initialScrollToFirstUnreadMessage && channel.countUnread() > scrollToFirstUnreadThreshold) {
+                loadChannelAtFirstUnreadMessage();
+              } else if (!channelLoaded) {
+                loadChannel();
               }
-              loadChannelAroundMessage({
-                messageId: messageId
-              });
-              _context.next = 16;
-              break;
-            case 9:
-              if (!(initialScrollToFirstUnreadMessage && channel.countUnread() > scrollToFirstUnreadThreshold)) {
-                _context.next = 13;
-                break;
-              }
-              loadChannelAtFirstUnreadMessage();
-              _context.next = 16;
-              break;
-            case 13:
-              if (!(((_channel$state$messag = channel.state.messages) == null ? void 0 : (_channel$state$messag2 = _channel$state$messag[channel.state.messages.length - 1]) == null ? void 0 : _channel$state$messag2.id) !== ((_channel$state$latest = channel.state.latestMessages) == null ? void 0 : (_channel$state$latest2 = _channel$state$latest[channel.state.latestMessages.length - 1]) == null ? void 0 : _channel$state$latest2.id) && !messageId)) {
-                _context.next = 16;
-                break;
-              }
-              _context.next = 16;
-              return loadChannel();
-            case 16:
+            case 8:
             case "end":
               return _context.stop();
           }
@@ -650,7 +624,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
             var updatedThreadMessages = thread.id && channel && channel.state.threads[thread.id] || threadMessages;
             setThreadMessages(updatedThreadMessages);
           }
-          if (channel && thread != null && thread.id && ((_event$message = event.message) == null ? void 0 : _event$message.id) === thread.id && !threadInstance) {
+          if (channel && thread != null && thread.id && ((_event$message = event.message) == null ? void 0 : _event$message.id) === thread.id) {
             var updatedThread = channel.state.formatMessage(event.message);
             setThread(updatedThread);
           }
@@ -965,11 +939,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
     channel.state.messageSets.push({
       isCurrent: false,
       isLatest: true,
-      messages: [],
-      pagination: {
-        hasNext: true,
-        hasPrev: true
-      }
+      messages: []
     });
   });
   var mergeOverlappingMessageSetsRef = (0, _react.useRef)(function () {
@@ -1046,26 +1016,25 @@ var ChannelWithContext = function ChannelWithContext(props) {
         while (1) switch (_context8.prev = _context8.next) {
           case 0:
             if (!(!(channel != null && channel.initialized) || !channel.state.isUpToDate)) {
-              _context8.next = 5;
+              _context8.next = 7;
               break;
             }
             _context8.next = 3;
             return channel == null ? void 0 : channel.watch();
           case 3:
-            _context8.next = 7;
+            channel == null ? void 0 : channel.state.setIsUpToDate(true);
+            setHasNoMoreRecentMessagesToLoad(true);
+            _context8.next = 9;
             break;
-          case 5:
-            _context8.next = 7;
-            return channel.state.loadMessageIntoState('latest');
           case 7:
+            _context8.next = 9;
+            return channel.state.loadMessageIntoState('latest');
+          case 9:
           case "end":
             return _context8.stop();
         }
       }, _callee8);
-    })), function () {
-      channel == null ? void 0 : channel.state.setIsUpToDate(true);
-      setHasNoMoreRecentMessagesToLoad(true);
-    });
+    })));
   };
   var reloadThread = function () {
     var _ref12 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee9() {
@@ -1099,7 +1068,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
             _yield$channel$getMes = _context9.sent;
             _messages = _yield$channel$getMes.messages;
             _messages2 = (0, _slicedToArray2["default"])(_messages, 1), threadMessage = _messages2[0];
-            if (threadMessage && !threadInstance) {
+            if (threadMessage) {
               formattedMessage = channel.state.formatMessage(threadMessage);
               setThread(formattedMessage);
             }
@@ -1505,11 +1474,11 @@ var ChannelWithContext = function ChannelWithContext(props) {
             attachment = updatedMessage.attachments[i];
             image = attachment.originalImage;
             file = attachment.originalFile;
-            if (!(attachment.type === _types.FileTypes.Image && image != null && image.uri && attachment.image_url && (0, _utils.isLocalUrl)(attachment.image_url))) {
+            if (!(attachment.type === 'image' && image != null && image.uri && attachment.image_url && (0, _utils.isLocalUrl)(attachment.image_url))) {
               _context15.next = 28;
               break;
             }
-            filename = (_image$name = image.name) != null ? _image$name : (0, _utils.getFileNameFromPath)(image.uri);
+            filename = (_image$name = image.name) != null ? _image$name : image.uri.replace(/^(file:\/\/|content:\/\/)/, '');
             controller = uploadAbortControllerRef.current.get(filename);
             if (controller) {
               controller.abort();
@@ -1545,7 +1514,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
               })
             });
           case 28:
-            if (!((attachment.type === _types.FileTypes.File || attachment.type === _types.FileTypes.Audio || attachment.type === _types.FileTypes.VoiceRecording || attachment.type === _types.FileTypes.Video) && attachment.asset_url && (0, _utils.isLocalUrl)(attachment.asset_url) && file != null && file.uri)) {
+            if (!((attachment.type === 'file' || attachment.type === 'audio' || attachment.type === 'voiceRecording' || attachment.type === 'video') && attachment.asset_url && (0, _utils.isLocalUrl)(attachment.asset_url) && file != null && file.uri)) {
               _context15.next = 45;
               break;
             }
@@ -1599,7 +1568,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
   }();
   var sendMessageRequest = function () {
     var _ref21 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee16(message, retrying) {
-      var _updatedMessage, extraFields, attachments, id, mentioned_users, parent_id, text, mentionedUserIds, _messageData, messageResponse, _updatedMessage2;
+      var _updatedMessage, __html, attachments, created_at, deleted_at, html, id, latest_reactions, mentioned_users, own_reactions, parent_id, quoted_message, reaction_counts, reactions, status, text, type, updated_at, user, extraFields, mentionedUserIds, _messageData, messageResponse;
       return _regenerator["default"].wrap(function _callee16$(_context16) {
         while (1) switch (_context16.prev = _context16.next) {
           case 0:
@@ -1608,14 +1577,13 @@ var ChannelWithContext = function ChannelWithContext(props) {
             return uploadPendingAttachments(message);
           case 3:
             _updatedMessage = _context16.sent;
-            extraFields = (0, _omit["default"])(_updatedMessage, ['__html', 'attachments', 'created_at', 'deleted_at', 'html', 'id', 'latest_reactions', 'mentioned_users', 'own_reactions', 'parent_id', 'quoted_message', 'reaction_counts', 'reaction_groups', 'reactions', 'status', 'text', 'type', 'updated_at', 'user']);
-            attachments = _updatedMessage.attachments, id = _updatedMessage.id, mentioned_users = _updatedMessage.mentioned_users, parent_id = _updatedMessage.parent_id, text = _updatedMessage.text;
+            __html = _updatedMessage.__html, attachments = _updatedMessage.attachments, created_at = _updatedMessage.created_at, deleted_at = _updatedMessage.deleted_at, html = _updatedMessage.html, id = _updatedMessage.id, latest_reactions = _updatedMessage.latest_reactions, mentioned_users = _updatedMessage.mentioned_users, own_reactions = _updatedMessage.own_reactions, parent_id = _updatedMessage.parent_id, quoted_message = _updatedMessage.quoted_message, reaction_counts = _updatedMessage.reaction_counts, reactions = _updatedMessage.reactions, status = _updatedMessage.status, text = _updatedMessage.text, type = _updatedMessage.type, updated_at = _updatedMessage.updated_at, user = _updatedMessage.user, extraFields = (0, _objectWithoutProperties2["default"])(_updatedMessage, _excluded3);
             if (channel.id) {
-              _context16.next = 8;
+              _context16.next = 7;
               break;
             }
             return _context16.abrupt("return");
-          case 8:
+          case 7:
             mentionedUserIds = (mentioned_users == null ? void 0 : mentioned_users.map(function (user) {
               return user.id;
             })) || [];
@@ -1628,25 +1596,25 @@ var ChannelWithContext = function ChannelWithContext(props) {
             }, extraFields);
             messageResponse = {};
             if (!doSendMessageRequest) {
-              _context16.next = 17;
+              _context16.next = 16;
               break;
             }
-            _context16.next = 14;
+            _context16.next = 13;
             return doSendMessageRequest((channel == null ? void 0 : channel.cid) || '', _messageData);
-          case 14:
+          case 13:
             messageResponse = _context16.sent;
-            _context16.next = 21;
+            _context16.next = 20;
             break;
-          case 17:
+          case 16:
             if (!channel) {
-              _context16.next = 21;
+              _context16.next = 20;
               break;
             }
-            _context16.next = 20;
+            _context16.next = 19;
             return channel.sendMessage(_messageData);
-          case 20:
+          case 19:
             messageResponse = _context16.sent;
-          case 21:
+          case 20:
             if (messageResponse.message) {
               messageResponse.message.status = _utils.MessageStatusTypes.RECEIVED;
               if (enableOfflineSupport) {
@@ -1661,24 +1629,17 @@ var ChannelWithContext = function ChannelWithContext(props) {
               } else {
                 updateMessage(messageResponse.message);
               }
-              threadInstance == null ? void 0 : threadInstance.upsertReplyLocally == null ? void 0 : threadInstance.upsertReplyLocally({
-                message: messageResponse.message
-              });
             }
-            _context16.next = 32;
+            _context16.next = 29;
             break;
-          case 24:
-            _context16.prev = 24;
+          case 23:
+            _context16.prev = 23;
             _context16.t0 = _context16["catch"](0);
             console.log(_context16.t0);
             message.status = _utils.MessageStatusTypes.FAILED;
-            _updatedMessage2 = Object.assign({}, message, {
+            updateMessage(Object.assign({}, message, {
               cid: channel.cid
-            });
-            updateMessage(_updatedMessage2);
-            threadInstance == null ? void 0 : threadInstance.upsertReplyLocally == null ? void 0 : threadInstance.upsertReplyLocally({
-              message: _updatedMessage2
-            });
+            }));
             if (enableOfflineSupport) {
               dbApi.updateMessage({
                 message: Object.assign({}, message, {
@@ -1686,11 +1647,11 @@ var ChannelWithContext = function ChannelWithContext(props) {
                 })
               });
             }
-          case 32:
+          case 29:
           case "end":
             return _context16.stop();
         }
-      }, _callee16, null, [[0, 24]]);
+      }, _callee16, null, [[0, 23]]);
     }));
     return function sendMessageRequest(_x7, _x8) {
       return _ref21.apply(this, arguments);
@@ -1714,9 +1675,6 @@ var ChannelWithContext = function ChannelWithContext(props) {
               commands: [],
               messageInput: ''
             });
-            threadInstance == null ? void 0 : threadInstance.upsertReplyLocally == null ? void 0 : threadInstance.upsertReplyLocally({
-              message: messagePreview
-            });
             if (enableOfflineSupport) {
               dbApi.upsertMessages({
                 messages: [Object.assign({}, messagePreview, {
@@ -1725,9 +1683,9 @@ var ChannelWithContext = function ChannelWithContext(props) {
                 })]
               });
             }
-            _context17.next = 8;
+            _context17.next = 7;
             return sendMessageRequest(messagePreview);
-          case 8:
+          case 7:
           case "end":
             return _context17.stop();
         }
@@ -1975,7 +1933,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
   };
   var sendReaction = function () {
     var _ref26 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee21(type, messageId) {
-      var payload, sendReactionResponse;
+      var payload;
       return _regenerator["default"].wrap(function _callee21$(_context21) {
         while (1) switch (_context21.prev = _context21.next) {
           case 0:
@@ -2019,13 +1977,6 @@ var ChannelWithContext = function ChannelWithContext(props) {
               }
             });
           case 11:
-            sendReactionResponse = _context21.sent;
-            if (sendReactionResponse != null && sendReactionResponse.message) {
-              threadInstance == null ? void 0 : threadInstance.upsertReplyLocally == null ? void 0 : threadInstance.upsertReplyLocally({
-                message: sendReactionResponse.message
-              });
-            }
-          case 13:
           case "end":
             return _context21.stop();
         }
@@ -2037,7 +1988,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
   }();
   var deleteMessage = function () {
     var _ref27 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee22(message) {
-      var _updatedMessage3, _data;
+      var _data;
       return _regenerator["default"].wrap(function _callee22$(_context22) {
         while (1) switch (_context22.prev = _context22.next) {
           case 0:
@@ -2071,19 +2022,15 @@ var ChannelWithContext = function ChannelWithContext(props) {
               messageId: message.id
             });
             removeMessage(message);
-            _context22.next = 21;
+            _context22.next = 19;
             break;
           case 14:
-            _updatedMessage3 = Object.assign({}, message, {
+            updateMessage(Object.assign({}, message, {
               cid: channel.cid,
               deleted_at: new Date().toISOString(),
               type: 'deleted'
-            });
-            updateMessage(_updatedMessage3);
-            threadInstance == null ? void 0 : threadInstance.upsertReplyLocally({
-              message: _updatedMessage3
-            });
-            _context22.next = 19;
+            }));
+            _context22.next = 17;
             return _DBSyncManager.DBSyncManager.queueTask({
               client: client,
               task: {
@@ -2094,12 +2041,12 @@ var ChannelWithContext = function ChannelWithContext(props) {
                 type: 'delete-message'
               }
             });
-          case 19:
+          case 17:
             _data = _context22.sent;
             if (_data != null && _data.message) {
               updateMessage(Object.assign({}, _data.message));
             }
-          case 21:
+          case 19:
           case "end":
             return _context22.stop();
         }
@@ -2160,13 +2107,11 @@ var ChannelWithContext = function ChannelWithContext(props) {
     };
   }();
   var openThread = (0, _react.useCallback)(function (message) {
+    var _channel$state2;
+    var newThreadMessages = message != null && message.id ? (channel == null ? void 0 : (_channel$state2 = channel.state) == null ? void 0 : _channel$state2.threads[message.id]) || [] : [];
     setThread(message);
-    if (channel.initialized) {
-      channel.markRead({
-        thread_id: message.id
-      });
-    }
-  }, [channel, setThread]);
+    setThreadMessages(newThreadMessages);
+  }, [setThread, setThreadMessages]);
   var closeThread = (0, _react.useCallback)(function () {
     setThread(null);
     setThreadMessages([]);
@@ -2277,8 +2222,6 @@ var ChannelWithContext = function ChannelWithContext(props) {
     watcherCount: watcherCount,
     watchers: watchers
   });
-  var sendMessageRef = (0, _react.useRef)(sendMessage);
-  sendMessageRef.current = sendMessage;
   var inputMessageInputContext = (0, _useCreateInputMessageInputContext.useCreateInputMessageInputContext)({
     additionalTextInputProps: additionalTextInputProps,
     asyncMessagesLockDistance: asyncMessagesLockDistance,
@@ -2301,14 +2244,13 @@ var ChannelWithContext = function ChannelWithContext(props) {
     CommandsButton: CommandsButton,
     compressImageQuality: compressImageQuality,
     CooldownTimer: CooldownTimer,
+    disabled: disabledValue,
     doDocUploadRequest: doDocUploadRequest,
     doImageUploadRequest: doImageUploadRequest,
     editing: editing,
     editMessage: editMessage,
     emojiSearchIndex: emojiSearchIndex,
     FileUploadPreview: FileUploadPreview,
-    handleAttachButtonPress: handleAttachButtonPress,
-    hasCameraPicker: hasCameraPicker,
     hasCommands: hasCommands,
     hasFilePicker: hasFilePicker,
     hasImagePicker: hasImagePicker,
@@ -2329,9 +2271,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
     quotedMessage: quotedMessage,
     SendButton: SendButton,
     sendImageAsync: sendImageAsync,
-    sendMessage: function sendMessage() {
-      return sendMessageRef.current.apply(sendMessageRef, arguments);
-    },
+    sendMessage: sendMessage,
     SendMessageDisallowedIndicator: SendMessageDisallowedIndicator,
     setInputRef: setInputRef,
     setQuotedMessageState: setQuotedMessageState,
@@ -2373,11 +2313,11 @@ var ChannelWithContext = function ChannelWithContext(props) {
     FileAttachmentIcon: FileAttachmentIcon,
     FlatList: FlatList,
     forceAlignMessages: forceAlignMessages,
+    formatDate: formatDate,
     Gallery: Gallery,
     getMessagesGroupStyles: getMessagesGroupStyles,
     Giphy: Giphy,
     giphyVersion: giphyVersion,
-    handleBan: handleBan,
     handleBlock: handleBlock,
     handleCopy: handleCopy,
     handleDelete: handleDelete,
@@ -2404,7 +2344,6 @@ var ChannelWithContext = function ChannelWithContext(props) {
     MessageContent: MessageContent,
     messageContentOrder: messageContentOrder,
     MessageDeleted: MessageDeleted,
-    MessageEditedTimestamp: MessageEditedTimestamp,
     MessageError: MessageError,
     MessageFooter: MessageFooter,
     MessageHeader: MessageHeader,
@@ -2416,7 +2355,6 @@ var ChannelWithContext = function ChannelWithContext(props) {
     MessageStatus: MessageStatus,
     MessageSystem: MessageSystem,
     MessageText: MessageText,
-    MessageTimestamp: MessageTimestamp,
     myMessageTheme: myMessageTheme,
     onLongPressMessage: onLongPressMessage,
     onPressInMessage: onPressInMessage,
@@ -2453,7 +2391,6 @@ var ChannelWithContext = function ChannelWithContext(props) {
     setThreadLoadingMore: setThreadLoadingMore,
     thread: thread,
     threadHasMore: threadHasMore,
-    threadInstance: threadInstance,
     threadLoadingMore: threadLoadingMore,
     threadMessages: threadMessages
   });
@@ -2515,20 +2452,14 @@ var ChannelWithContext = function ChannelWithContext(props) {
   }));
 };
 var Channel = function Channel(props) {
+  var _props$thread, _props$thread2;
   var _useChatContext = (0, _ChatContext.useChatContext)(),
     client = _useChatContext.client,
     enableOfflineSupport = _useChatContext.enableOfflineSupport;
   var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
     t = _useTranslationContex.t;
-  var threadFromProps = props == null ? void 0 : props.thread;
-  var threadMessage = threadFromProps != null && threadFromProps.threadInstance ? threadFromProps.thread : threadFromProps;
-  var threadInstance = threadFromProps == null ? void 0 : threadFromProps.threadInstance;
-  var thread = {
-    thread: threadMessage,
-    threadInstance: threadInstance
-  };
-  var shouldSyncChannel = threadMessage != null && threadMessage.id ? !!props.threadList : true;
-  var _useChannelState = (0, _useChannelState2.useChannelState)(props.channel, props.threadList ? threadMessage == null ? void 0 : threadMessage.id : undefined),
+  var shouldSyncChannel = (_props$thread = props.thread) != null && _props$thread.id ? !!props.threadList : true;
+  var _useChannelState = (0, _useChannelState2.useChannelState)(props.channel, props.threadList ? (_props$thread2 = props.thread) == null ? void 0 : _props$thread2.id : undefined),
     members = _useChannelState.members,
     messages = _useChannelState.messages,
     read = _useChannelState.read,
@@ -2559,7 +2490,6 @@ var Channel = function Channel(props) {
     setTyping: setTyping,
     setWatcherCount: setWatcherCount,
     setWatchers: setWatchers,
-    thread: thread,
     threadMessages: threadMessages,
     typing: typing,
     watcherCount: watcherCount,

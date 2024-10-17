@@ -23,7 +23,6 @@ import { generateMarkdownText } from './generateMarkdownText';
 import type { MessageContextValue } from '../../../../contexts/messageContext/MessageContext';
 import type { Colors, MarkdownStyle } from '../../../../contexts/themeContext/utils/theme';
 import type { DefaultStreamChatGenerics } from '../../../../types/types';
-import { escapeRegExp } from '../../../../utils/utils';
 import type { MessageType } from '../../../MessageList/hooks/useMessageList';
 
 const defaultMarkdownStyles: MarkdownStyle = {
@@ -132,10 +131,16 @@ export const renderText = <
     },
   };
 
-  const onLink = (url: string) =>
-    onLinkParams
+  const onLink = (url: string) => {
+    const pattern = new RegExp(/^\S+:\/\//);
+    if (!pattern.test(url)) {
+      url = 'http://' + url;
+    }
+
+    return onLinkParams
       ? onLinkParams(url)
       : Linking.canOpenURL(url).then((canOpenUrl) => canOpenUrl && Linking.openURL(url));
+  };
 
   let previousLink: string | undefined;
   const linkReact: ReactNodeOutput = (node, output, { ...state }) => {
@@ -209,12 +214,22 @@ export const renderText = <
   // take the @ mentions and turn them into markdown?
   // translate links
   const { mentioned_users } = message;
-  const mentionedUsernames = (mentioned_users || [])
-    .map((user) => user.name || user.id)
-    .filter(Boolean)
-    .sort((a, b) => b.length - a.length)
-    .map(escapeRegExp);
-  const mentionedUsers = mentionedUsernames.map((username) => `@${username}`).join('|');
+  const mentionedUsers = Array.isArray(mentioned_users)
+    ? mentioned_users.reduce((acc, cur) => {
+        const userName = cur.name || cur.id || '';
+        if (userName) {
+          acc += `${acc.length ? '|' : ''}@${userName.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            function (match) {
+              return '\\' + match;
+            },
+          )}`;
+        }
+
+        return acc;
+      }, '')
+    : '';
+
   const regEx = new RegExp(`^\\B(${mentionedUsers})`, 'g');
   const mentionsMatchFunction: MatchFunction = (source) => regEx.exec(source);
 

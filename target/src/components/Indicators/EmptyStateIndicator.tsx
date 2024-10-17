@@ -4,23 +4,34 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../../contexts/themeContext/ThemeContext';
 import { useTranslationContext } from '../../contexts/translationContext/TranslationContext';
 import { useViewport } from '../../hooks/useViewport';
-import { ChatIcon, MessageBubbleEmpty, MessageIcon } from '../../icons';
+import { MessageIcon } from '../../icons/MessageIcon';
+
+const styles = StyleSheet.create({
+  channelContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
+  channelDetails: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  channelTitle: {
+    fontSize: 16,
+    paddingBottom: 8,
+    paddingTop: 16,
+  },
+});
 
 export type EmptyStateProps = {
-  listType?: 'channel' | 'message' | 'threads' | 'default';
+  listType?: 'channel' | 'message' | 'default';
 };
 
 export const EmptyStateIndicator = ({ listType }: EmptyStateProps) => {
   const {
     theme: {
       colors: { black, grey, grey_gainsboro },
-      emptyStateIndicator: {
-        channelContainer,
-        channelDetails,
-        channelTitle,
-        messageContainer,
-        messageTitle,
-      },
+      emptyStateIndicator: { channelContainer, channelDetails, channelTitle },
     },
   } = useTheme();
   const { vw } = useViewport();
@@ -30,7 +41,7 @@ export const EmptyStateIndicator = ({ listType }: EmptyStateProps) => {
   switch (listType) {
     case 'channel':
       return (
-        <View style={[styles.container, channelContainer]}>
+        <View style={[styles.channelContainer, channelContainer]}>
           <MessageIcon height={width} pathFill={grey_gainsboro} width={width} />
           <Text
             style={[styles.channelTitle, { color: black }, channelTitle]}
@@ -47,44 +58,8 @@ export const EmptyStateIndicator = ({ listType }: EmptyStateProps) => {
         </View>
       );
     case 'message':
-      return (
-        <View style={[styles.container, messageContainer]}>
-          <ChatIcon height={width} pathFill={grey_gainsboro} width={width} />
-          <Text style={[styles.messageTitle, { color: grey_gainsboro }, messageTitle]}>
-            {t<string>('No chats here yet…')}
-          </Text>
-        </View>
-      );
-    case 'threads':
-      return (
-        <View style={[styles.container]}>
-          <MessageBubbleEmpty height={width} pathFill={'#B4BBBA'} width={width} />
-          <Text style={{ color: '#7E828B' }}>{t<string>('No threads here yet')}...</Text>
-        </View>
-      );
+      return null;
     default:
-      return <Text style={[{ color: black }, messageContainer]}>No items exist</Text>;
+      return <Text style={{ color: black }}>No items exist</Text>;
   }
 };
-
-const styles = StyleSheet.create({
-  channelDetails: {
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  channelTitle: {
-    fontSize: 16,
-    paddingBottom: 8,
-    paddingTop: 16,
-  },
-  container: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-  },
-  messageTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    paddingBottom: 8,
-  },
-});

@@ -20,14 +20,9 @@ var parseLinksFromText = function parseLinksFromText(input) {
   var result = [].concat((0, _toConsumableArray2["default"])(links), (0, _toConsumableArray2["default"])(emails)).map(function (_ref) {
     var href = _ref.href,
       value = _ref.value;
-    var hrefWithProtocol = href;
-    var pattern = new RegExp(/^(mailto:|tel:|sms:|\S+:\/\/)/);
-    if (!pattern.test(hrefWithProtocol)) {
-      hrefWithProtocol = 'http://' + hrefWithProtocol;
-    }
     return {
       raw: value,
-      url: hrefWithProtocol
+      url: href
     };
   });
   return result;

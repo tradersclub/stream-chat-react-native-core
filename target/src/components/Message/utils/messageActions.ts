@@ -1,27 +1,18 @@
 import type { MessageContextValue } from '../../../contexts/messageContext/MessageContext';
 import type { OwnCapabilitiesContextValue } from '../../../contexts/ownCapabilitiesContext/OwnCapabilitiesContext';
-import { setClipboardString } from '../../../native';
 import type { DefaultStreamChatGenerics } from '../../../types/types';
 import type { MessageActionType } from '../../MessageOverlay/MessageActionListItem';
 
 export type MessageActionsParams<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 > = {
-  banUser: MessageActionType;
-  copyMessage: MessageActionType;
+  blockUser: MessageActionType;
   deleteMessage: MessageActionType;
   dismissOverlay: () => void;
   editMessage: MessageActionType;
   error: boolean | Error;
   flagMessage: MessageActionType;
-  /**
-   * Determines if the message actions are visible.
-   */
-  isMessageActionsVisible: boolean;
   isThreadMessage: boolean;
-  /**
-   * @deprecated use `isMessageActionsVisible` instead.
-   */
   messageReactions: boolean;
   muteUser: MessageActionType;
   ownCapabilities: OwnCapabilitiesContextValue;
@@ -30,10 +21,7 @@ export type MessageActionsParams<
   retry: MessageActionType;
   threadReply: MessageActionType;
   unpinMessage: MessageActionType;
-  /**
-   * @deprecated use `banUser` instead.
-   */
-  blockUser?: MessageActionType;
+  copyMessage?: MessageActionType;
 } & Pick<MessageContextValue<StreamChatGenerics>, 'message' | 'isMyMessage'>;
 
 export type MessageActionsProp<
@@ -43,14 +31,12 @@ export type MessageActionsProp<
 export const messageActions = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 >({
-  banUser,
   blockUser,
   copyMessage,
   deleteMessage,
   editMessage,
   error,
   flagMessage,
-  isMessageActionsVisible,
   isMyMessage,
   isThreadMessage,
   message,
@@ -62,8 +48,8 @@ export const messageActions = <
   threadReply,
   unpinMessage,
 }: MessageActionsParams<StreamChatGenerics>) => {
-  if (messageReactions || !isMessageActionsVisible) {
-    return [];
+  if (messageReactions) {
+    return undefined;
   }
 
   const actions: Array<MessageActionType> = [];
@@ -87,7 +73,7 @@ export const messageActions = <
     actions.push(editMessage);
   }
 
-  if (setClipboardString !== null && message.text && !error) {
+  if (copyMessage !== undefined && message.text && !error) {
     actions.push(copyMessage);
   }
 
@@ -104,7 +90,7 @@ export const messageActions = <
   }
 
   if (!isMyMessage && ownCapabilities.banChannelMembers) {
-    actions.push(banUser || blockUser);
+    actions.push(blockUser);
   }
 
   if (

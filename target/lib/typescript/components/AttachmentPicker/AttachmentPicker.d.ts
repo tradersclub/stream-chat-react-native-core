@@ -29,7 +29,7 @@ export type AttachmentPickerProps = Pick<AttachmentPickerContextValue, 'Attachme
     numberOfAttachmentImagesToLoadPerCall?: number;
     numberOfAttachmentPickerImageColumns?: number;
 };
-export declare const AttachmentPicker: React.ForwardRefExoticComponent<Pick<AttachmentPickerContextValue, "attachmentPickerBottomSheetHeight" | "AttachmentPickerBottomSheetHandle" | "attachmentPickerBottomSheetHandleHeight" | "attachmentSelectionBarHeight"> & {
+export declare const AttachmentPicker: React.ForwardRefExoticComponent<Pick<AttachmentPickerContextValue, "AttachmentPickerBottomSheetHandle" | "attachmentPickerBottomSheetHandleHeight" | "attachmentPickerBottomSheetHeight" | "attachmentSelectionBarHeight"> & {
     /**
      * Custom UI component to render error component while opening attachment picker.
      *

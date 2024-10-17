@@ -354,7 +354,6 @@ export const ChannelList = <
 
   useUserPresence({
     setChannels,
-    setForceUpdate,
   });
 
   const channelIdsStr = channels?.reduce((acc, channel) => `${acc}${channel.cid}`, '');
@@ -369,7 +368,6 @@ export const ChannelList = <
       filters,
       sort,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelIdsStr, staticChannelsActive]);
 
   const channelsContext = useCreateChannelsContext({

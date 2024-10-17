@@ -12,11 +12,10 @@ export type Reaction = {
     image?: string;
 };
 export type OverlayReactionsProps<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<MessageOverlayContextValue<StreamChatGenerics>, 'OverlayReactionsAvatar'> & {
+    reactions: Reaction[];
     showScreen: Animated.SharedValue<number>;
     title: string;
     alignment?: Alignment;
-    messageId?: string;
-    reactions?: Reaction[];
     supportedReactions?: ReactionData[];
 };
 /**
