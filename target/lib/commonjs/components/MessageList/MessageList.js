@@ -26,7 +26,7 @@ var _OverlayContext = require("../../contexts/overlayContext/OverlayContext");
 var _PaginatedMessageListContext = require("../../contexts/paginatedMessageListContext/PaginatedMessageListContext");
 var _ThemeContext = require("../../contexts/themeContext/ThemeContext");
 var _ThreadContext = require("../../contexts/threadContext/ThreadContext");
-var _TranslationContext = require("../../contexts/translationContext/TranslationContext");
+var _types = require("../../types/types");
 var _jsxRuntime = require("react/jsx-runtime");
 var _excluded = ["contentContainerStyle", "style"];
 var _this = this,
@@ -47,11 +47,6 @@ var styles = _reactNative.StyleSheet.create({
   },
   flex: {
     flex: 1
-  },
-  invert: {
-    transform: [{
-      scaleY: -1
-    }]
   },
   invertAndroid: {
     transform: [{
@@ -132,7 +127,6 @@ var MessageListWithContext = function MessageListWithContext(props) {
     setTargetedMessage = props.setTargetedMessage,
     StickyHeader = props.StickyHeader,
     targetedMessage = props.targetedMessage,
-    tDateTimeParser = props.tDateTimeParser,
     thread = props.thread,
     _props$threadList = props.threadList,
     threadList = _props$threadList === void 0 ? false : _props$threadList,
@@ -337,11 +331,11 @@ var MessageListWithContext = function MessageListWithContext(props) {
       var isLatestMessageSetShown = !!channel.state.messageSets.find(function (set) {
         return set.isCurrent && set.isLatest;
       });
-      var msg = processedMessageList == null ? void 0 : processedMessageList[messageArrayIndex];
       if (!isLatestMessageSetShown) {
+        var msg = processedMessageList == null ? void 0 : processedMessageList[messageArrayIndex];
         if (channel.state.latestMessages.length !== 0 && unreadCount > channel.state.latestMessages.length) {
           return messageArrayIndex <= unreadCount - channel.state.latestMessages.length - 1;
-        } else if (lastRead && msg.created_at) {
+        } else if (lastRead && msg != null && msg.created_at) {
           return lastRead < msg.created_at;
         }
         return false;
@@ -644,7 +638,7 @@ var MessageListWithContext = function MessageListWithContext(props) {
     var isMessageTypeDeleted = message.type === 'deleted';
     if (!isMessageTypeDeleted && message.attachments) {
       return message.attachments.some(function (attachment) {
-        return attachment.type === 'image' && !attachment.title_link && !attachment.og_scrape_url && (attachment.image_url || attachment.thumb_url);
+        return attachment.type === _types.FileTypes.Image && !attachment.title_link && !attachment.og_scrape_url && (attachment.image_url || attachment.thumb_url);
       });
     }
     return false;
@@ -662,13 +656,6 @@ var MessageListWithContext = function MessageListWithContext(props) {
       setMessages(messagesWithImages);
     }
   }, [imageString, isListActive, legacyImageViewerSwipeBehaviour, numberOfMessagesWithImages, threadExists, threadList]);
-  var stickyHeaderFormatDate = (stickyHeaderDate == null ? void 0 : stickyHeaderDate.getFullYear()) === new Date().getFullYear() ? 'MMM D' : 'MMM D, YYYY';
-  var tStickyHeaderDate = stickyHeaderDate && !hideStickyDateHeader ? tDateTimeParser(stickyHeaderDate) : null;
-  var stickyHeaderDateString = (0, _react.useMemo)(function () {
-    if (tStickyHeaderDate === null || hideStickyDateHeader) return null;
-    if ((0, _TranslationContext.isDayOrMoment)(tStickyHeaderDate)) return tStickyHeaderDate.format(stickyHeaderFormatDate);
-    return new Date(tStickyHeaderDate).toDateString();
-  }, [tStickyHeaderDate, stickyHeaderFormatDate, hideStickyDateHeader]);
   var dismissImagePicker = function dismissImagePicker() {
     if (!hasMoved && selectedPicker) {
       setSelectedPicker(undefined);
@@ -698,17 +685,6 @@ var MessageListWithContext = function MessageListWithContext(props) {
       data: processedMessageList
     });
   }
-  var renderListEmptyComponent = (0, _react.useCallback)(function () {
-    return (0, _jsxRuntime.jsx)(_reactNative.View, {
-      style: [styles.flex, {
-        backgroundColor: white_snow
-      }, shouldApplyAndroidWorkaround ? styles.invertAndroid : styles.invert],
-      testID: "empty-state",
-      children: (0, _jsxRuntime.jsx)(EmptyStateIndicator, {
-        listType: "message"
-      })
-    });
-  }, [EmptyStateIndicator, shouldApplyAndroidWorkaround]);
   var ListFooterComponent = (0, _react.useCallback)(function () {
     return (0, _jsxRuntime.jsx)(_reactNative.View, {
       style: shouldApplyAndroidWorkaround ? styles.invertAndroid : undefined,
@@ -721,16 +697,6 @@ var MessageListWithContext = function MessageListWithContext(props) {
       children: (0, _jsxRuntime.jsx)(HeaderComponent, {})
     });
   }, [shouldApplyAndroidWorkaround, HeaderComponent]);
-  var StickyHeaderComponent = function StickyHeaderComponent() {
-    if (!stickyHeaderDateString) return null;
-    if (StickyHeader) return (0, _jsxRuntime.jsx)(StickyHeader, {
-      dateString: stickyHeaderDateString
-    });
-    if (messageListLengthAfterUpdate) return (0, _jsxRuntime.jsx)(DateHeader, {
-      dateString: stickyHeaderDateString
-    });
-    return null;
-  };
   var additionalFlatListPropsExcludingStyle;
   if (additionalFlatListProps) {
     var contentContainerStyle = additionalFlatListProps.contentContainerStyle,
@@ -754,7 +720,15 @@ var MessageListWithContext = function MessageListWithContext(props) {
       backgroundColor: white_snow
     }, container],
     testID: "message-flat-list-wrapper",
-    children: [(0, _jsxRuntime.jsx)(FlatList, Object.assign({
+    children: [processedMessageList.length === 0 && !thread ? (0, _jsxRuntime.jsx)(_reactNative.View, {
+      style: [styles.flex, {
+        backgroundColor: white_snow
+      }],
+      testID: "empty-state",
+      children: EmptyStateIndicator ? (0, _jsxRuntime.jsx)(EmptyStateIndicator, {
+        listType: "message"
+      }) : null
+    }) : (0, _jsxRuntime.jsx)(FlatList, Object.assign({
       CellRendererComponent: shouldApplyAndroidWorkaround ? InvertedCellRendererComponent : undefined,
       contentContainerStyle: [styles.contentContainer, additionalFlatListProps == null ? void 0 : additionalFlatListProps.contentContainerStyle, contentContainer],
       data: processedMessageList,
@@ -762,7 +736,6 @@ var MessageListWithContext = function MessageListWithContext(props) {
       inverted: shouldApplyAndroidWorkaround ? false : inverted,
       keyboardShouldPersistTaps: "handled",
       keyExtractor: keyExtractor,
-      ListEmptyComponent: renderListEmptyComponent,
       ListFooterComponent: ListFooterComponent,
       ListHeaderComponent: ListHeaderComponent,
       maintainVisibleContentPosition: {
@@ -787,7 +760,10 @@ var MessageListWithContext = function MessageListWithContext(props) {
     }, additionalFlatListPropsExcludingStyle)), !loading && (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
       children: [(0, _jsxRuntime.jsx)(_reactNative.View, {
         style: styles.stickyHeader,
-        children: (0, _jsxRuntime.jsx)(StickyHeaderComponent, {})
+        children: messageListLengthAfterUpdate && StickyHeader ? (0, _jsxRuntime.jsx)(StickyHeader, {
+          date: stickyHeaderDate,
+          DateHeader: DateHeader
+        }) : null
       }), !disableTypingIndicator && TypingIndicator && (0, _jsxRuntime.jsx)(TypingIndicatorContainer, {
         children: (0, _jsxRuntime.jsx)(TypingIndicator, {})
       }), (0, _jsxRuntime.jsx)(ScrollToBottomButton, {
@@ -849,9 +825,6 @@ var MessageList = function MessageList(props) {
   var _useThreadContext = (0, _ThreadContext.useThreadContext)(),
     loadMoreThread = _useThreadContext.loadMoreThread,
     thread = _useThreadContext.thread;
-  var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
-    t = _useTranslationContex.t,
-    tDateTimeParser = _useTranslationContex.tDateTimeParser;
   return (0, _jsxRuntime.jsx)(MessageListWithContext, Object.assign({
     channel: channel,
     client: client,
@@ -890,9 +863,7 @@ var MessageList = function MessageList(props) {
     setSelectedPicker: setSelectedPicker,
     setTargetedMessage: setTargetedMessage,
     StickyHeader: StickyHeader,
-    t: t,
     targetedMessage: targetedMessage,
-    tDateTimeParser: tDateTimeParser,
     thread: thread,
     threadList: threadList,
     TypingIndicator: TypingIndicator,

@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Streami18n = void 0;
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
+var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
 var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
@@ -14,19 +15,22 @@ var _localeData = _interopRequireDefault(require("dayjs/plugin/localeData"));
 var _localizedFormat = _interopRequireDefault(require("dayjs/plugin/localizedFormat"));
 var _relativeTime = _interopRequireDefault(require("dayjs/plugin/relativeTime"));
 var _updateLocale = _interopRequireDefault(require("dayjs/plugin/updateLocale"));
+var _utc = _interopRequireDefault(require("dayjs/plugin/utc"));
 var _i18next = _interopRequireDefault(require("i18next"));
-var _en2 = _interopRequireDefault(require("../i18n/en.json"));
-var _es2 = _interopRequireDefault(require("../i18n/es.json"));
-var _fr2 = _interopRequireDefault(require("../i18n/fr.json"));
-var _he2 = _interopRequireDefault(require("../i18n/he.json"));
-var _hi2 = _interopRequireDefault(require("../i18n/hi.json"));
-var _it2 = _interopRequireDefault(require("../i18n/it.json"));
-var _ja2 = _interopRequireDefault(require("../i18n/ja.json"));
-var _ko2 = _interopRequireDefault(require("../i18n/ko.json"));
-var _nl2 = _interopRequireDefault(require("../i18n/nl.json"));
-var _ptBR2 = _interopRequireDefault(require("../i18n/pt-BR.json"));
-var _ru2 = _interopRequireDefault(require("../i18n/ru.json"));
-var _tr2 = _interopRequireDefault(require("../i18n/tr.json"));
+var _calendarFormats = require("./calendarFormats");
+var _predefinedFormatters = require("./predefinedFormatters");
+var _en2 = _interopRequireDefault(require("../../i18n/en.json"));
+var _es2 = _interopRequireDefault(require("../../i18n/es.json"));
+var _fr2 = _interopRequireDefault(require("../../i18n/fr.json"));
+var _he2 = _interopRequireDefault(require("../../i18n/he.json"));
+var _hi2 = _interopRequireDefault(require("../../i18n/hi.json"));
+var _it2 = _interopRequireDefault(require("../../i18n/it.json"));
+var _ja2 = _interopRequireDefault(require("../../i18n/ja.json"));
+var _ko2 = _interopRequireDefault(require("../../i18n/ko.json"));
+var _nl2 = _interopRequireDefault(require("../../i18n/nl.json"));
+var _ptBr = _interopRequireDefault(require("../../i18n/pt-br.json"));
+var _ru2 = _interopRequireDefault(require("../../i18n/ru.json"));
+var _tr2 = _interopRequireDefault(require("../../i18n/tr.json"));
 require("dayjs/locale/es");
 require("dayjs/locale/fr");
 require("dayjs/locale/he");
@@ -42,7 +46,9 @@ require("dayjs/locale/en");
 var defaultNS = 'translation';
 var defaultLng = 'en';
 _dayjs["default"].extend(_updateLocale["default"]);
+_dayjs["default"].extend(_utc["default"]);
 _dayjs["default"].updateLocale('en', {
+  calendar: _calendarFormats.calendarFormats.en,
   format: {
     L: 'DD/MM/YYYY',
     LL: 'D MMMM YYYY',
@@ -52,35 +58,17 @@ _dayjs["default"].updateLocale('en', {
     LTS: 'HH:mm:ss'
   }
 });
-_dayjs["default"].updateLocale('nl', {
-  calendar: {
-    lastDay: '[gisteren om] LT',
-    lastWeek: '[afgelopen] dddd [om] LT',
-    nextDay: '[morgen om] LT',
-    nextWeek: 'dddd [om] LT',
-    sameDay: '[vandaag om] LT',
-    sameElse: 'L'
-  }
+_dayjs["default"].updateLocale('es', {
+  calendar: _calendarFormats.calendarFormats.es
 });
-_dayjs["default"].updateLocale('it', {
-  calendar: {
-    lastDay: '[Ieri alle] LT',
-    lastWeek: '[lo scorso] dddd [alle] LT',
-    nextDay: '[Domani alle] LT',
-    nextWeek: 'dddd [alle] LT',
-    sameDay: '[Oggi alle] LT',
-    sameElse: 'L'
-  }
+_dayjs["default"].updateLocale('fr', {
+  calendar: _calendarFormats.calendarFormats.fr
+});
+_dayjs["default"].updateLocale('he', {
+  calendar: _calendarFormats.calendarFormats.he
 });
 _dayjs["default"].updateLocale('hi', {
-  calendar: {
-    lastDay: '[कल] LT',
-    lastWeek: '[पिछले] dddd, LT',
-    nextDay: '[कल] LT',
-    nextWeek: 'dddd, LT',
-    sameDay: '[आज] LT',
-    sameElse: 'L'
-  },
+  calendar: _calendarFormats.calendarFormats.hi,
   meridiem: function meridiem(hour) {
     if (hour < 4) return 'रात';
     if (hour < 10) return 'सुबह';
@@ -100,32 +88,26 @@ _dayjs["default"].updateLocale('hi', {
   },
   meridiemParse: /रात|सुबह|दोपहर|शाम/
 });
-_dayjs["default"].updateLocale('fr', {
-  calendar: {
-    lastDay: '[Hier à] LT',
-    lastWeek: 'dddd [dernier à] LT',
-    nextDay: '[Demain à] LT',
-    nextWeek: 'dddd [à] LT',
-    sameDay: '[Aujourd’hui à] LT',
-    sameElse: 'L'
-  }
+_dayjs["default"].updateLocale('it', {
+  calendar: _calendarFormats.calendarFormats.it
 });
-_dayjs["default"].updateLocale('tr', {
-  calendar: {
-    lastDay: '[dün] LT',
-    lastWeek: '[geçen] dddd [saat] LT',
-    nextDay: '[yarın saat] LT',
-    nextWeek: '[gelecek] dddd [saat] LT',
-    sameDay: '[bugün saat] LT',
-    sameElse: 'L'
-  }
+_dayjs["default"].updateLocale('ja', {
+  calendar: _calendarFormats.calendarFormats.ja
+});
+_dayjs["default"].updateLocale('ko', {
+  calendar: _calendarFormats.calendarFormats.ko
+});
+_dayjs["default"].updateLocale('nl', {
+  calendar: _calendarFormats.calendarFormats.nl
+});
+_dayjs["default"].updateLocale('pt-br', {
+  calendar: _calendarFormats.calendarFormats['pt-br']
 });
 _dayjs["default"].updateLocale('ru', {
-  calendar: {
-    lastDay: '[Вчера, в] LT',
-    nextDay: '[Завтра, в] LT',
-    sameDay: '[Сегодня, в] LT'
-  }
+  calendar: _calendarFormats.calendarFormats.ru
+});
+_dayjs["default"].updateLocale('tr', {
+  calendar: _calendarFormats.calendarFormats.tr
 });
 var en_locale = {
   formats: {},
@@ -135,6 +117,9 @@ var en_locale = {
 };
 var isDayJs = function isDayJs(dateTimeParser) {
   return dateTimeParser.extend !== undefined;
+};
+var supportsTz = function supportsTz(dateTimeParser) {
+  return dateTimeParser.tz !== undefined;
 };
 var defaultStreami18nOptions = {
   DateTimeParser: _dayjs["default"],
@@ -170,11 +155,12 @@ var Streami18n = function () {
       ja: (0, _defineProperty2["default"])({}, defaultNS, _ja2["default"]),
       ko: (0, _defineProperty2["default"])({}, defaultNS, _ko2["default"]),
       nl: (0, _defineProperty2["default"])({}, defaultNS, _nl2["default"]),
-      'pt-BR': (0, _defineProperty2["default"])({}, defaultNS, _ptBR2["default"]),
+      'pt-BR': (0, _defineProperty2["default"])({}, defaultNS, _ptBr["default"]),
       ru: (0, _defineProperty2["default"])({}, defaultNS, _ru2["default"]),
       tr: (0, _defineProperty2["default"])({}, defaultNS, _tr2["default"])
     };
     this.dayjsLocales = {};
+    this.formatters = _predefinedFormatters.predefinedFormatters;
     this.localeExists = function (language) {
       if (_this.isCustomDateTimeParser) return true;
       return Object.keys(_dayjs["default"].Ls).indexOf(language) > -1;
@@ -199,6 +185,8 @@ var Streami18n = function () {
     this.logger = finalOptions.logger;
     this.currentLanguage = finalOptions.language;
     this.DateTimeParser = finalOptions.DateTimeParser;
+    this.timezone = finalOptions.timezone;
+    this.formatters = Object.assign({}, _predefinedFormatters.predefinedFormatters, options == null ? void 0 : options.formatters);
     try {
       if (this.DateTimeParser && isDayJs(this.DateTimeParser)) {
         this.DateTimeParser.extend(_localizedFormat["default"]);
@@ -221,7 +209,8 @@ var Streami18n = function () {
       debug: finalOptions.debug,
       fallbackLng: false,
       interpolation: {
-        escapeValue: false
+        escapeValue: false,
+        formatSeparator: '|'
       },
       keySeparator: false,
       lng: this.currentLanguage,
@@ -239,16 +228,11 @@ var Streami18n = function () {
       this.logger("Streami18n: Streami18n(...) - Locale config for ".concat(this.currentLanguage, " does not exist in momentjs.") + "Please import the locale file using \"import 'moment/locale/".concat(this.currentLanguage, "';\" in your app or ") + "register the locale config with Streami18n using registerTranslation(language, translation, customDayjsLocale)");
     }
     this.tDateTimeParser = function (timestamp) {
-      if (finalOptions.disableDateTimeTranslations || !_this.localeExists(_this.currentLanguage)) {
-        if (isDayJs(_this.DateTimeParser)) {
-          return _this.DateTimeParser(timestamp).locale(defaultLng);
-        }
-        return _this.DateTimeParser(timestamp).locale(defaultLng);
+      var language = finalOptions.disableDateTimeTranslations || !_this.localeExists(_this.currentLanguage) ? defaultLng : _this.currentLanguage;
+      if (!isDayJs(_this.DateTimeParser)) {
+        return supportsTz(_this.DateTimeParser) && _this.timezone ? _this.DateTimeParser(timestamp).tz(_this.timezone).locale(language) : _this.DateTimeParser(timestamp).locale(language);
       }
-      if (isDayJs(_this.DateTimeParser)) {
-        return _this.DateTimeParser(timestamp).locale(_this.currentLanguage);
-      }
-      return _this.DateTimeParser(timestamp).locale(_this.currentLanguage);
+      return _this.DateTimeParser(timestamp).locale(language);
     };
   }
   (0, _createClass2["default"])(Streami18n, [{
@@ -276,19 +260,29 @@ var Streami18n = function () {
                 });
               }
               this.initialized = true;
-              _context.next = 12;
+              if (this.formatters) {
+                Object.entries(this.formatters).forEach(function (_ref) {
+                  var _this2$i18nInstance$s;
+                  var _ref2 = (0, _slicedToArray2["default"])(_ref, 2),
+                    name = _ref2[0],
+                    formatterFactory = _ref2[1];
+                  if (!formatterFactory) return;
+                  (_this2$i18nInstance$s = _this2.i18nInstance.services.formatter) == null ? void 0 : _this2$i18nInstance$s.add(name, formatterFactory(_this2));
+                });
+              }
+              _context.next = 13;
               break;
-            case 9:
-              _context.prev = 9;
+            case 10:
+              _context.prev = 10;
               _context.t0 = _context["catch"](1);
               this.logger("Something went wrong with init: ".concat(JSON.stringify(_context.t0)));
-            case 12:
-              this.waitForInitializing = undefined;
             case 13:
+              this.waitForInitializing = undefined;
+            case 14:
             case "end":
               return _context.stop();
           }
-        }, _callee, this, [[1, 9]]);
+        }, _callee, this, [[1, 10]]);
       }));
       function init() {
         return _init.apply(this, arguments);

@@ -5,7 +5,7 @@ import { ThreadContextValue } from '../../contexts/threadContext/ThreadContext';
 import type { DefaultStreamChatGenerics } from '../../types/types';
 import { MessageInputProps } from '../MessageInput/MessageInput';
 import type { MessageListProps } from '../MessageList/MessageList';
-type ThreadPropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<ChatContextValue<StreamChatGenerics>, 'client'> & Pick<MessagesContextValue<StreamChatGenerics>, 'MessageList'> & Pick<ThreadContextValue<StreamChatGenerics>, 'closeThread' | 'loadMoreThread' | 'reloadThread' | 'thread'> & {
+type ThreadPropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<ChatContextValue<StreamChatGenerics>, 'client'> & Pick<MessagesContextValue<StreamChatGenerics>, 'MessageList'> & Pick<ThreadContextValue<StreamChatGenerics>, 'closeThread' | 'loadMoreThread' | 'parentMessagePreventPress' | 'reloadThread' | 'thread'> & {
     /**
      * Additional props for underlying MessageInput component.
      * Available props - https://getstream.io/chat/docs/sdk/reactnative/ui-components/message-input/#props

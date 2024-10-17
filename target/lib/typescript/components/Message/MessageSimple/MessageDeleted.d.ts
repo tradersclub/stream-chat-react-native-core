@@ -1,19 +1,19 @@
 import React from 'react';
 import { LayoutChangeEvent } from 'react-native';
-import type { MessageFooterProps } from './MessageFooter';
-import { Alignment } from '../../../contexts/messageContext/MessageContext';
+import { MessageContextValue } from '../../../contexts/messageContext/MessageContext';
+import { MessagesContextValue } from '../../../contexts/messagesContext/MessagesContext';
 import type { DefaultStreamChatGenerics } from '../../../types/types';
-import type { MessageType } from '../../MessageList/hooks/useMessageList';
 type MessageDeletedComponentProps = {
-    formattedDate: string | Date;
     groupStyle: string;
     noBorder: boolean;
     onLayout: (event: LayoutChangeEvent) => void;
+    date?: string | Date;
 };
-export type MessageDeletedProps<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = MessageDeletedComponentProps & {
-    alignment?: Alignment;
-    message?: MessageType<StreamChatGenerics>;
-    MessageFooter?: React.ComponentType<MessageFooterProps<StreamChatGenerics>>;
+type MessageDeletedPropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<MessageContextValue<StreamChatGenerics>, 'alignment' | 'message'> & Pick<MessagesContextValue<StreamChatGenerics>, 'MessageFooter'> & MessageDeletedComponentProps;
+export type MessageDeletedProps<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Partial<MessageDeletedPropsWithContext<StreamChatGenerics>> & {
+    groupStyle: string;
+    noBorder: boolean;
+    onLayout: (event: LayoutChangeEvent) => void;
 };
 export declare const MessageDeleted: {
     <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(props: MessageDeletedProps<StreamChatGenerics>): React.JSX.Element;

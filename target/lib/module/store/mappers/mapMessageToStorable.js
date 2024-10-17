@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.mapMessageToStorable = void 0;
 var _objectWithoutProperties2 = _interopRequireDefault(require("@babel/runtime/helpers/objectWithoutProperties"));
 var _mapDateTimeToStorable = require("./mapDateTimeToStorable");
-var _excluded = ["attachments", "cid", "created_at", "deleted_at", "id", "latest_reactions", "own_reactions", "reaction_counts", "text", "type", "updated_at", "user"];
+var _excluded = ["attachments", "cid", "created_at", "deleted_at", "id", "latest_reactions", "message_text_updated_at", "own_reactions", "reaction_groups", "text", "type", "updated_at", "user"];
 var mapMessageToStorable = function mapMessageToStorable(message) {
   var attachments = message.attachments,
     cid = message.cid,
@@ -13,8 +13,9 @@ var mapMessageToStorable = function mapMessageToStorable(message) {
     deleted_at = message.deleted_at,
     id = message.id,
     latest_reactions = message.latest_reactions,
+    message_text_updated_at = message.message_text_updated_at,
     own_reactions = message.own_reactions,
-    reaction_counts = message.reaction_counts,
+    reaction_groups = message.reaction_groups,
     text = message.text,
     type = message.type,
     updated_at = message.updated_at,
@@ -27,7 +28,8 @@ var mapMessageToStorable = function mapMessageToStorable(message) {
     deletedAt: (0, _mapDateTimeToStorable.mapDateTimeToStorable)(deleted_at),
     extraData: JSON.stringify(extraData),
     id: id,
-    reactionCounts: JSON.stringify(reaction_counts),
+    messageTextUpdatedAt: (0, _mapDateTimeToStorable.mapDateTimeToStorable)(message_text_updated_at),
+    reactionGroups: JSON.stringify(reaction_groups),
     text: text,
     type: type,
     updatedAt: (0, _mapDateTimeToStorable.mapDateTimeToStorable)(updated_at),

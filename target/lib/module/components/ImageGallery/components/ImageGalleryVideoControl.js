@@ -7,9 +7,9 @@ var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"))
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 var _react = _interopRequireDefault(require("react"));
 var _reactNative = require("react-native");
-var _dayjs = _interopRequireDefault(require("dayjs"));
 var _ThemeContext = require("../../../contexts/themeContext/ThemeContext");
 var _icons = require("../../../icons");
+var _utils = require("../../../utils/utils");
 var _ProgressControl = require("../../ProgressControl/ProgressControl");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
@@ -42,9 +42,9 @@ var ImageGalleryVideoControl = _react["default"].memo(function (props) {
     paused = props.paused,
     progress = props.progress,
     videoRef = props.videoRef;
-  var videoDuration = duration ? duration / 3600 >= 1 ? _dayjs["default"].duration(duration, 'second').format('HH:mm:ss') : _dayjs["default"].duration(duration, 'second').format('mm:ss') : null;
+  var videoDuration = (0, _utils.getDurationLabelFromDuration)(duration);
   var progressValueInSeconds = progress * duration;
-  var progressDuration = progressValueInSeconds ? progressValueInSeconds / 3600 >= 1 ? _dayjs["default"].duration(progressValueInSeconds, 'second').format('HH:mm:ss') : _dayjs["default"].duration(progressValueInSeconds, 'second').format('mm:ss') : null;
+  var progressDuration = (0, _utils.getDurationLabelFromDuration)(progressValueInSeconds);
   var _useTheme = (0, _ThemeContext.useTheme)(),
     _useTheme$theme = _useTheme.theme,
     _useTheme$theme$color = _useTheme$theme.colors,
@@ -90,9 +90,9 @@ var ImageGalleryVideoControl = _react["default"].memo(function (props) {
       accessibilityLabel: "Play Pause Button",
       onPress: handlePlayPause,
       children: (0, _jsxRuntime.jsx)(_reactNative.View, {
-        style: [styles.roundedView, roundedView, {
+        style: [styles.roundedView, {
           backgroundColor: static_white
-        }],
+        }, roundedView],
         children: paused ? (0, _jsxRuntime.jsx)(_icons.Play, {
           accessibilityLabel: "Play Icon",
           fill: static_black,
@@ -107,10 +107,10 @@ var ImageGalleryVideoControl = _react["default"].memo(function (props) {
       })
     }), (0, _jsxRuntime.jsx)(_reactNative.Text, {
       accessibilityLabel: "Progress Duration",
-      style: [styles.durationTextStyle, durationTextStyle, {
+      style: [styles.durationTextStyle, {
         color: black
-      }],
-      children: progressDuration ? progressDuration : '00:00'
+      }, durationTextStyle],
+      children: progressDuration
     }), (0, _jsxRuntime.jsx)(_ProgressControl.ProgressControl, {
       duration: duration,
       filledColor: accent_blue,
@@ -120,10 +120,10 @@ var ImageGalleryVideoControl = _react["default"].memo(function (props) {
       width: 180
     }), (0, _jsxRuntime.jsx)(_reactNative.Text, {
       accessibilityLabel: "Video Duration",
-      style: [styles.durationTextStyle, durationTextStyle, {
+      style: [styles.durationTextStyle, {
         color: black
-      }],
-      children: videoDuration ? videoDuration : '00:00'
+      }, durationTextStyle],
+      children: videoDuration
     })]
   });
 }, function (prevProps, nextProps) {

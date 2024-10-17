@@ -100,9 +100,8 @@ var AutoCompleteSuggestionCommandIcon = function AutoCompleteSuggestionCommandIc
           backgroundColor: accent_blue
         }, iconContainer],
         children: (0, _jsxRuntime.jsx)(_icons.Lightning, {
-          height: 16,
-          pathFill: white,
-          width: 16
+          fill: white,
+          size: 16
         })
       });
   }

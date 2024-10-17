@@ -1,18 +1,13 @@
 import React from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 import type { MessageType } from './hooks/useMessageList';
-import { TDateTimeParserInput } from '../../contexts/translationContext/TranslationContext';
 import type { DefaultStreamChatGenerics } from '../../types/types';
 export type MessageSystemProps<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = {
     /** Current [message object](https://getstream.io/chat/docs/#message_format) */
     message: MessageType<StreamChatGenerics>;
     /**
-     * Formatter function for date object.
-     *
-     * @param date TDateTimeParserInput object of message
-     * @returns string
+     * Additional styles for the system message container.
      */
-    formatDate?: (date: TDateTimeParserInput) => string;
     style?: StyleProp<ViewStyle>;
 };
 /**

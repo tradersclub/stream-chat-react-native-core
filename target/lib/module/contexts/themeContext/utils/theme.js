@@ -288,6 +288,11 @@ var defaultTheme = {
     inputBoxContainer: {},
     micButtonContainer: {},
     moreOptionsButton: {},
+    nativeAttachmentPicker: {
+      buttonContainer: {},
+      buttonDimmerStyle: {},
+      container: {}
+    },
     optionsContainer: {},
     replyContainer: {},
     searchIcon: {},
@@ -411,8 +416,8 @@ var defaultTheme = {
         videoContainer: {}
       },
       playIcon: {
-        height: 24,
-        width: 24
+        height: 32,
+        width: 32
       }
     },
     container: {},
@@ -434,6 +439,8 @@ var defaultTheme = {
           fontWeight: '400'
         }
       },
+      editedLabel: {},
+      editedTimestampContainer: {},
       errorContainer: {
         paddingRight: 12,
         paddingTop: 0
@@ -470,6 +477,7 @@ var defaultTheme = {
           }
         }
       },
+      timestampText: {},
       wrapper: {}
     },
     file: {
@@ -489,6 +497,7 @@ var defaultTheme = {
       gridHeight: 195,
       gridWidth: 256,
       image: {},
+      imageBorderRadius: undefined,
       imageContainer: {},
       maxHeight: 300,
       maxWidth: 256,
@@ -531,7 +540,8 @@ var defaultTheme = {
       middleIcon: {},
       radius: 2,
       reactionBubble: {},
-      reactionBubbleBackground: {},
+      reactionContainer: {},
+      reactionCount: {},
       reactionSize: 24,
       strokeSize: 1
     },

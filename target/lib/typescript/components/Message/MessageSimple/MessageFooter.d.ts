@@ -6,7 +6,8 @@ import { Alignment } from '../../../contexts/messageContext/MessageContext';
 import type { DefaultStreamChatGenerics } from '../../../types/types';
 import type { MessageType } from '../../MessageList/hooks/useMessageList';
 type MessageFooterComponentProps = {
-    formattedDate: string | Date;
+    date?: string | Date;
+    formattedDate?: string | Date;
     isDeleted?: boolean;
 };
 export type MessageFooterProps<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Partial<Pick<ChannelContextValue<StreamChatGenerics>, 'members'>> & MessageFooterComponentProps & {

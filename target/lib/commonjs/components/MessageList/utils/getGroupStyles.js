@@ -2,6 +2,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getGroupStyles = void 0;
+var _utils = require("../../../utils/utils");
 var getGroupStyles = function getGroupStyles(params) {
   var dateSeparators = params.dateSeparators,
     hideDateSeparators = params.hideDateSeparators,
@@ -25,8 +26,8 @@ var getGroupStyles = function getGroupStyles(params) {
     var isPrevMessageTypeDeleted = (previousMessage == null ? void 0 : previousMessage.type) === 'deleted';
     var isNextMessageTypeDeleted = (nextMessage == null ? void 0 : nextMessage.type) === 'deleted';
     var _userId = (message == null ? void 0 : (_message$user2 = message.user) == null ? void 0 : _message$user2.id) || null;
-    var isTopMessage = !previousMessage || previousMessage.type === 'system' || _userId !== (previousMessage == null ? void 0 : (_previousMessage$user = previousMessage.user) == null ? void 0 : _previousMessage$user.id) || previousMessage.type === 'error' || !!isPrevMessageTypeDeleted || !hideDateSeparators && dateSeparators[message.id] || ((_messageGroupStyles$p = messageGroupStyles[previousMessage.id]) == null ? void 0 : _messageGroupStyles$p.includes('bottom'));
-    var isBottomMessage = !nextMessage || nextMessage.type === 'system' || _userId !== (nextMessage == null ? void 0 : (_nextMessage$user = nextMessage.user) == null ? void 0 : _nextMessage$user.id) || nextMessage.type === 'error' || !!isNextMessageTypeDeleted || !hideDateSeparators && dateSeparators[nextMessage.id] || maxTimeBetweenGroupedMessages !== undefined && nextMessage.created_at.getTime() - message.created_at.getTime() > maxTimeBetweenGroupedMessages;
+    var isTopMessage = !previousMessage || previousMessage.type === 'system' || previousMessage.type === 'error' || _userId !== (previousMessage == null ? void 0 : (_previousMessage$user = previousMessage.user) == null ? void 0 : _previousMessage$user.id) || !!isPrevMessageTypeDeleted || !hideDateSeparators && dateSeparators[message.id] || ((_messageGroupStyles$p = messageGroupStyles[previousMessage.id]) == null ? void 0 : _messageGroupStyles$p.includes('bottom')) || (0, _utils.isEditedMessage)(previousMessage);
+    var isBottomMessage = !nextMessage || nextMessage.type === 'system' || nextMessage.type === 'error' || _userId !== (nextMessage == null ? void 0 : (_nextMessage$user = nextMessage.user) == null ? void 0 : _nextMessage$user.id) || !!isNextMessageTypeDeleted || !hideDateSeparators && dateSeparators[nextMessage.id] || maxTimeBetweenGroupedMessages !== undefined && nextMessage.created_at.getTime() - message.created_at.getTime() > maxTimeBetweenGroupedMessages || (0, _utils.isEditedMessage)(message);
     if (isTopMessage) {
       groupStyles.push('top');
     }

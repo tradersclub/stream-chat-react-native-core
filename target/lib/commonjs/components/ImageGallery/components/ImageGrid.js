@@ -10,6 +10,7 @@ var _bottomSheet = require("@gorhom/bottom-sheet");
 var _VideoThumbnail = require("../../../components/Attachment/VideoThumbnail");
 var _ThemeContext = require("../../../contexts/themeContext/ThemeContext");
 var _useViewport2 = require("../../../hooks/useViewport");
+var _types = require("../../../types/types");
 var _jsxRuntime = require("react/jsx-runtime");
 var _excluded = ["imageComponent"];
 var _this = this,
@@ -56,7 +57,7 @@ var GridImage = function GridImage(_ref) {
   return (0, _jsxRuntime.jsx)(_bottomSheet.TouchableOpacity, {
     accessibilityLabel: "Grid Image",
     onPress: selectAndClose,
-    children: type === 'video' ? (0, _jsxRuntime.jsx)(_reactNative.View, {
+    children: type === _types.FileTypes.Video ? (0, _jsxRuntime.jsx)(_reactNative.View, {
       style: [styles.image, {
         height: size,
         width: size

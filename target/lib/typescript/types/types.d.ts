@@ -1,5 +1,14 @@
 import type { ExtendableGenerics, LiteralStringForUnion } from 'stream-chat';
 import type { FileStateValue } from '../utils/utils';
+export declare enum FileTypes {
+    Audio = "audio",
+    File = "file",
+    Giphy = "giphy",
+    Image = "image",
+    Imgur = "imgur",
+    Video = "video",
+    VoiceRecording = "voiceRecording"
+}
 export type Asset = {
     duration: number;
     height: number;
@@ -17,7 +26,7 @@ export type File = {
     id?: string;
     mimeType?: string;
     size?: number;
-    type?: 'file' | 'image' | 'video' | 'audio' | 'voiceRecording';
+    type?: FileTypes;
     uri?: string;
     waveform_data?: number[];
 };

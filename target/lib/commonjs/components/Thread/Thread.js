@@ -32,6 +32,8 @@ var ThreadWithContext = function ThreadWithContext(props) {
     MessageInput = _props$MessageInput === void 0 ? _MessageInput.MessageInput : _props$MessageInput,
     MessageList = props.MessageList,
     onThreadDismount = props.onThreadDismount,
+    _props$parentMessageP = props.parentMessagePreventPress,
+    parentMessagePreventPress = _props$parentMessageP === void 0 ? true : _props$parentMessageP,
     thread = props.thread;
   (0, _react.useEffect)(function () {
     var loadMoreThreadAsync = function () {
@@ -68,7 +70,11 @@ var ThreadWithContext = function ThreadWithContext(props) {
   if (!thread) return null;
   return (0, _jsxRuntime.jsxs)(_react["default"].Fragment, {
     children: [(0, _jsxRuntime.jsx)(MessageList, Object.assign({
-      FooterComponent: _ThreadFooterComponent.ThreadFooterComponent,
+      FooterComponent: function FooterComponent() {
+        return (0, _jsxRuntime.jsx)(_ThreadFooterComponent.ThreadFooterComponent, {
+          parentMessagePreventPress: parentMessagePreventPress
+        });
+      },
       threadList: true
     }, additionalMessageListProps)), (0, _jsxRuntime.jsx)(MessageInput, Object.assign({
       additionalTextInputProps: {

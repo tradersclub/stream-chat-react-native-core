@@ -9,7 +9,6 @@ var _react = _interopRequireWildcard(require("react"));
 var _useLatestMessagePreview = require("./hooks/useLatestMessagePreview");
 var _ChannelsContext = require("../../contexts/channelsContext/ChannelsContext");
 var _ChatContext = require("../../contexts/chatContext/ChatContext");
-var _useTranslatedMessage = require("../../hooks/useTranslatedMessage");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/ChannelPreview/ChannelPreview.tsx";
@@ -24,7 +23,6 @@ var ChannelPreviewWithContext = function ChannelPreviewWithContext(props) {
     _useState2 = (0, _slicedToArray2["default"])(_useState, 2),
     lastMessage = _useState2[0],
     setLastMessage = _useState2[1];
-  var translatedLastMessage = (0, _useTranslatedMessage.useTranslatedMessage)(lastMessage || {});
   var _useState3 = (0, _react.useState)(0),
     _useState4 = (0, _slicedToArray2["default"])(_useState3, 2),
     forceUpdate = _useState4[0],
@@ -33,7 +31,7 @@ var ChannelPreviewWithContext = function ChannelPreviewWithContext(props) {
     _useState6 = (0, _slicedToArray2["default"])(_useState5, 2),
     unread = _useState6[0],
     setUnread = _useState6[1];
-  var latestMessagePreview = (0, _useLatestMessagePreview.useLatestMessagePreview)(channel, forceUpdate, translatedLastMessage);
+  var latestMessagePreview = (0, _useLatestMessagePreview.useLatestMessagePreview)(channel, forceUpdate, lastMessage);
   var channelLastMessage = channel.lastMessage();
   var channelLastMessageString = "".concat(channelLastMessage == null ? void 0 : channelLastMessage.id).concat(channelLastMessage == null ? void 0 : channelLastMessage.updated_at);
   (0, _react.useEffect)(function () {

@@ -24,7 +24,7 @@ function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; 
 var styles = _reactNative.StyleSheet.create({
   inputBox: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 16,
     includeFontPadding: false,
     padding: 0,
     paddingTop: 0,

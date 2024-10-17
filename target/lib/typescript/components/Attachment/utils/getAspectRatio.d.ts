@@ -1,5 +1,5 @@
 import type { Attachment } from 'stream-chat';
-import type { DefaultStreamChatGenerics } from '../../../types/types';
+import { DefaultStreamChatGenerics } from '../../../types/types';
 /**
  * Returns the aspect ratio of an image attachment.
  *

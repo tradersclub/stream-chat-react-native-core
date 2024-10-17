@@ -1,18 +1,41 @@
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+var _typeof = require("@babel/runtime/helpers/typeof");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.Attach = void 0;
+var _objectWithoutProperties2 = _interopRequireDefault(require("@babel/runtime/helpers/objectWithoutProperties"));
 var _react = _interopRequireDefault(require("react"));
-var _base = require("./utils/base");
+var _reactNativeSvg = _interopRequireWildcard(require("react-native-svg"));
 var _jsxRuntime = require("react/jsx-runtime");
+var _excluded = ["size"];
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/icons/Attach.tsx";
-var Attach = function Attach(props) {
-  return (0, _jsxRuntime.jsx)(_base.RootSvg, Object.assign({}, props, {
-    children: (0, _jsxRuntime.jsx)(_base.RootPath, Object.assign({
-      d: "M13.468 2.888a5.07 5.07 0 012.983.635 5.07 5.07 0 012.041 2.265c.45 1.01.546 2.254-.144 3.449l-4.5 7.794a3.232 3.232 0 01-1.427 1.294c-.757.342-1.696.367-2.671-.196-.975-.563-1.422-1.389-1.506-2.215a3.233 3.233 0 01.408-1.883l4-6.928a1 1 0 011.732 1l-4 6.928c-.087.15-.176.425-.15.682.02.196.105.447.516.684.41.237.671.185.85.105.236-.107.43-.32.516-.47l4.5-7.795c.31-.538.29-1.093.049-1.636a3.072 3.072 0 00-1.214-1.346 3.072 3.072 0 00-1.773-.378c-.591.062-1.082.322-1.392.86l-5 8.66c-.654 1.133-.286 3.3 1.964 4.598 2.25 1.3 4.31.535 4.964-.598l3.5-6.062a1 1 0 111.732 1l-3.5 6.062c-1.345 2.33-4.75 3.031-7.696 1.33-2.946-1.7-4.042-5-2.696-7.33l5-8.66c.69-1.195 1.815-1.733 2.914-1.85z"
-    }, props))
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != _typeof(e) && "function" != typeof e) return { "default": e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n["default"] = e, t && t.set(e, n), n; }
+var Attach = function Attach(_ref) {
+  var size = _ref.size,
+    rest = (0, _objectWithoutProperties2["default"])(_ref, _excluded);
+  return (0, _jsxRuntime.jsxs)(_reactNativeSvg["default"], Object.assign({
+    height: size,
+    viewBox: "0 0 ".concat(size, " ").concat(size),
+    width: size
+  }, rest, {
+    children: [(0, _jsxRuntime.jsx)(_reactNativeSvg.G, {
+      clipPath: "url(#id)",
+      children: (0, _jsxRuntime.jsx)(_reactNativeSvg.Path, Object.assign({
+        d: "M17.5245 9.33332L14.8579 9.33332L14.8579 14.6666L9.52453 14.6666L9.52453 17.3333L14.8579 17.3333L14.8579 22.6667L17.5245 22.6667L17.5245 17.3333L22.8579 17.3333L22.8579 14.6666L17.5245 14.6666L17.5245 9.33332ZM16.1912 2.66665C8.83119 2.66665 2.85786 8.63998 2.85786 16C2.85786 23.36 8.83119 29.3333 16.1912 29.3333C23.5512 29.3333 29.5245 23.36 29.5245 16C29.5245 8.63998 23.5512 2.66665 16.1912 2.66665ZM16.1912 26.6667C10.3112 26.6666 5.52453 21.88 5.52453 16C5.52453 10.12 10.3112 5.33332 16.1912 5.33332C22.0712 5.33332 26.8579 10.12 26.8579 16C26.8579 21.88 22.0712 26.6666 16.1912 26.6667Z"
+      }, rest))
+    }), (0, _jsxRuntime.jsx)(_reactNativeSvg.Defs, {
+      children: (0, _jsxRuntime.jsx)(_reactNativeSvg.ClipPath, {
+        id: "id",
+        children: (0, _jsxRuntime.jsx)(_reactNativeSvg.Rect, {
+          height: 32,
+          transform: 'translate(0.191406)',
+          width: size
+        })
+      })
+    })]
   }));
 };
 exports.Attach = Attach;

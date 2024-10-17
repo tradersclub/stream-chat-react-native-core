@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import type { DefaultStreamChatGenerics, FileUpload, ImageUpload } from '../../../types/types';
+import { DefaultStreamChatGenerics, FileUpload, ImageUpload } from '../../../types/types';
 import type { MessageInputContextValue } from '../MessageInputContext';
 export declare const useMessageDetailsForState: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(message: import("../../..").MessageType<StreamChatGenerics> | undefined, initialValue?: string) => {
     fileUploads: FileUpload[];

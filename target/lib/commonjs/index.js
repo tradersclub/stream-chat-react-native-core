@@ -98,6 +98,7 @@ Object.defineProperty(exports, "version", {
     return _version.version;
   }
 });
+require("intl-pluralrules");
 var _components = require("./components");
 Object.keys(_components).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -183,7 +184,7 @@ Object.keys(_patchMessageTextCommand).forEach(function (key) {
     }
   });
 });
-var _Streami18n = require("./utils/Streami18n");
+var _Streami18n = require("./utils/i18n/Streami18n");
 Object.keys(_Streami18n).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
   if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;

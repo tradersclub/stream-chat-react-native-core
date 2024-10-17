@@ -12,6 +12,7 @@ var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/sli
 var _react = _interopRequireWildcard(require("react"));
 var _reactNative = require("react-native");
 var _debounce = _interopRequireDefault(require("lodash/debounce"));
+var _omit = _interopRequireDefault(require("lodash/omit"));
 var _throttle = _interopRequireDefault(require("lodash/throttle"));
 var _mimeTypes = require("mime-types");
 var _streamChat = require("stream-chat");
@@ -39,6 +40,7 @@ var _useAppStateListener = require("../../hooks/useAppStateListener");
 var _icons = require("../../icons");
 var _native = require("../../native");
 var dbApi = _interopRequireWildcard(require("../../store/apis"));
+var _types = require("../../types/types");
 var _addReactionToLocalState = require("../../utils/addReactionToLocalState");
 var _compressImage = require("../../utils/compressImage");
 var _DBSyncManager = require("../../utils/DBSyncManager");
@@ -70,6 +72,7 @@ var _MessageAvatar = require("../Message/MessageSimple/MessageAvatar");
 var _MessageBounce = require("../Message/MessageSimple/MessageBounce");
 var _MessageContent = require("../Message/MessageSimple/MessageContent");
 var _MessageDeleted = require("../Message/MessageSimple/MessageDeleted");
+var _MessageEditedTimestamp = require("../Message/MessageSimple/MessageEditedTimestamp");
 var _MessageError = require("../Message/MessageSimple/MessageError");
 var _MessageFooter = require("../Message/MessageSimple/MessageFooter");
 var _MessagePinnedHeader = require("../Message/MessageSimple/MessagePinnedHeader");
@@ -77,6 +80,7 @@ var _MessageReplies = require("../Message/MessageSimple/MessageReplies");
 var _MessageRepliesAvatars = require("../Message/MessageSimple/MessageRepliesAvatars");
 var _MessageSimple = require("../Message/MessageSimple/MessageSimple");
 var _MessageStatus = require("../Message/MessageSimple/MessageStatus");
+var _MessageTimestamp = require("../Message/MessageSimple/MessageTimestamp");
 var _ReactionList = require("../Message/MessageSimple/ReactionList");
 var _AttachButton = require("../MessageInput/AttachButton");
 var _CommandsButton = require("../MessageInput/CommandsButton");
@@ -105,14 +109,14 @@ var _MessageList = require("../MessageList/MessageList");
 var _MessageSystem = require("../MessageList/MessageSystem");
 var _NetworkDownIndicator = require("../MessageList/NetworkDownIndicator");
 var _ScrollToBottomButton = require("../MessageList/ScrollToBottomButton");
+var _StickyHeader = require("../MessageList/StickyHeader");
 var _TypingIndicator = require("../MessageList/TypingIndicator");
 var _TypingIndicatorContainer = require("../MessageList/TypingIndicatorContainer");
 var _OverlayReactionList = require("../MessageOverlay/OverlayReactionList");
 var _Reply = require("../Reply/Reply");
 var _jsxRuntime = require("react/jsx-runtime");
 var _excluded = ["attachments", "mentioned_users", "parent_id", "text"],
-  _excluded2 = ["channel_mutes", "devices", "mutes"],
-  _excluded3 = ["__html", "attachments", "created_at", "deleted_at", "html", "id", "latest_reactions", "mentioned_users", "own_reactions", "parent_id", "quoted_message", "reaction_counts", "reactions", "status", "text", "type", "updated_at", "user"];
+  _excluded2 = ["channel_mutes", "devices", "mutes"];
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/Channel/Channel.tsx";
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
@@ -245,7 +249,6 @@ var ChannelWithContext = function ChannelWithContext(props) {
     _props$FlatList = props.FlatList,
     FlatList = _props$FlatList === void 0 ? _native.FlatList : _props$FlatList,
     forceAlignMessages = props.forceAlignMessages,
-    formatDate = props.formatDate,
     _props$Gallery = props.Gallery,
     Gallery = _props$Gallery === void 0 ? _Gallery.Gallery : _props$Gallery,
     getMessagesGroupStyles = props.getMessagesGroupStyles,
@@ -254,6 +257,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
     giphyEnabled = props.giphyEnabled,
     _props$giphyVersion = props.giphyVersion,
     giphyVersion = _props$giphyVersion === void 0 ? 'fixed_height' : _props$giphyVersion,
+    handleAttachButtonPress = props.handleAttachButtonPress,
     handleBlock = props.handleBlock,
     handleCopy = props.handleCopy,
     handleDelete = props.handleDelete,
@@ -265,6 +269,8 @@ var ChannelWithContext = function ChannelWithContext(props) {
     handleReaction = props.handleReaction,
     handleRetry = props.handleRetry,
     handleThreadReply = props.handleThreadReply,
+    _props$hasCameraPicke = props.hasCameraPicker,
+    hasCameraPicker = _props$hasCameraPicke === void 0 ? (0, _native.isImagePickerAvailable)() : _props$hasCameraPicke,
     _props$hasCommands = props.hasCommands,
     hasCommands = _props$hasCommands === void 0 ? true : _props$hasCommands,
     _props$hasFilePicker = props.hasFilePicker,
@@ -332,6 +338,8 @@ var ChannelWithContext = function ChannelWithContext(props) {
     messageContentOrder = _props$messageContent === void 0 ? ['quoted_reply', 'gallery', 'files', 'text', 'attachments'] : _props$messageContent,
     _props$MessageDeleted = props.MessageDeleted,
     MessageDeleted = _props$MessageDeleted === void 0 ? _MessageDeleted.MessageDeleted : _props$MessageDeleted,
+    _props$MessageEditedT = props.MessageEditedTimestamp,
+    MessageEditedTimestamp = _props$MessageEditedT === void 0 ? _MessageEditedTimestamp.MessageEditedTimestamp : _props$MessageEditedT,
     _props$MessageError = props.MessageError,
     MessageError = _props$MessageError === void 0 ? _MessageError.MessageError : _props$MessageError,
     _props$MessageFooter = props.MessageFooter,
@@ -354,6 +362,8 @@ var ChannelWithContext = function ChannelWithContext(props) {
     _props$MessageSystem = props.MessageSystem,
     MessageSystem = _props$MessageSystem === void 0 ? _MessageSystem.MessageSystem : _props$MessageSystem,
     MessageText = props.MessageText,
+    _props$MessageTimesta = props.MessageTimestamp,
+    MessageTimestamp = _props$MessageTimesta === void 0 ? _MessageTimestamp.MessageTimestamp : _props$MessageTimesta,
     _props$MoreOptionsBut = props.MoreOptionsButton,
     MoreOptionsButton = _props$MoreOptionsBut === void 0 ? _MoreOptionsButton.MoreOptionsButton : _props$MoreOptionsBut,
     myMessageTheme = props.myMessageTheme,
@@ -399,7 +409,8 @@ var ChannelWithContext = function ChannelWithContext(props) {
     StartAudioRecordingButton = _props$StartAudioReco === void 0 ? _AudioRecordingButton.AudioRecordingButton : _props$StartAudioReco,
     _props$stateUpdateThr = props.stateUpdateThrottleInterval,
     stateUpdateThrottleInterval = _props$stateUpdateThr === void 0 ? defaultThrottleInterval : _props$stateUpdateThr,
-    StickyHeader = props.StickyHeader,
+    _props$StickyHeader = props.StickyHeader,
+    StickyHeader = _props$StickyHeader === void 0 ? _StickyHeader.StickyHeader : _props$StickyHeader,
     _props$supportedReact = props.supportedReactions,
     supportedReactions = _props$supportedReact === void 0 ? reactionData : _props$supportedReact,
     t = props.t,
@@ -443,7 +454,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
     _useState10 = (0, _slicedToArray2["default"])(_useState9, 2),
     lastRead = _useState10[0],
     setLastRead = _useState10[1];
-  var _useState11 = (0, _react.useState)(!(channel != null && channel.state.messages.length)),
+  var _useState11 = (0, _react.useState)(false),
     _useState12 = (0, _slicedToArray2["default"])(_useState11, 2),
     loading = _useState12[0],
     setLoading = _useState12[1];
@@ -486,7 +497,6 @@ var ChannelWithContext = function ChannelWithContext(props) {
   (0, _react.useEffect)(function () {
     var initChannel = function () {
       var _ref = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee() {
-        var channelLoaded;
         return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
@@ -496,26 +506,21 @@ var ChannelWithContext = function ChannelWithContext(props) {
               }
               return _context.abrupt("return");
             case 2:
-              channelLoaded = false;
               if (channel.initialized) {
-                _context.next = 7;
+                _context.next = 5;
                 break;
               }
-              _context.next = 6;
+              _context.next = 5;
               return loadChannel();
-            case 6:
-              channelLoaded = true;
-            case 7:
+            case 5:
               if (messageId) {
                 loadChannelAroundMessage({
                   messageId: messageId
                 });
               } else if (initialScrollToFirstUnreadMessage && channel.countUnread() > scrollToFirstUnreadThreshold) {
                 loadChannelAtFirstUnreadMessage();
-              } else if (!channelLoaded) {
-                loadChannel();
               }
-            case 8:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -1016,25 +1021,26 @@ var ChannelWithContext = function ChannelWithContext(props) {
         while (1) switch (_context8.prev = _context8.next) {
           case 0:
             if (!(!(channel != null && channel.initialized) || !channel.state.isUpToDate)) {
-              _context8.next = 7;
+              _context8.next = 5;
               break;
             }
             _context8.next = 3;
             return channel == null ? void 0 : channel.watch();
           case 3:
-            channel == null ? void 0 : channel.state.setIsUpToDate(true);
-            setHasNoMoreRecentMessagesToLoad(true);
-            _context8.next = 9;
+            _context8.next = 7;
             break;
-          case 7:
-            _context8.next = 9;
+          case 5:
+            _context8.next = 7;
             return channel.state.loadMessageIntoState('latest');
-          case 9:
+          case 7:
           case "end":
             return _context8.stop();
         }
       }, _callee8);
-    })));
+    })), function () {
+      channel == null ? void 0 : channel.state.setIsUpToDate(true);
+      setHasNoMoreRecentMessagesToLoad(true);
+    });
   };
   var reloadThread = function () {
     var _ref12 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee9() {
@@ -1474,11 +1480,11 @@ var ChannelWithContext = function ChannelWithContext(props) {
             attachment = updatedMessage.attachments[i];
             image = attachment.originalImage;
             file = attachment.originalFile;
-            if (!(attachment.type === 'image' && image != null && image.uri && attachment.image_url && (0, _utils.isLocalUrl)(attachment.image_url))) {
+            if (!(attachment.type === _types.FileTypes.Image && image != null && image.uri && attachment.image_url && (0, _utils.isLocalUrl)(attachment.image_url))) {
               _context15.next = 28;
               break;
             }
-            filename = (_image$name = image.name) != null ? _image$name : image.uri.replace(/^(file:\/\/|content:\/\/)/, '');
+            filename = (_image$name = image.name) != null ? _image$name : (0, _utils.getFileNameFromPath)(image.uri);
             controller = uploadAbortControllerRef.current.get(filename);
             if (controller) {
               controller.abort();
@@ -1514,7 +1520,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
               })
             });
           case 28:
-            if (!((attachment.type === 'file' || attachment.type === 'audio' || attachment.type === 'voiceRecording' || attachment.type === 'video') && attachment.asset_url && (0, _utils.isLocalUrl)(attachment.asset_url) && file != null && file.uri)) {
+            if (!((attachment.type === _types.FileTypes.File || attachment.type === _types.FileTypes.Audio || attachment.type === _types.FileTypes.VoiceRecording || attachment.type === _types.FileTypes.Video) && attachment.asset_url && (0, _utils.isLocalUrl)(attachment.asset_url) && file != null && file.uri)) {
               _context15.next = 45;
               break;
             }
@@ -1568,7 +1574,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
   }();
   var sendMessageRequest = function () {
     var _ref21 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee16(message, retrying) {
-      var _updatedMessage, __html, attachments, created_at, deleted_at, html, id, latest_reactions, mentioned_users, own_reactions, parent_id, quoted_message, reaction_counts, reactions, status, text, type, updated_at, user, extraFields, mentionedUserIds, _messageData, messageResponse;
+      var _updatedMessage, extraFields, attachments, id, mentioned_users, parent_id, text, mentionedUserIds, _messageData, messageResponse;
       return _regenerator["default"].wrap(function _callee16$(_context16) {
         while (1) switch (_context16.prev = _context16.next) {
           case 0:
@@ -1577,13 +1583,14 @@ var ChannelWithContext = function ChannelWithContext(props) {
             return uploadPendingAttachments(message);
           case 3:
             _updatedMessage = _context16.sent;
-            __html = _updatedMessage.__html, attachments = _updatedMessage.attachments, created_at = _updatedMessage.created_at, deleted_at = _updatedMessage.deleted_at, html = _updatedMessage.html, id = _updatedMessage.id, latest_reactions = _updatedMessage.latest_reactions, mentioned_users = _updatedMessage.mentioned_users, own_reactions = _updatedMessage.own_reactions, parent_id = _updatedMessage.parent_id, quoted_message = _updatedMessage.quoted_message, reaction_counts = _updatedMessage.reaction_counts, reactions = _updatedMessage.reactions, status = _updatedMessage.status, text = _updatedMessage.text, type = _updatedMessage.type, updated_at = _updatedMessage.updated_at, user = _updatedMessage.user, extraFields = (0, _objectWithoutProperties2["default"])(_updatedMessage, _excluded3);
+            extraFields = (0, _omit["default"])(_updatedMessage, ['__html', 'attachments', 'created_at', 'deleted_at', 'html', 'id', 'latest_reactions', 'mentioned_users', 'own_reactions', 'parent_id', 'quoted_message', 'reaction_counts', 'reaction_groups', 'reactions', 'status', 'text', 'type', 'updated_at', 'user']);
+            attachments = _updatedMessage.attachments, id = _updatedMessage.id, mentioned_users = _updatedMessage.mentioned_users, parent_id = _updatedMessage.parent_id, text = _updatedMessage.text;
             if (channel.id) {
-              _context16.next = 7;
+              _context16.next = 8;
               break;
             }
             return _context16.abrupt("return");
-          case 7:
+          case 8:
             mentionedUserIds = (mentioned_users == null ? void 0 : mentioned_users.map(function (user) {
               return user.id;
             })) || [];
@@ -1596,25 +1603,25 @@ var ChannelWithContext = function ChannelWithContext(props) {
             }, extraFields);
             messageResponse = {};
             if (!doSendMessageRequest) {
-              _context16.next = 16;
+              _context16.next = 17;
               break;
             }
-            _context16.next = 13;
+            _context16.next = 14;
             return doSendMessageRequest((channel == null ? void 0 : channel.cid) || '', _messageData);
-          case 13:
+          case 14:
             messageResponse = _context16.sent;
-            _context16.next = 20;
+            _context16.next = 21;
             break;
-          case 16:
+          case 17:
             if (!channel) {
-              _context16.next = 20;
+              _context16.next = 21;
               break;
             }
-            _context16.next = 19;
+            _context16.next = 20;
             return channel.sendMessage(_messageData);
-          case 19:
-            messageResponse = _context16.sent;
           case 20:
+            messageResponse = _context16.sent;
+          case 21:
             if (messageResponse.message) {
               messageResponse.message.status = _utils.MessageStatusTypes.RECEIVED;
               if (enableOfflineSupport) {
@@ -1630,10 +1637,10 @@ var ChannelWithContext = function ChannelWithContext(props) {
                 updateMessage(messageResponse.message);
               }
             }
-            _context16.next = 29;
+            _context16.next = 30;
             break;
-          case 23:
-            _context16.prev = 23;
+          case 24:
+            _context16.prev = 24;
             _context16.t0 = _context16["catch"](0);
             console.log(_context16.t0);
             message.status = _utils.MessageStatusTypes.FAILED;
@@ -1647,11 +1654,11 @@ var ChannelWithContext = function ChannelWithContext(props) {
                 })
               });
             }
-          case 29:
+          case 30:
           case "end":
             return _context16.stop();
         }
-      }, _callee16, null, [[0, 23]]);
+      }, _callee16, null, [[0, 24]]);
     }));
     return function sendMessageRequest(_x7, _x8) {
       return _ref21.apply(this, arguments);
@@ -2244,13 +2251,14 @@ var ChannelWithContext = function ChannelWithContext(props) {
     CommandsButton: CommandsButton,
     compressImageQuality: compressImageQuality,
     CooldownTimer: CooldownTimer,
-    disabled: disabledValue,
     doDocUploadRequest: doDocUploadRequest,
     doImageUploadRequest: doImageUploadRequest,
     editing: editing,
     editMessage: editMessage,
     emojiSearchIndex: emojiSearchIndex,
     FileUploadPreview: FileUploadPreview,
+    handleAttachButtonPress: handleAttachButtonPress,
+    hasCameraPicker: hasCameraPicker,
     hasCommands: hasCommands,
     hasFilePicker: hasFilePicker,
     hasImagePicker: hasImagePicker,
@@ -2313,7 +2321,6 @@ var ChannelWithContext = function ChannelWithContext(props) {
     FileAttachmentIcon: FileAttachmentIcon,
     FlatList: FlatList,
     forceAlignMessages: forceAlignMessages,
-    formatDate: formatDate,
     Gallery: Gallery,
     getMessagesGroupStyles: getMessagesGroupStyles,
     Giphy: Giphy,
@@ -2344,6 +2351,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
     MessageContent: MessageContent,
     messageContentOrder: messageContentOrder,
     MessageDeleted: MessageDeleted,
+    MessageEditedTimestamp: MessageEditedTimestamp,
     MessageError: MessageError,
     MessageFooter: MessageFooter,
     MessageHeader: MessageHeader,
@@ -2355,6 +2363,7 @@ var ChannelWithContext = function ChannelWithContext(props) {
     MessageStatus: MessageStatus,
     MessageSystem: MessageSystem,
     MessageText: MessageText,
+    MessageTimestamp: MessageTimestamp,
     myMessageTheme: myMessageTheme,
     onLongPressMessage: onLongPressMessage,
     onPressInMessage: onPressInMessage,

@@ -8,7 +8,7 @@ var _reactNative = require("react-native");
 var _ThemeContext = require("../../contexts/themeContext/ThemeContext");
 var _TranslationContext = require("../../contexts/translationContext/TranslationContext");
 var _useViewport2 = require("../../hooks/useViewport");
-var _MessageIcon = require("../../icons/MessageIcon");
+var _icons = require("../../icons");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/Indicators/EmptyStateIndicator.tsx";
@@ -26,6 +26,16 @@ var styles = _reactNative.StyleSheet.create({
     fontSize: 16,
     paddingBottom: 8,
     paddingTop: 16
+  },
+  messageContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center'
+  },
+  messageTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    paddingBottom: 8
   }
 });
 var EmptyStateIndicator = function EmptyStateIndicator(_ref) {
@@ -49,7 +59,7 @@ var EmptyStateIndicator = function EmptyStateIndicator(_ref) {
     case 'channel':
       return (0, _jsxRuntime.jsxs)(_reactNative.View, {
         style: [styles.channelContainer, channelContainer],
-        children: [(0, _jsxRuntime.jsx)(_MessageIcon.MessageIcon, {
+        children: [(0, _jsxRuntime.jsx)(_icons.MessageIcon, {
           height: width,
           pathFill: grey_gainsboro,
           width: width
@@ -69,7 +79,19 @@ var EmptyStateIndicator = function EmptyStateIndicator(_ref) {
         })]
       });
     case 'message':
-      return null;
+      return (0, _jsxRuntime.jsxs)(_reactNative.View, {
+        style: [styles.messageContainer],
+        children: [(0, _jsxRuntime.jsx)(_icons.ChatIcon, {
+          height: width,
+          pathFill: grey_gainsboro,
+          width: width
+        }), (0, _jsxRuntime.jsx)(_reactNative.Text, {
+          style: [styles.messageTitle, {
+            color: grey_gainsboro
+          }],
+          children: t('No chats here yet…')
+        })]
+      });
     default:
       return (0, _jsxRuntime.jsx)(_reactNative.Text, {
         style: {

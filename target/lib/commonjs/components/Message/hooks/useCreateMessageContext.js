@@ -3,19 +3,20 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.useCreateMessageContext = void 0;
 var _react = require("react");
-var _useMessageList = require("../../MessageList/hooks/useMessageList");
+var _utils = require("../../../utils/utils");
 var useCreateMessageContext = function useCreateMessageContext(_ref) {
   var _message$quoted_messa;
   var actionsEnabled = _ref.actionsEnabled,
     alignment = _ref.alignment,
     channel = _ref.channel,
-    disabled = _ref.disabled,
     files = _ref.files,
     goToMessage = _ref.goToMessage,
     groupStyles = _ref.groupStyles,
     handleAction = _ref.handleAction,
+    handleCopyMessage = _ref.handleCopyMessage,
     handleDeleteMessage = _ref.handleDeleteMessage,
     handleEditMessage = _ref.handleEditMessage,
+    handleFlagMessage = _ref.handleFlagMessage,
     handleQuotedReplyMessage = _ref.handleQuotedReplyMessage,
     handleResendMessage = _ref.handleResendMessage,
     handleToggleBanUser = _ref.handleToggleBanUser,
@@ -23,6 +24,7 @@ var useCreateMessageContext = function useCreateMessageContext(_ref) {
     handleToggleReaction = _ref.handleToggleReaction,
     hasReactions = _ref.hasReactions,
     images = _ref.images,
+    isEditedMessageOpen = _ref.isEditedMessageOpen,
     isMyMessage = _ref.isMyMessage,
     lastGroupMessage = _ref.lastGroupMessage,
     lastReceivedId = _ref.lastReceivedId,
@@ -38,6 +40,7 @@ var useCreateMessageContext = function useCreateMessageContext(_ref) {
     otherAttachments = _ref.otherAttachments,
     preventPress = _ref.preventPress,
     reactions = _ref.reactions,
+    setIsEditedMessageOpen = _ref.setIsEditedMessageOpen,
     showAvatar = _ref.showAvatar,
     showMessageOverlay = _ref.showMessageOverlay,
     showMessageStatus = _ref.showMessageStatus,
@@ -45,17 +48,12 @@ var useCreateMessageContext = function useCreateMessageContext(_ref) {
     videos = _ref.videos;
   var groupStylesLength = groupStyles.length;
   var reactionsValue = reactions.map(function (_ref2) {
-    var own = _ref2.own,
+    var count = _ref2.count,
+      own = _ref2.own,
       type = _ref2.type;
-    return "".concat(own).concat(type);
+    return "".concat(own).concat(type).concat(count);
   }).join();
-  var latestReactions = message.latest_reactions ? message.latest_reactions : undefined;
-  var readBy = (0, _useMessageList.isMessageWithStylesReadByAndDateSeparator)(message) && message.readBy;
-  var messageValue = "".concat(latestReactions ? latestReactions.map(function (_ref3) {
-    var type = _ref3.type,
-      user = _ref3.user;
-    return "".concat(type).concat(user == null ? void 0 : user.id);
-  }).join() : '').concat(message.updated_at).concat(message.deleted_at).concat(readBy).concat(message.status).concat(message.type).concat(message.text).concat(message.reply_count);
+  var stringifiedMessage = (0, _utils.stringifyMessage)(message);
   var membersValue = JSON.stringify(members);
   var myMessageThemeString = (0, _react.useMemo)(function () {
     return JSON.stringify(myMessageTheme);
@@ -66,13 +64,14 @@ var useCreateMessageContext = function useCreateMessageContext(_ref) {
       actionsEnabled: actionsEnabled,
       alignment: alignment,
       channel: channel,
-      disabled: disabled,
       files: files,
       goToMessage: goToMessage,
       groupStyles: groupStyles,
       handleAction: handleAction,
+      handleCopyMessage: handleCopyMessage,
       handleDeleteMessage: handleDeleteMessage,
       handleEditMessage: handleEditMessage,
+      handleFlagMessage: handleFlagMessage,
       handleQuotedReplyMessage: handleQuotedReplyMessage,
       handleResendMessage: handleResendMessage,
       handleToggleBanUser: handleToggleBanUser,
@@ -80,6 +79,7 @@ var useCreateMessageContext = function useCreateMessageContext(_ref) {
       handleToggleReaction: handleToggleReaction,
       hasReactions: hasReactions,
       images: images,
+      isEditedMessageOpen: isEditedMessageOpen,
       isMyMessage: isMyMessage,
       lastGroupMessage: lastGroupMessage,
       lastReceivedId: lastReceivedId,
@@ -95,13 +95,14 @@ var useCreateMessageContext = function useCreateMessageContext(_ref) {
       otherAttachments: otherAttachments,
       preventPress: preventPress,
       reactions: reactions,
+      setIsEditedMessageOpen: setIsEditedMessageOpen,
       showAvatar: showAvatar,
       showMessageOverlay: showMessageOverlay,
       showMessageStatus: showMessageStatus,
       threadList: threadList,
       videos: videos
     };
-  }, [actionsEnabled, quotedMessageDeletedValue, alignment, disabled, goToMessage, groupStylesLength, hasReactions, lastGroupMessage, lastReceivedId, membersValue, messageValue, myMessageThemeString, reactionsValue, showAvatar, showMessageStatus, threadList]);
+  }, [actionsEnabled, quotedMessageDeletedValue, alignment, goToMessage, groupStylesLength, hasReactions, isEditedMessageOpen, lastGroupMessage, lastReceivedId, membersValue, stringifiedMessage, myMessageThemeString, reactionsValue, showAvatar, showMessageStatus, threadList]);
   return messageContext;
 };
 exports.useCreateMessageContext = useCreateMessageContext;

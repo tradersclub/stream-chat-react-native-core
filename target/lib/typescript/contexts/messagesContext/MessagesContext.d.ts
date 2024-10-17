@@ -18,6 +18,7 @@ import type { MessageAvatarProps } from '../../components/Message/MessageSimple/
 import type { MessageBounceProps } from '../../components/Message/MessageSimple/MessageBounce';
 import type { MessageContentProps } from '../../components/Message/MessageSimple/MessageContent';
 import type { MessageDeletedProps } from '../../components/Message/MessageSimple/MessageDeleted';
+import type { MessageEditedTimestampProps } from '../../components/Message/MessageSimple/MessageEditedTimestamp';
 import type { MessageErrorProps } from '../../components/Message/MessageSimple/MessageError';
 import type { MessageFooterProps } from '../../components/Message/MessageSimple/MessageFooter';
 import type { MessagePinnedHeaderProps } from '../../components/Message/MessageSimple/MessagePinnedHeader';
@@ -26,6 +27,7 @@ import type { MessageRepliesAvatarsProps } from '../../components/Message/Messag
 import type { MessageSimpleProps } from '../../components/Message/MessageSimple/MessageSimple';
 import type { MessageStatusProps } from '../../components/Message/MessageSimple/MessageStatus';
 import type { MessageTextProps } from '../../components/Message/MessageSimple/MessageTextContainer';
+import { MessageTimestampProps } from '../../components/Message/MessageSimple/MessageTimestamp';
 import type { ReactionListProps } from '../../components/Message/MessageSimple/ReactionList';
 import type { MarkdownRules } from '../../components/Message/MessageSimple/utils/renderText';
 import type { MessageActionsParams } from '../../components/Message/utils/messageActions';
@@ -47,7 +49,6 @@ import type { Alignment } from '../messageContext/MessageContext';
 import type { SuggestionCommand } from '../suggestionsContext/SuggestionsContext';
 import type { DeepPartial } from '../themeContext/ThemeContext';
 import type { Theme } from '../themeContext/utils/theme';
-import type { TDateTimeParserInput } from '../translationContext/TranslationContext';
 export type MessageContentType = 'attachments' | 'files' | 'gallery' | 'quoted_reply' | 'text';
 export type DeletedMessagesVisibilityType = 'always' | 'never' | 'receiver' | 'sender';
 export type MessagesContextValue<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = {
@@ -153,6 +154,11 @@ export type MessagesContextValue<StreamChatGenerics extends DefaultStreamChatGen
      */
     MessageDeleted: React.ComponentType<MessageDeletedProps<StreamChatGenerics>>;
     /**
+     * UI component for MessageEditedTimestamp
+     * Defaults to: [MessageEditedTimestamp](https://github.com/GetStream/stream-chat-react-native/blob/main/package/src/components/MessageSimple/MessageEditedTimestamp.tsx)
+     */
+    MessageEditedTimestamp: React.ComponentType<MessageEditedTimestampProps>;
+    /**
      * UI component for the MessageError.
      */
     MessageError: React.ComponentType<MessageErrorProps>;
@@ -190,6 +196,11 @@ export type MessagesContextValue<StreamChatGenerics extends DefaultStreamChatGen
      * Defaults to: [MessageSystem](https://getstream.io/chat/docs/sdk/reactnative/ui-components/message-system/)
      */
     MessageSystem: React.ComponentType<MessageSystemProps<StreamChatGenerics>>;
+    /**
+     * UI component for MessageTimestamp
+     * Defaults to: [MessageTimestamp](https://github.com/GetStream/stream-chat-react-native/blob/develop/package/src/components/Message/MessageSimple/MessageTimestamp.tsx)
+     */
+    MessageTimestamp: React.ComponentType<MessageTimestampProps>;
     /**
      * UI component for OverlayReactionList
      */
@@ -278,10 +289,6 @@ export type MessagesContextValue<StreamChatGenerics extends DefaultStreamChatGen
      * sent messages will be aligned to right.
      */
     forceAlignMessages?: Alignment | boolean;
-    /**
-     * Optional function to custom format the message date
-     */
-    formatDate?: (date: TDateTimeParserInput) => string;
     getMessagesGroupStyles?: typeof getGroupStyles;
     handleBlock?: (message: MessageType<StreamChatGenerics>) => Promise<void>;
     /** Handler to access when a copy message action is invoked */

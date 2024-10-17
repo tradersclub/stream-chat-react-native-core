@@ -360,9 +360,8 @@ var GiphyWithContext = function GiphyWithContext(props) {
             backgroundColor: label_bg_transparent
           }, giphyContainer],
           children: [(0, _jsxRuntime.jsx)(_Lightning.Lightning, {
-            height: 16,
-            pathFill: white,
-            width: 16
+            fill: white,
+            size: 16
           }), (0, _jsxRuntime.jsx)(_reactNative.Text, {
             style: [styles.giphyMaskText, {
               color: white

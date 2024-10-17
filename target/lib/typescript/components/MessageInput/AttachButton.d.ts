@@ -7,12 +7,12 @@ type AttachButtonPropsWithContext<StreamChatGenerics extends DefaultStreamChatGe
     handleOnPress?: ((event: GestureResponderEvent) => void) & (() => void);
     selectedPicker?: 'images';
 };
-export type AttachButtonProps<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Partial<AttachButtonPropsWithContext<StreamChatGenerics>>;
+export type AttachButtonProps = Partial<AttachButtonPropsWithContext>;
 /**
  * UI Component for attach button in MessageInput component.
  */
 export declare const AttachButton: {
-    <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(props: Partial<AttachButtonPropsWithContext<StreamChatGenerics>>): React.JSX.Element;
+    (props: AttachButtonProps): React.JSX.Element;
     displayName: string;
 };
 export {};

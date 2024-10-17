@@ -89,6 +89,17 @@ Object.keys(_Camera).forEach(function (key) {
     }
   });
 });
+var _ChatIcon = require("./ChatIcon");
+Object.keys(_ChatIcon).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _ChatIcon[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _ChatIcon[key];
+    }
+  });
+});
 var _Check = require("./Check");
 Object.keys(_Check).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -328,6 +339,17 @@ Object.keys(_GiphyIcon).forEach(function (key) {
     enumerable: true,
     get: function get() {
       return _GiphyIcon[key];
+    }
+  });
+});
+var _GiphyLightning = require("./GiphyLightning");
+Object.keys(_GiphyLightning).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _GiphyLightning[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _GiphyLightning[key];
     }
   });
 });
@@ -669,6 +691,17 @@ Object.keys(_Refresh).forEach(function (key) {
     enumerable: true,
     get: function get() {
       return _Refresh[key];
+    }
+  });
+});
+var _Resend = require("./Resend");
+Object.keys(_Resend).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _Resend[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _Resend[key];
     }
   });
 });

@@ -20,21 +20,17 @@ var useNewMessage = function useNewMessage(_ref) {
       } else {
         setChannels(function (channels) {
           if (!channels) return channels;
-          if (!lockChannelOrder && event.cid && event.channel_type && event.channel_id) {
-            var targetChannelIndex = channels.findIndex(function (c) {
-              return c.cid === event.cid;
-            });
-            if (targetChannelIndex >= 0) {
-              return (0, _utils.moveChannelUp)({
-                channels: channels,
-                cid: event.cid
-              });
-            }
+          var channelInList = channels.filter(function (channel) {
+            return channel.cid === event.cid;
+          }).length > 0;
+          if (!channelInList && event.channel_type && event.channel_id) {
             var channel = client.channel(event.channel_type, event.channel_id);
-            if (channel.initialized) {
-              return [channel].concat((0, _toConsumableArray2["default"])(channels));
-            }
+            return [channel].concat((0, _toConsumableArray2["default"])(channels));
           }
+          if (!lockChannelOrder && event.cid) return (0, _utils.moveChannelUp)({
+            channels: channels,
+            cid: event.cid
+          });
           return (0, _toConsumableArray2["default"])(channels);
         });
       }

@@ -1,10 +1,9 @@
 import React from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
-import { ChannelContextValue } from '../../../../contexts/channelContext/ChannelContext';
 import { MessageInputContextValue } from '../../../../contexts/messageInputContext/MessageInputContext';
 import { AudioRecordingReturnType } from '../../../../native';
 import type { DefaultStreamChatGenerics } from '../../../../types/types';
-type AudioRecorderPropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<ChannelContextValue<StreamChatGenerics>, 'disabled'> & Pick<MessageInputContextValue<StreamChatGenerics>, 'asyncMessagesMultiSendEnabled'> & {
+type AudioRecorderPropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<MessageInputContextValue<StreamChatGenerics>, 'asyncMessagesMultiSendEnabled'> & {
     /**
      * Function to stop and delete the voice recording.
      */

@@ -3,7 +3,7 @@ import { ChatContextValue } from '../../contexts/chatContext/ChatContext';
 import { DeepPartial } from '../../contexts/themeContext/ThemeContext';
 import type { Theme } from '../../contexts/themeContext/utils/theme';
 import type { DefaultStreamChatGenerics } from '../../types/types';
-import type { Streami18n } from '../../utils/Streami18n';
+import type { Streami18n } from '../../utils/i18n/Streami18n';
 export type ChatProps<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<ChatContextValue<StreamChatGenerics>, 'client'> & Partial<Pick<ChatContextValue<StreamChatGenerics>, 'ImageComponent' | 'resizableCDNHosts'>> & {
     /**
      * When false, ws connection won't be disconnection upon backgrounding the app.

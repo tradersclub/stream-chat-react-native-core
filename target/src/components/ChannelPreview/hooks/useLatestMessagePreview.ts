@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 
+import { TFunction } from 'i18next';
 import type { Channel, ChannelState, MessageResponse, StreamChat, UserResponse } from 'stream-chat';
 
 import { useChatContext } from '../../../contexts/chatContext/ChatContext';
-import {
-  isDayOrMoment,
-  TDateTimeParser,
-  useTranslationContext,
-} from '../../../contexts/translationContext/TranslationContext';
+import { useTranslationContext } from '../../../contexts/translationContext/TranslationContext';
 
+import { useTranslatedMessage } from '../../../hooks/useTranslatedMessage';
 import type { DefaultStreamChatGenerics } from '../../../types/types';
+import { stringifyMessage } from '../../../utils/utils';
 
 type LatestMessage<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
@@ -20,13 +19,13 @@ type LatestMessage<
 export type LatestMessagePreview<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 > = {
-  created_at: string | number | Date;
   messageObject: LatestMessage<StreamChatGenerics> | undefined;
   previews: {
     bold: boolean;
     text: string;
   }[];
   status: number;
+  created_at?: string | Date;
 };
 
 const getMessageSenderName = <
@@ -130,22 +129,6 @@ const getLatestMessageDisplayText = <
   ];
 };
 
-const getLatestMessageDisplayDate = <
-  StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
->(
-  message: LatestMessage<StreamChatGenerics> | undefined,
-  tDateTimeParser: TDateTimeParser,
-) => {
-  const parserOutput = tDateTimeParser(message?.created_at);
-  if (isDayOrMoment(parserOutput)) {
-    if (parserOutput.isSame(new Date(), 'day')) {
-      return parserOutput.format('LT');
-    }
-    return parserOutput.format('L');
-  }
-  return parserOutput;
-};
-
 export enum MessageReadStatus {
   NOT_SENT_BY_CURRENT_USER = 0,
   UNREAD = 1,
@@ -165,7 +148,7 @@ const getLatestMessageReadStatus = <
     return MessageReadStatus.NOT_SENT_BY_CURRENT_USER;
   }
 
-  const readList = channel.state.read;
+  const readList = { ...channel.state.read };
   if (currentUserId) {
     delete readList[currentUserId];
   }
@@ -189,13 +172,12 @@ const getLatestMessagePreview = <
   channel: Channel<StreamChatGenerics>;
   client: StreamChat<StreamChatGenerics>;
   readEvents: boolean;
-  t: (key: string) => string;
-  tDateTimeParser: TDateTimeParser;
+  t: TFunction;
   lastMessage?:
     | ReturnType<ChannelState<StreamChatGenerics>['formatMessage']>
     | MessageResponse<StreamChatGenerics>;
 }) => {
-  const { channel, client, lastMessage, readEvents, t, tDateTimeParser } = params;
+  const { channel, client, lastMessage, readEvents, t } = params;
 
   const messages = channel.state.messages;
 
@@ -218,7 +200,7 @@ const getLatestMessagePreview = <
   const message = lastMessage !== undefined ? lastMessage : channelStateLastMessage;
 
   return {
-    created_at: getLatestMessageDisplayDate(message, tDateTimeParser),
+    created_at: message?.created_at,
     messageObject: message,
     previews: getLatestMessageDisplayText(channel, client, message, t),
     status: getLatestMessageReadStatus(channel, client, message, readEvents),
@@ -242,16 +224,15 @@ export const useLatestMessagePreview = <
     | MessageResponse<StreamChatGenerics>,
 ) => {
   const { client } = useChatContext<StreamChatGenerics>();
-  const { t, tDateTimeParser } = useTranslationContext();
+  const { t } = useTranslationContext();
 
   const channelConfigExists = typeof channel?.getConfig === 'function';
 
-  const messages = channel.state.messages;
-  const message = messages.length ? messages[messages.length - 1] : undefined;
+  const translatedLastMessage = useTranslatedMessage<StreamChatGenerics>(lastMessage);
 
-  const channelLastMessageString = `${lastMessage?.id || message?.id}${
-    lastMessage?.updated_at || message?.updated_at
-  }`;
+  const channelLastMessageString = translatedLastMessage
+    ? stringifyMessage(translatedLastMessage)
+    : '';
 
   const [readEvents, setReadEvents] = useState(true);
   const [latestMessagePreview, setLatestMessagePreview] = useState<
@@ -268,12 +249,7 @@ export const useLatestMessagePreview = <
     status: MessageReadStatus.NOT_SENT_BY_CURRENT_USER,
   });
 
-  const readStatus = getLatestMessageReadStatus(
-    channel,
-    client,
-    lastMessage || message,
-    readEvents,
-  );
+  const readStatus = getLatestMessageReadStatus(channel, client, translatedLastMessage, readEvents);
 
   useEffect(() => {
     if (channelConfigExists) {
@@ -290,10 +266,9 @@ export const useLatestMessagePreview = <
         getLatestMessagePreview({
           channel,
           client,
-          lastMessage,
+          lastMessage: translatedLastMessage,
           readEvents,
           t,
-          tDateTimeParser,
         }),
       ),
     [channelLastMessageString, forceUpdate, readEvents, readStatus],

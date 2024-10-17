@@ -1,5 +1,6 @@
 import type React from 'react';
 
+import dayjs from 'dayjs';
 import EmojiRegex from 'emoji-regex';
 import type { DebouncedFunc } from 'lodash';
 import debounce from 'lodash/debounce';
@@ -9,11 +10,13 @@ import type {
   ChannelMemberResponse,
   CommandResponse,
   FormatMessageResponse,
+  MessageResponse,
   StreamChat,
   UserResponse,
 } from 'stream-chat';
 
-import type { MessageType } from '../components/MessageList/hooks/useMessageList';
+import { IconProps } from '../../src/icons/utils/base';
+import { MessageType } from '../components/MessageList/hooks/useMessageList';
 import type {
   EmojiSearchIndex,
   MentionAllAppUsersQuery,
@@ -24,7 +27,6 @@ import type {
   SuggestionUser,
 } from '../contexts/suggestionsContext/SuggestionsContext';
 import { compiledEmojis, Emoji } from '../emoji-data';
-import type { IconProps } from '../icons/utils/base';
 import type { TableRowJoinedUser } from '../store/types';
 import type { DefaultStreamChatGenerics, ValueOf } from '../types/types';
 
@@ -112,6 +114,17 @@ export const isBouncedMessage = <
 >(
   message: MessageType<StreamChatGenerics>,
 ) => message.type === 'error' && message.moderation_details !== undefined;
+
+/**
+ * Utility to check if the message is a edited message.
+ * @param message
+ * @returns boolean
+ */
+export const isEditedMessage = <
+  StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
+>(
+  message: MessageType<StreamChatGenerics>,
+) => !!message.message_text_updated_at;
 
 const defaultAutoCompleteSuggestionsLimit = 10;
 const defaultMentionAllAppUsersQuery = {
@@ -591,19 +604,35 @@ export const hasOnlyEmojis = (text: string) => {
  * @param {FormatMessageResponse<StreamChatGenerics>} message - the message object to be stringified
  * @returns {string} The stringified message
  */
-const stringifyMessage = <
+export const stringifyMessage = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 >({
   deleted_at,
+  i18n,
   latest_reactions,
+  reaction_groups,
+  readBy,
   reply_count,
   status,
+  text,
   type,
   updated_at,
-}: FormatMessageResponse<StreamChatGenerics>): string =>
-  `${type}${deleted_at}${
-    latest_reactions ? latest_reactions.map(({ type }) => type).join() : ''
-  }${reply_count}${status}${updated_at?.toISOString?.() || updated_at}`;
+}:
+  | MessageResponse<StreamChatGenerics>
+  | FormatMessageResponse<StreamChatGenerics>
+  | MessageType<StreamChatGenerics>): string =>
+  `${
+    latest_reactions ? latest_reactions.map(({ type, user }) => `${type}${user?.id}`).join() : ''
+  }${
+    reaction_groups
+      ? Object.entries(reaction_groups)
+          .flatMap(
+            ([type, { count, first_reaction_at, last_reaction_at }]) =>
+              `${type}${count}${first_reaction_at}${last_reaction_at}`,
+          )
+          .join()
+      : ''
+  }${type}${deleted_at}${text}${readBy}${reply_count}${status}${updated_at}${JSON.stringify(i18n)}`;
 
 /**
  * Reduces a list of messages to strings that are used in useEffect & useMemo
@@ -615,3 +644,36 @@ export const reduceMessagesToString = <
 >(
   messages: FormatMessageResponse<StreamChatGenerics>[],
 ): string => messages.map(stringifyMessage).join();
+
+/**
+ * Utility to get the file name from the path using regex.
+ * `[^/]+` matches one or more characters that are not a slash (/), ensuring we capture the filename part.
+ * `\.` matches the period before the file extension.
+ * `[^/]+$` matches one or more characters that are not a slash (/) until the end of the string, capturing the file extension.
+ * @param path string
+ * @returns string
+ */
+export const getFileNameFromPath = (path: string) => {
+  const pattern = /[^/]+\.[^/]+$/;
+  const match = path.match(pattern);
+  return match ? match[0] : '';
+};
+
+/**
+ * Utility to get the duration label from the duration in seconds.
+ * @param duration number
+ * @returns string
+ */
+export const getDurationLabelFromDuration = (duration: number) => {
+  const ONE_HOUR_IN_SECONDS = 3600;
+  const ONE_HOUR_IN_MILLISECONDS = ONE_HOUR_IN_SECONDS * 1000;
+  let durationLabel = '00:00';
+  const isDurationLongerThanHour = duration / ONE_HOUR_IN_MILLISECONDS >= 1;
+  const formattedDurationParam = isDurationLongerThanHour ? 'HH:mm:ss' : 'mm:ss';
+  const formattedVideoDuration = dayjs
+    .duration(duration, 'milliseconds')
+    .format(formattedDurationParam);
+  durationLabel = formattedVideoDuration;
+
+  return durationLabel;
+};

@@ -2,7 +2,7 @@ import React from 'react';
 import { MessageContextValue } from '../../../contexts/messageContext/MessageContext';
 import { MessagesContextValue } from '../../../contexts/messagesContext/MessagesContext';
 import type { DefaultStreamChatGenerics } from '../../../types/types';
-export type MessageSimplePropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<MessageContextValue<StreamChatGenerics>, 'alignment' | 'channel' | 'disabled' | 'groupStyles' | 'hasReactions' | 'message'> & Pick<MessagesContextValue<StreamChatGenerics>, 'enableMessageGroupingByUser' | 'myMessageTheme' | 'MessageAvatar' | 'MessageContent' | 'ReactionList'>;
+export type MessageSimplePropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<MessageContextValue<StreamChatGenerics>, 'alignment' | 'channel' | 'isEditedMessageOpen' | 'groupStyles' | 'hasReactions' | 'message'> & Pick<MessagesContextValue<StreamChatGenerics>, 'enableMessageGroupingByUser' | 'myMessageTheme' | 'MessageAvatar' | 'MessageContent' | 'ReactionList'>;
 export type MessageSimpleProps<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Partial<MessageSimplePropsWithContext<StreamChatGenerics>>;
 /**
  *

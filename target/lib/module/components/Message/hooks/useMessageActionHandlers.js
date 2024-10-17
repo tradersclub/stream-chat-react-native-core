@@ -5,6 +5,9 @@ Object.defineProperty(exports, "__esModule", {
 exports.useMessageActionHandlers = void 0;
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
+var _reactNative = require("react-native");
+var _TranslationContext = require("../../../contexts/translationContext/TranslationContext");
+var _native = require("../../../native");
 var useMessageActionHandlers = function useMessageActionHandlers(_ref) {
   var channel = _ref.channel,
     client = _ref.client,
@@ -15,6 +18,8 @@ var useMessageActionHandlers = function useMessageActionHandlers(_ref) {
     sendReaction = _ref.sendReaction,
     setEditingState = _ref.setEditingState,
     setQuotedMessageState = _ref.setQuotedMessageState;
+  var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
+    t = _useTranslationContex.t;
   var handleResendMessage = function handleResendMessage() {
     return retrySendMessage(message);
   };
@@ -25,25 +30,42 @@ var useMessageActionHandlers = function useMessageActionHandlers(_ref) {
     var _message$user;
     return mute.user.id === client.userID && mute.target.id === ((_message$user = message.user) == null ? void 0 : _message$user.id);
   });
-  var handleDeleteMessage = function () {
-    var _ref2 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee() {
-      return _regenerator["default"].wrap(function _callee$(_context) {
-        while (1) switch (_context.prev = _context.next) {
-          case 0:
-            _context.next = 2;
-            return deleteMessage(message);
-          case 2:
-          case "end":
-            return _context.stop();
-        }
-      }, _callee);
-    }));
-    return function handleDeleteMessage() {
-      return _ref2.apply(this, arguments);
-    };
-  }();
+  var handleCopyMessage = function handleCopyMessage() {
+    (0, _native.setClipboardString)(message.text || '');
+  };
+  var handleDeleteMessage = function handleDeleteMessage() {
+    if (message.id) {
+      _reactNative.Alert.alert(t('Delete Message'), t('Are you sure you want to permanently delete this message?'), [{
+        style: 'cancel',
+        text: t('Cancel')
+      }, {
+        onPress: function () {
+          var _onPress = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee() {
+            return _regenerator["default"].wrap(function _callee$(_context) {
+              while (1) switch (_context.prev = _context.next) {
+                case 0:
+                  _context.next = 2;
+                  return deleteMessage(message);
+                case 2:
+                case "end":
+                  return _context.stop();
+              }
+            }, _callee);
+          }));
+          function onPress() {
+            return _onPress.apply(this, arguments);
+          }
+          return onPress;
+        }(),
+        style: 'destructive',
+        text: t('Delete')
+      }], {
+        cancelable: false
+      });
+    }
+  };
   var handleToggleMuteUser = function () {
-    var _ref3 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee2() {
+    var _ref2 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee2() {
       var _message$user2;
       return _regenerator["default"].wrap(function _callee2$(_context2) {
         while (1) switch (_context2.prev = _context2.next) {
@@ -73,11 +95,11 @@ var useMessageActionHandlers = function useMessageActionHandlers(_ref) {
       }, _callee2);
     }));
     return function handleToggleMuteUser() {
-      return _ref3.apply(this, arguments);
+      return _ref2.apply(this, arguments);
     };
   }();
   var handleToggleBanUser = function () {
-    var _ref4 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee3() {
+    var _ref3 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee3() {
       var messageUser;
       return _regenerator["default"].wrap(function _callee3$(_context3) {
         while (1) switch (_context3.prev = _context3.next) {
@@ -108,11 +130,11 @@ var useMessageActionHandlers = function useMessageActionHandlers(_ref) {
       }, _callee3);
     }));
     return function handleToggleBanUser() {
-      return _ref4.apply(this, arguments);
+      return _ref3.apply(this, arguments);
     };
   }();
   var handleTogglePinMessage = function () {
-    var _ref5 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee4() {
+    var _ref4 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee4() {
       var MessagePinnedHeaderStatus;
       return _regenerator["default"].wrap(function _callee4$(_context4) {
         while (1) switch (_context4.prev = _context4.next) {
@@ -137,18 +159,54 @@ var useMessageActionHandlers = function useMessageActionHandlers(_ref) {
       }, _callee4);
     }));
     return function handleTogglePinMessage() {
-      return _ref5.apply(this, arguments);
+      return _ref4.apply(this, arguments);
     };
   }();
   var handleEditMessage = function handleEditMessage() {
     setEditingState(message);
   };
+  var handleFlagMessage = function handleFlagMessage() {
+    try {
+      if (message.id) {
+        _reactNative.Alert.alert(t('Flag Message'), t('Do you want to send a copy of this message to a moderator for further investigation?'), [{
+          style: 'cancel',
+          text: t('Cancel')
+        }, {
+          onPress: function () {
+            var _onPress2 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee5() {
+              return _regenerator["default"].wrap(function _callee5$(_context5) {
+                while (1) switch (_context5.prev = _context5.next) {
+                  case 0:
+                    _context5.next = 2;
+                    return client.flagMessage(message.id);
+                  case 2:
+                    _reactNative.Alert.alert(t('Message flagged'), t('The message has been reported to a moderator.'));
+                  case 3:
+                  case "end":
+                    return _context5.stop();
+                }
+              }, _callee5);
+            }));
+            function onPress() {
+              return _onPress2.apply(this, arguments);
+            }
+            return onPress;
+          }(),
+          text: t('Flag')
+        }], {
+          cancelable: false
+        });
+      }
+    } catch (_) {
+      _reactNative.Alert.alert(t('Cannot Flag Message'), t('Flag action failed either due to a network issue or the message is already flagged'));
+    }
+  };
   var handleToggleReaction = function () {
-    var _ref6 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee5(reactionType) {
+    var _ref5 = (0, _asyncToGenerator2["default"])(_regenerator["default"].mark(function _callee6(reactionType) {
       var _message$own_reaction;
       var messageId, own_reactions, userExistingReaction;
-      return _regenerator["default"].wrap(function _callee5$(_context5) {
-        while (1) switch (_context5.prev = _context5.next) {
+      return _regenerator["default"].wrap(function _callee6$(_context6) {
+        while (1) switch (_context6.prev = _context6.next) {
           case 0:
             messageId = message.id;
             own_reactions = (_message$own_reaction = message.own_reactions) != null ? _message$own_reaction : [];
@@ -160,43 +218,45 @@ var useMessageActionHandlers = function useMessageActionHandlers(_ref) {
               }
               return false;
             });
-            _context5.prev = 3;
+            _context6.prev = 3;
             if (!(channel && messageId)) {
-              _context5.next = 12;
+              _context6.next = 12;
               break;
             }
             if (!userExistingReaction) {
-              _context5.next = 10;
+              _context6.next = 10;
               break;
             }
-            _context5.next = 8;
+            _context6.next = 8;
             return deleteReaction(userExistingReaction.type, messageId);
           case 8:
-            _context5.next = 12;
+            _context6.next = 12;
             break;
           case 10:
-            _context5.next = 12;
+            _context6.next = 12;
             return sendReaction(reactionType, messageId);
           case 12:
-            _context5.next = 17;
+            _context6.next = 17;
             break;
           case 14:
-            _context5.prev = 14;
-            _context5.t0 = _context5["catch"](3);
-            console.log(_context5.t0);
+            _context6.prev = 14;
+            _context6.t0 = _context6["catch"](3);
+            console.log(_context6.t0);
           case 17:
           case "end":
-            return _context5.stop();
+            return _context6.stop();
         }
-      }, _callee5, null, [[3, 14]]);
+      }, _callee6, null, [[3, 14]]);
     }));
     return function handleToggleReaction(_x) {
-      return _ref6.apply(this, arguments);
+      return _ref5.apply(this, arguments);
     };
   }();
   return {
+    handleCopyMessage: handleCopyMessage,
     handleDeleteMessage: handleDeleteMessage,
     handleEditMessage: handleEditMessage,
+    handleFlagMessage: handleFlagMessage,
     handleQuotedReplyMessage: handleQuotedReplyMessage,
     handleResendMessage: handleResendMessage,
     handleToggleBanUser: handleToggleBanUser,

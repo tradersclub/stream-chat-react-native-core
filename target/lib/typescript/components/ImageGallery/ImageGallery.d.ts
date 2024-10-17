@@ -6,7 +6,7 @@ import { ImageGalleryHeaderCustomComponentProps } from './components/ImageGaller
 import { ImageGalleryGridImageComponents } from './components/ImageGrid';
 import { ImageGalleryGridHandleCustomComponentProps } from './components/ImageGridHandle';
 import { OverlayProviderProps } from '../../contexts/overlayContext/OverlayContext';
-import type { DefaultStreamChatGenerics } from '../../types/types';
+import { DefaultStreamChatGenerics } from '../../types/types';
 export declare enum HasPinched {
     FALSE = 0,
     TRUE = 1

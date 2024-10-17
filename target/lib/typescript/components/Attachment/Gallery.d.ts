@@ -4,7 +4,7 @@ import { ImageGalleryContextValue } from '../../contexts/imageGalleryContext/Ima
 import { MessageContextValue } from '../../contexts/messageContext/MessageContext';
 import { MessagesContextValue } from '../../contexts/messagesContext/MessagesContext';
 import { OverlayContextValue } from '../../contexts/overlayContext/OverlayContext';
-import type { DefaultStreamChatGenerics } from '../../types/types';
+import { DefaultStreamChatGenerics } from '../../types/types';
 export type GalleryPropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<ImageGalleryContextValue<StreamChatGenerics>, 'setSelectedMessage' | 'setMessages'> & Pick<MessageContextValue<StreamChatGenerics>, 'alignment' | 'groupStyles' | 'images' | 'videos' | 'onLongPress' | 'onPress' | 'onPressIn' | 'preventPress' | 'threadList'> & Pick<MessagesContextValue<StreamChatGenerics>, 'additionalTouchableProps' | 'legacyImageViewerSwipeBehaviour' | 'VideoThumbnail' | 'ImageLoadingIndicator' | 'ImageLoadingFailedIndicator' | 'myMessageTheme'> & Pick<OverlayContextValue, 'setOverlay'> & {
     channelId: string | undefined;
     hasThreadReplies?: boolean;

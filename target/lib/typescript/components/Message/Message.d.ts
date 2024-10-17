@@ -10,7 +10,7 @@ import { MessagesContextValue } from '../../contexts/messagesContext/MessagesCon
 import { OverlayContextValue } from '../../contexts/overlayContext/OverlayContext';
 import { ThreadContextValue } from '../../contexts/threadContext/ThreadContext';
 import { TranslationContextValue } from '../../contexts/translationContext/TranslationContext';
-import type { DefaultStreamChatGenerics } from '../../types/types';
+import { DefaultStreamChatGenerics } from '../../types/types';
 import { MessageType } from '../MessageList/hooks/useMessageList';
 export type TouchableEmitter = 'fileAttachment' | 'gallery' | 'giphy' | 'message' | 'messageContent' | 'messageReplies' | 'reactionList';
 export type TextMentionTouchableHandlerPayload<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = {
@@ -41,7 +41,7 @@ export type MessageTouchableHandlerPayload<StreamChatGenerics extends DefaultStr
     /**
      * Set of action handler functions for various message actions. You can use these functions to perform any action when give interaction occurs.
      */
-    actionHandlers?: MessageActionHandlers;
+    actionHandlers?: MessageActionHandlers<StreamChatGenerics>;
     /**
      * Additional message touchable handler info.
      */
@@ -51,9 +51,11 @@ export type MessageTouchableHandlerPayload<StreamChatGenerics extends DefaultStr
      */
     message?: MessageType<StreamChatGenerics>;
 };
-export type MessageActionHandlers = {
-    deleteMessage: () => Promise<void>;
+export type MessageActionHandlers<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = {
+    copyMessage: () => void;
+    deleteMessage: () => void;
     editMessage: () => void;
+    flagMessage: () => void;
     pinMessage: () => Promise<void>;
     quotedReply: () => void;
     resendMessage: () => Promise<void>;
@@ -61,8 +63,10 @@ export type MessageActionHandlers = {
     toggleBanUser: () => Promise<void>;
     toggleMuteUser: () => Promise<void>;
     toggleReaction: (reactionType: string) => Promise<void>;
+    unpinMessage: () => Promise<void>;
+    threadReply?: (message: MessageType<StreamChatGenerics>) => Promise<void>;
 };
-export type MessagePropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<ChannelContextValue<StreamChatGenerics>, 'channel' | 'disabled' | 'enforceUniqueReaction' | 'members'> & Pick<KeyboardContextValue, 'dismissKeyboard'> & Partial<Omit<MessageContextValue<StreamChatGenerics>, 'groupStyles' | 'message'>> & Pick<MessageContextValue<StreamChatGenerics>, 'groupStyles' | 'message'> & Pick<MessagesContextValue<StreamChatGenerics>, 'sendReaction' | 'deleteMessage' | 'dismissKeyboardOnMessageTouch' | 'forceAlignMessages' | 'handleBlock' | 'handleCopy' | 'handleDelete' | 'handleEdit' | 'handleFlag' | 'handleMute' | 'handlePinMessage' | 'handleQuotedReply' | 'handleReaction' | 'handleRetry' | 'handleThreadReply' | 'isAttachmentEqual' | 'messageActions' | 'messageContentOrder' | 'MessageBounce' | 'MessageSimple' | 'onLongPressMessage' | 'onPressInMessage' | 'onPressMessage' | 'OverlayReactionList' | 'removeMessage' | 'deleteReaction' | 'retrySendMessage' | 'selectReaction' | 'setEditingState' | 'setQuotedMessageState' | 'supportedReactions' | 'updateMessage'> & Pick<MessageOverlayContextValue<StreamChatGenerics>, 'setData'> & Pick<OverlayContextValue, 'setOverlay'> & Pick<ThreadContextValue<StreamChatGenerics>, 'openThread'> & Pick<TranslationContextValue, 't'> & {
+export type MessagePropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<ChannelContextValue<StreamChatGenerics>, 'channel' | 'enforceUniqueReaction' | 'members'> & Pick<KeyboardContextValue, 'dismissKeyboard'> & Partial<Omit<MessageContextValue<StreamChatGenerics>, 'groupStyles' | 'message'>> & Pick<MessageContextValue<StreamChatGenerics>, 'groupStyles' | 'message'> & Pick<MessagesContextValue<StreamChatGenerics>, 'sendReaction' | 'deleteMessage' | 'dismissKeyboardOnMessageTouch' | 'forceAlignMessages' | 'handleBlock' | 'handleCopy' | 'handleDelete' | 'handleEdit' | 'handleFlag' | 'handleMute' | 'handlePinMessage' | 'handleQuotedReply' | 'handleReaction' | 'handleRetry' | 'handleThreadReply' | 'isAttachmentEqual' | 'messageActions' | 'messageContentOrder' | 'MessageBounce' | 'MessageSimple' | 'onLongPressMessage' | 'onPressInMessage' | 'onPressMessage' | 'OverlayReactionList' | 'removeMessage' | 'deleteReaction' | 'retrySendMessage' | 'selectReaction' | 'setEditingState' | 'setQuotedMessageState' | 'supportedReactions' | 'updateMessage'> & Pick<MessageOverlayContextValue<StreamChatGenerics>, 'setData'> & Pick<OverlayContextValue, 'setOverlay'> & Pick<ThreadContextValue<StreamChatGenerics>, 'openThread'> & Pick<TranslationContextValue, 't'> & {
     chatContext: ChatContextValue<StreamChatGenerics>;
     messagesContext: MessagesContextValue<StreamChatGenerics>;
     /**

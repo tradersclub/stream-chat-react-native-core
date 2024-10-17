@@ -14,6 +14,7 @@ var _MessageInputContext = require("../../contexts/messageInputContext/MessageIn
 var _MessagesContext = require("../../contexts/messagesContext/MessagesContext");
 var _ThemeContext = require("../../contexts/themeContext/ThemeContext");
 var _TranslationContext = require("../../contexts/translationContext/TranslationContext");
+var _types = require("../../types/types");
 var _getResizedImageUrl = require("../../utils/getResizedImageUrl");
 var _getTrimmedAttachmentTitle = require("../../utils/getTrimmedAttachmentTitle");
 var _utils = require("../../utils/utils");
@@ -77,24 +78,24 @@ var styles = _reactNative.StyleSheet.create({
 });
 var getMessageType = function getMessageType(lastAttachment) {
   var messageType;
-  var isLastAttachmentFile = lastAttachment.type === 'file';
-  var isLastAttachmentAudio = lastAttachment.type === 'audio';
-  var isLastAttachmentVoiceRecording = lastAttachment.type === 'voiceRecording';
-  var isLastAttachmentVideo = lastAttachment.type === 'video';
-  var isLastAttachmentGiphy = (lastAttachment == null ? void 0 : lastAttachment.type) === 'giphy' || (lastAttachment == null ? void 0 : lastAttachment.type) === 'imgur';
-  var isLastAttachmentImageOrGiphy = (lastAttachment == null ? void 0 : lastAttachment.type) === 'image' && !(lastAttachment != null && lastAttachment.title_link) && !(lastAttachment != null && lastAttachment.og_scrape_url);
+  var isLastAttachmentFile = lastAttachment.type === _types.FileTypes.File;
+  var isLastAttachmentAudio = lastAttachment.type === _types.FileTypes.Audio;
+  var isLastAttachmentVoiceRecording = lastAttachment.type === _types.FileTypes.VoiceRecording;
+  var isLastAttachmentVideo = lastAttachment.type === _types.FileTypes.Video;
+  var isLastAttachmentGiphy = (lastAttachment == null ? void 0 : lastAttachment.type) === _types.FileTypes.Giphy || (lastAttachment == null ? void 0 : lastAttachment.type) === _types.FileTypes.Imgur;
+  var isLastAttachmentImageOrGiphy = (lastAttachment == null ? void 0 : lastAttachment.type) === _types.FileTypes.Image && !(lastAttachment != null && lastAttachment.title_link) && !(lastAttachment != null && lastAttachment.og_scrape_url);
   var isLastAttachmentImage = (lastAttachment == null ? void 0 : lastAttachment.image_url) || (lastAttachment == null ? void 0 : lastAttachment.thumb_url);
   if (isLastAttachmentFile) {
-    messageType = 'file';
+    messageType = _types.FileTypes.File;
   } else if (isLastAttachmentVideo) {
-    messageType = 'video';
+    messageType = _types.FileTypes.Video;
   } else if (isLastAttachmentAudio) {
-    messageType = 'audio';
+    messageType = _types.FileTypes.Audio;
   } else if (isLastAttachmentVoiceRecording) {
-    messageType = 'voiceRecording';
+    messageType = _types.FileTypes.VoiceRecording;
   } else if (isLastAttachmentImageOrGiphy) {
-    if (isLastAttachmentImage) messageType = 'image';else messageType = undefined;
-  } else if (isLastAttachmentGiphy) messageType = 'giphy';else messageType = 'other';
+    if (isLastAttachmentImage) messageType = _types.FileTypes.Image;else messageType = undefined;
+  } else if (isLastAttachmentGiphy) messageType = _types.FileTypes.Giphy;else messageType = 'other';
   return messageType;
 };
 var ReplyWithContext = function ReplyWithContext(props) {
@@ -140,7 +141,7 @@ var ReplyWithContext = function ReplyWithContext(props) {
   var lastAttachment = (_quotedMessage$attach = quotedMessage.attachments) == null ? void 0 : _quotedMessage$attach.slice(-1)[0];
   var messageType = lastAttachment && getMessageType(lastAttachment);
   var trimmedLastAttachmentTitle = (0, _getTrimmedAttachmentTitle.getTrimmedAttachmentTitle)(lastAttachment == null ? void 0 : lastAttachment.title);
-  var hasImage = !error && lastAttachment && messageType !== 'file' && messageType !== 'video' && messageType !== 'audio' && messageType !== 'voiceRecording' && (lastAttachment.image_url || lastAttachment.thumb_url || lastAttachment.og_scrape_url);
+  var hasImage = !error && lastAttachment && messageType !== _types.FileTypes.File && messageType !== _types.FileTypes.Video && messageType !== _types.FileTypes.Audio && messageType !== _types.FileTypes.VoiceRecording && (lastAttachment.image_url || lastAttachment.thumb_url || lastAttachment.og_scrape_url);
   var onlyEmojis = !lastAttachment && emojiOnlyText;
   return (0, _jsxRuntime.jsxs)(_reactNative.View, {
     style: [styles.container, container, stylesProp.container],
@@ -155,7 +156,7 @@ var ReplyWithContext = function ReplyWithContext(props) {
         borderColor: border,
         borderWidth: messageType === 'other' ? 0 : 1
       }, messageContainer, stylesProp.messageContainer],
-      children: [!error && lastAttachment ? messageType === 'file' || messageType === 'voiceRecording' || messageType === 'audio' ? (0, _jsxRuntime.jsx)(_reactNative.View, {
+      children: [!error && lastAttachment ? messageType === _types.FileTypes.File || messageType === _types.FileTypes.Audio || messageType === _types.FileTypes.VoiceRecording ? (0, _jsxRuntime.jsx)(_reactNative.View, {
         style: [styles.fileAttachmentContainer, fileAttachmentContainer, stylesProp.fileAttachmentContainer],
         children: (0, _jsxRuntime.jsx)(FileAttachmentIcon, {
           mimeType: lastAttachment.mime_type,
@@ -173,7 +174,7 @@ var ReplyWithContext = function ReplyWithContext(props) {
           })
         },
         style: [styles.imageAttachment, imageAttachment, stylesProp.imageAttachment]
-      }) : null : null, messageType === 'video' && !lastAttachment.og_scrape_url ? (0, _jsxRuntime.jsx)(_VideoThumbnail.VideoThumbnail, {
+      }) : null : null, messageType === _types.FileTypes.Video && !lastAttachment.og_scrape_url ? (0, _jsxRuntime.jsx)(_VideoThumbnail.VideoThumbnail, {
         imageStyle: [styles.videoThumbnailImageStyle, videoThumbnailImageStyle],
         style: [styles.videoThumbnailContainerStyle, videoThumbnailContainerStyle],
         thumb_url: lastAttachment.thumb_url
@@ -190,15 +191,15 @@ var ReplyWithContext = function ReplyWithContext(props) {
             text: styles.text
           }, markdownStyles),
           message: Object.assign({}, quotedMessage, {
-            text: quotedMessage.type === 'deleted' ? "_".concat(t('Message deleted'), "_") : quotedMessage.text ? quotedMessage.text.length > 170 ? "".concat(quotedMessage.text.slice(0, 170), "...") : quotedMessage.text : messageType === 'image' ? t('Photo') : messageType === 'video' ? t('Video') : messageType === 'file' || messageType === 'audio' || messageType === 'voiceRecording' ? trimmedLastAttachmentTitle || '' : ''
+            text: quotedMessage.type === 'deleted' ? "_".concat(t('Message deleted'), "_") : quotedMessage.text ? quotedMessage.text.length > 170 ? "".concat(quotedMessage.text.slice(0, 170), "...") : quotedMessage.text : messageType === _types.FileTypes.Image ? t('Photo') : messageType === _types.FileTypes.Video ? t('Video') : messageType === _types.FileTypes.File || messageType === _types.FileTypes.Audio || messageType === _types.FileTypes.VoiceRecording ? trimmedLastAttachmentTitle || '' : ''
           }),
           onlyEmojis: onlyEmojis,
           styles: {
             textContainer: [{
-              marginRight: hasImage || messageType === 'video' ? Number(((_stylesProp$imageAtta3 = stylesProp.imageAttachment) == null ? void 0 : _stylesProp$imageAtta3.height) || imageAttachment.height || styles.imageAttachment.height) + Number(((_stylesProp$imageAtta4 = stylesProp.imageAttachment) == null ? void 0 : _stylesProp$imageAtta4.marginLeft) || imageAttachment.marginLeft || styles.imageAttachment.marginLeft) : messageType === 'file' || messageType === 'audio' || messageType === 'voiceRecording' ? attachmentSize + Number(((_stylesProp$fileAttac = stylesProp.fileAttachmentContainer) == null ? void 0 : _stylesProp$fileAttac.paddingLeft) || fileAttachmentContainer.paddingLeft || styles.fileAttachmentContainer.paddingLeft) : undefined
+              marginRight: hasImage || messageType === _types.FileTypes.Video ? Number(((_stylesProp$imageAtta3 = stylesProp.imageAttachment) == null ? void 0 : _stylesProp$imageAtta3.height) || imageAttachment.height || styles.imageAttachment.height) + Number(((_stylesProp$imageAtta4 = stylesProp.imageAttachment) == null ? void 0 : _stylesProp$imageAtta4.marginLeft) || imageAttachment.marginLeft || styles.imageAttachment.marginLeft) : messageType === _types.FileTypes.File || messageType === _types.FileTypes.Audio || messageType === _types.FileTypes.VoiceRecording ? attachmentSize + Number(((_stylesProp$fileAttac = stylesProp.fileAttachmentContainer) == null ? void 0 : _stylesProp$fileAttac.paddingLeft) || fileAttachmentContainer.paddingLeft || styles.fileAttachmentContainer.paddingLeft) : undefined
             }, styles.textContainer, textContainer, stylesProp.textContainer]
           }
-        }), messageType === 'audio' || messageType === 'voiceRecording' ? (0, _jsxRuntime.jsx)(_reactNative.Text, {
+        }), messageType === _types.FileTypes.Audio || messageType === _types.FileTypes.VoiceRecording ? (0, _jsxRuntime.jsx)(_reactNative.Text, {
           style: [styles.secondaryText, {
             color: grey
           }, secondaryText],

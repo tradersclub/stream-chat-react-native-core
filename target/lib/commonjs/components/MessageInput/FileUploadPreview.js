@@ -7,7 +7,6 @@ exports.FileUploadPreview = void 0;
 var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
 var _react = _interopRequireWildcard(require("react"));
 var _reactNative = require("react-native");
-var _dayjs = _interopRequireDefault(require("dayjs"));
 var _UploadProgressIndicator = require("./UploadProgressIndicator");
 var _contexts = require("../../contexts");
 var _MessageInputContext = require("../../contexts/messageInputContext/MessageInputContext");
@@ -50,17 +49,16 @@ var styles = _reactNative.StyleSheet.create({
   },
   filenameText: {
     fontSize: 14,
-    fontWeight: 'bold',
-    paddingHorizontal: 10
+    fontWeight: 'bold'
   },
   fileSizeText: {
     fontSize: 12,
-    marginTop: 10,
-    paddingHorizontal: 10
+    marginTop: 10
   },
   fileTextContainer: {
     justifyContent: 'space-around',
-    marginVertical: 10
+    marginVertical: 10,
+    paddingHorizontal: 10
   },
   flatList: {
     marginBottom: 12,
@@ -73,7 +71,7 @@ var styles = _reactNative.StyleSheet.create({
   },
   unsupportedFile: {
     flexDirection: 'row',
-    paddingLeft: 10
+    paddingTop: 10
   },
   unsupportedFileText: {
     fontSize: 12,
@@ -94,15 +92,6 @@ var UnsupportedFileTypeOrFileSizeIndicator = function UnsupportedFileTypeOrFileS
     grey = _useTheme$theme$color.grey,
     grey_dark = _useTheme$theme$color.grey_dark,
     fileSizeText = _useTheme$theme.messageInput.fileUploadPreview.fileSizeText;
-  var ONE_HOUR_IN_SECONDS = 3600;
-  var durationLabel = '00:00';
-  var videoDuration = item.file.duration;
-  if (videoDuration) {
-    var isDurationLongerThanHour = videoDuration / ONE_HOUR_IN_SECONDS >= 1;
-    var formattedDurationParam = isDurationLongerThanHour ? 'HH:mm:ss' : 'mm:ss';
-    var formattedVideoDuration = _dayjs["default"].duration(videoDuration, 'second').format(formattedDurationParam);
-    durationLabel = formattedVideoDuration;
-  }
   var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
     t = _useTranslationContex.t;
   return indicatorType === _utils.ProgressIndicatorTypes.NOT_SUPPORTED ? (0, _jsxRuntime.jsxs)(_reactNative.View, {
@@ -122,7 +111,7 @@ var UnsupportedFileTypeOrFileSizeIndicator = function UnsupportedFileTypeOrFileS
     style: [styles.fileSizeText, {
       color: grey
     }, fileSizeText],
-    children: videoDuration ? durationLabel : (0, _FileAttachment.getFileSizeDisplayText)(item.file.size)
+    children: item.file.duration ? (0, _utils.getDurationLabelFromDuration)(item.file.duration) : (0, _FileAttachment.getFileSizeDisplayText)(item.file.size)
   });
 };
 var FileUploadPreviewWithContext = function FileUploadPreviewWithContext(props) {

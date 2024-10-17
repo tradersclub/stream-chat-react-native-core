@@ -19,7 +19,6 @@ var _AttachmentPickerContext = require("../../contexts/attachmentPickerContext/A
 var _ChannelContext = require("../../contexts/channelContext/ChannelContext");
 var _MessageInputContext = require("../../contexts/messageInputContext/MessageInputContext");
 var _MessagesContext = require("../../contexts/messagesContext/MessagesContext");
-var _OwnCapabilitiesContext = require("../../contexts/ownCapabilitiesContext/OwnCapabilitiesContext");
 var _SuggestionsContext = require("../../contexts/suggestionsContext/SuggestionsContext");
 var _ThemeContext = require("../../contexts/themeContext/ThemeContext");
 var _ThreadContext = require("../../contexts/threadContext/ThreadContext");
@@ -91,11 +90,11 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
     closeAttachmentPicker = props.closeAttachmentPicker,
     cooldownEndsAt = props.cooldownEndsAt,
     CooldownTimer = props.CooldownTimer,
-    disabled = props.disabled,
     editing = props.editing,
     FileUploadPreview = props.FileUploadPreview,
     fileUploads = props.fileUploads,
     giphyActive = props.giphyActive,
+    hasImagePicker = props.hasImagePicker,
     ImageUploadPreview = props.ImageUploadPreview,
     imageUploads = props.imageUploads,
     Input = props.Input,
@@ -133,8 +132,6 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
     _useState2 = (0, _slicedToArray2["default"])(_useState, 2),
     height = _useState2[0],
     setHeight = _useState2[1];
-  var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
-    t = _useTranslationContex.t;
   var _useTheme = (0, _ThemeContext.useTheme)(),
     _useTheme$theme = _useTheme.theme,
     _useTheme$theme$color = _useTheme$theme.colors,
@@ -221,14 +218,12 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
     }
   }, [fileUploadsLength, selectedFilesLength]);
   (0, _react.useEffect)(function () {
-    if (imagesForInput === false && imageUploads.length) {
+    if (imagesForInput === false && imageUploadsLength) {
       imageUploads.forEach(function (image) {
         return removeImage(image.id);
       });
     }
-  }, [imagesForInput]);
-  var MEGA_BYTES_TO_BYTES = 1024 * 1024;
-  var MAX_FILE_SIZE_TO_UPLOAD_IN_MB = 100;
+  }, [imagesForInput, imageUploadsLength]);
   var uploadImagesHandler = function uploadImagesHandler() {
     var imageToUpload = selectedImages.find(function (selectedImage) {
       var uploadedImage = imageUploads.find(function (imageUpload) {
@@ -236,16 +231,7 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
       });
       return !uploadedImage;
     });
-    if (imageToUpload && Number(imageToUpload.size) / MEGA_BYTES_TO_BYTES > MAX_FILE_SIZE_TO_UPLOAD_IN_MB) {
-      _reactNative.Alert.alert(t("Maximum file size upload limit reached. Please upload a file below {{MAX_FILE_SIZE_TO_UPLOAD_IN_MB}} MB.", {
-        MAX_FILE_SIZE_TO_UPLOAD_IN_MB: MAX_FILE_SIZE_TO_UPLOAD_IN_MB
-      }));
-      setSelectedImages(selectedImages.filter(function (selectedImage) {
-        return selectedImage.uri !== imageToUpload.uri;
-      }));
-    } else {
-      if (imageToUpload) uploadNewImage(imageToUpload);
-    }
+    if (imageToUpload) uploadNewImage(imageToUpload);
   };
   var removeImagesHandler = function removeImagesHandler() {
     var imagesToRemove = imageUploads.filter(function (imageUpload) {
@@ -274,16 +260,7 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
         });
         return !uploadedFile;
       });
-      if (fileToUpload && Number(fileToUpload.size) / MEGA_BYTES_TO_BYTES > MAX_FILE_SIZE_TO_UPLOAD_IN_MB) {
-        _reactNative.Alert.alert(t("Maximum file size upload limit reached. Please upload a file below {{MAX_FILE_SIZE_TO_UPLOAD_IN_MB}} MB.", {
-          MAX_FILE_SIZE_TO_UPLOAD_IN_MB: MAX_FILE_SIZE_TO_UPLOAD_IN_MB
-        }));
-        setSelectedFiles(selectedFiles.filter(function (selectedFile) {
-          return selectedFile.uri !== fileToUpload.uri;
-        }));
-      } else {
-        if (fileToUpload) uploadNewFile(fileToUpload);
-      }
+      if (fileToUpload) uploadNewFile(fileToUpload);
     } else {
       var filesToRemove = fileUploads.filter(function (fileUpload) {
         return !selectedFiles.find(function (selectedFile) {
@@ -296,7 +273,7 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
     }
   }, [selectedFilesLength]);
   (0, _react.useEffect)(function () {
-    if (imagesForInput) {
+    if (imagesForInput && hasImagePicker) {
       if (imageUploadsLength < selectedImagesLength) {
         var updatedSelectedImages = selectedImages.filter(function (selectedImage) {
           var uploadedImage = imageUploads.find(function (imageUpload) {
@@ -316,34 +293,36 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
         }).filter(Boolean));
       }
     }
-  }, [imageUploadsLength]);
+  }, [imageUploadsLength, hasImagePicker]);
   (0, _react.useEffect)(function () {
-    if (fileUploadsLength < selectedFilesLength) {
-      var updatedSelectedFiles = selectedFiles.filter(function (selectedFile) {
-        var uploadedFile = fileUploads.find(function (fileUpload) {
-          return fileUpload.file.uri === selectedFile.uri || fileUpload.url === selectedFile.uri;
+    if (hasImagePicker) {
+      if (fileUploadsLength < selectedFilesLength) {
+        var updatedSelectedFiles = selectedFiles.filter(function (selectedFile) {
+          var uploadedFile = fileUploads.find(function (fileUpload) {
+            return fileUpload.file.uri === selectedFile.uri || fileUpload.url === selectedFile.uri;
+          });
+          return uploadedFile;
         });
-        return uploadedFile;
-      });
-      setSelectedFiles(updatedSelectedFiles);
-    } else if (fileUploadsLength > selectedFilesLength) {
-      setSelectedFiles(fileUploads.map(function (fileUpload) {
-        return {
-          duration: fileUpload.file.duration,
-          mimeType: fileUpload.file.mimeType,
-          name: fileUpload.file.name,
-          size: fileUpload.file.size,
-          uri: fileUpload.file.uri
-        };
-      }));
+        setSelectedFiles(updatedSelectedFiles);
+      } else if (fileUploadsLength > selectedFilesLength) {
+        setSelectedFiles(fileUploads.map(function (fileUpload) {
+          return {
+            duration: fileUpload.file.duration,
+            mimeType: fileUpload.file.mimeType,
+            name: fileUpload.file.name,
+            size: fileUpload.file.size,
+            uri: fileUpload.file.uri
+          };
+        }));
+      }
     }
-  }, [fileUploadsLength]);
+  }, [fileUploadsLength, hasImagePicker]);
   var editingExists = !!editing;
   (0, _react.useEffect)(function () {
     if (editing && inputBoxRef.current) {
       inputBoxRef.current.focus();
     }
-    if (!editing && (giphyActive || fileUploads.length > 0 || mentionedUsers.length > 0 || imageUploads.length > 0 || numberOfUploads > 0)) {
+    if (!editing && (giphyActive || fileUploads.length > 0 || mentionedUsers.length > 0 || imageUploads.length > 0 || numberOfUploads > 0) && resetInput) {
       resetInput();
     }
   }, [editingExists]);
@@ -400,9 +379,7 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
     }
     return result;
   };
-  var additionalTextInputContainerProps = Object.assign({
-    editable: disabled ? false : undefined
-  }, additionalTextInputProps);
+  var additionalTextInputContainerProps = Object.assign({}, additionalTextInputProps);
   var memoizedAdditionalTextInputProps = (0, _react.useMemo)(function () {
     return Object.assign({}, additionalTextInputProps, {
       onBlur: function onBlur(event) {
@@ -608,7 +585,7 @@ var MessageInputWithContext = function MessageInputWithContext(props) {
           }) : (0, _jsxRuntime.jsx)(_reactNative.View, {
             style: [styles.sendButtonContainer, sendButtonContainer],
             children: (0, _jsxRuntime.jsx)(SendButton, {
-              disabled: disabled || sending.current || !isValidMessage() || giphyActive && !isOnline
+              disabled: sending.current || !isValidMessage() || giphyActive && !isOnline
             })
           })), audioRecordingEnabled && !micLocked && (0, _jsxRuntime.jsx)(_reactNativeGestureHandler.PanGestureHandler, {
             activateAfterLongPress: asyncMessagesMinimumPressDuration + 100,
@@ -653,7 +630,6 @@ var areEqual = function areEqual(prevProps, nextProps) {
     prevAsyncMessagesSlideToCancelDistance = prevProps.asyncMessagesSlideToCancelDistance,
     prevAsyncUploads = prevProps.asyncUploads,
     prevAsyncMessagesEnabled = prevProps.audioRecordingEnabled,
-    prevDisabled = prevProps.disabled,
     prevEditing = prevProps.editing,
     prevFileUploads = prevProps.fileUploads,
     prevGiphyActive = prevProps.giphyActive,
@@ -674,7 +650,6 @@ var areEqual = function areEqual(prevProps, nextProps) {
     nextAsyncMessagesSlideToCancelDistance = nextProps.asyncMessagesSlideToCancelDistance,
     nextAsyncUploads = nextProps.asyncUploads,
     nextAsyncMessagesEnabled = nextProps.audioRecordingEnabled,
-    nextDisabled = nextProps.disabled,
     nextEditing = nextProps.editing,
     nextFileUploads = nextProps.fileUploads,
     nextGiphyActive = nextProps.giphyActive,
@@ -701,8 +676,6 @@ var areEqual = function areEqual(prevProps, nextProps) {
   if (!asyncMessagesMinimumPressDurationEqual) return false;
   var asyncMessagesSlideToCancelDistanceEqual = prevAsyncMessagesSlideToCancelDistance === nextAsyncMessagesSlideToCancelDistance;
   if (!asyncMessagesSlideToCancelDistanceEqual) return false;
-  var disabledEqual = prevDisabled === nextDisabled;
-  if (!disabledEqual) return false;
   var editingEqual = !!prevEditing === !!nextEditing;
   if (!editingEqual) return false;
   var imageUploadsEqual = prevImageUploads.length === nextImageUploads.length;
@@ -744,7 +717,7 @@ var MessageInput = function MessageInput(props) {
     AttachmentPickerSelectionBar = _useAttachmentPickerC2.AttachmentPickerSelectionBar;
   var _useChatContext = (0, _contexts.useChatContext)(),
     isOnline = _useChatContext.isOnline;
-  var ownCapabilities = (0, _OwnCapabilitiesContext.useOwnCapabilitiesContext)();
+  var ownCapabilities = (0, _contexts.useOwnCapabilitiesContext)();
   var _useChannelContext = (0, _ChannelContext.useChannelContext)(),
     disabled = _useChannelContext.disabled,
     members = _useChannelContext.members,
@@ -772,6 +745,7 @@ var MessageInput = function MessageInput(props) {
     FileUploadPreview = _useMessageInputConte.FileUploadPreview,
     fileUploads = _useMessageInputConte.fileUploads,
     giphyActive = _useMessageInputConte.giphyActive,
+    hasImagePicker = _useMessageInputConte.hasImagePicker,
     ImageUploadPreview = _useMessageInputConte.ImageUploadPreview,
     imageUploads = _useMessageInputConte.imageUploads,
     Input = _useMessageInputConte.Input,
@@ -810,9 +784,9 @@ var MessageInput = function MessageInput(props) {
     triggerType = _useSuggestionsContex.triggerType;
   var _useThreadContext = (0, _ThreadContext.useThreadContext)(),
     thread = _useThreadContext.thread;
-  var _useTranslationContex2 = (0, _TranslationContext.useTranslationContext)(),
-    t = _useTranslationContex2.t;
-  if ((disabled || !ownCapabilities.sendMessage) && SendMessageDisallowedIndicator) {
+  var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
+    t = _useTranslationContex.t;
+  if (!editing && disabled && !ownCapabilities.sendMessage && SendMessageDisallowedIndicator) {
     return (0, _jsxRuntime.jsx)(SendMessageDisallowedIndicator, {});
   }
   return (0, _jsxRuntime.jsx)(MemoizedMessageInput, Object.assign({
@@ -837,11 +811,11 @@ var MessageInput = function MessageInput(props) {
     closeAttachmentPicker: closeAttachmentPicker,
     cooldownEndsAt: cooldownEndsAt,
     CooldownTimer: CooldownTimer,
-    disabled: disabled,
     editing: editing,
     FileUploadPreview: FileUploadPreview,
     fileUploads: fileUploads,
     giphyActive: giphyActive,
+    hasImagePicker: hasImagePicker,
     ImageUploadPreview: ImageUploadPreview,
     imageUploads: imageUploads,
     Input: Input,

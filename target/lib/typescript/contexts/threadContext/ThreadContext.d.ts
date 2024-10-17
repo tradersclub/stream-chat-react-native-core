@@ -13,6 +13,10 @@ export type ThreadContextValue<StreamChatGenerics extends DefaultStreamChatGener
     threadHasMore: boolean;
     threadLoadingMore: boolean;
     threadMessages: ChannelState<StreamChatGenerics>['threads'][string];
+    /**
+     * Boolean to enable/disable parent message press
+     */
+    parentMessagePreventPress?: boolean;
 };
 export declare const ThreadContext: React.Context<ThreadContextValue<DefaultStreamChatGenerics>>;
 export declare const ThreadProvider: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>({ children, value, }: React.PropsWithChildren<{

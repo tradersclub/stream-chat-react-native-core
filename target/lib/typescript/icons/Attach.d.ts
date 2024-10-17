@@ -1,4 +1,8 @@
 import React from 'react';
 import { IconProps } from './utils/base';
-export declare const Attach: (props: IconProps) => React.JSX.Element;
+type Props = IconProps & {
+    size: number;
+};
+export declare const Attach: ({ size, ...rest }: Props) => React.JSX.Element;
+export {};
 //# sourceMappingURL=Attach.d.ts.map

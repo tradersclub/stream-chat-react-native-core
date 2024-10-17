@@ -4,23 +4,31 @@ import localeData from 'dayjs/plugin/localeData';
 import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import updateLocale from 'dayjs/plugin/updateLocale';
+import utc from 'dayjs/plugin/utc';
 import i18n, { FallbackLng, TFunction } from 'i18next';
 
-import type moment from 'moment';
+import type momentTimezone from 'moment-timezone';
 
-import type { TDateTimeParser } from '../contexts/translationContext/TranslationContext';
-import enTranslations from '../i18n/en.json';
-import esTranslations from '../i18n/es.json';
-import frTranslations from '../i18n/fr.json';
-import heTranslations from '../i18n/he.json';
-import hiTranslations from '../i18n/hi.json';
-import itTranslations from '../i18n/it.json';
-import jaTranslations from '../i18n/ja.json';
-import koTranslations from '../i18n/ko.json';
-import nlTranslations from '../i18n/nl.json';
-import ptBRTranslations from '../i18n/pt-BR.json';
-import ruTranslations from '../i18n/ru.json';
-import trTranslations from '../i18n/tr.json';
+import { calendarFormats } from './calendarFormats';
+import {
+  CustomFormatters,
+  PredefinedFormatters,
+  predefinedFormatters,
+} from './predefinedFormatters';
+
+import type { TDateTimeParser } from '../../contexts/translationContext/TranslationContext';
+import enTranslations from '../../i18n/en.json';
+import esTranslations from '../../i18n/es.json';
+import frTranslations from '../../i18n/fr.json';
+import heTranslations from '../../i18n/he.json';
+import hiTranslations from '../../i18n/hi.json';
+import itTranslations from '../../i18n/it.json';
+import jaTranslations from '../../i18n/ja.json';
+import koTranslations from '../../i18n/ko.json';
+import nlTranslations from '../../i18n/nl.json';
+import ptBRTranslations from '../../i18n/pt-br.json';
+import ruTranslations from '../../i18n/ru.json';
+import trTranslations from '../../i18n/tr.json';
 
 import 'dayjs/locale/es';
 import 'dayjs/locale/fr';
@@ -41,14 +49,16 @@ import 'dayjs/locale/tr';
  */
 import 'dayjs/locale/en';
 
-import type { DefaultStreamChatGenerics } from '../types/types';
+import type { DefaultStreamChatGenerics } from '../../types/types';
 
 const defaultNS = 'translation';
 const defaultLng = 'en';
 
 Dayjs.extend(updateLocale);
+Dayjs.extend(utc);
 
 Dayjs.updateLocale('en', {
+  calendar: calendarFormats.en,
   format: {
     L: 'DD/MM/YYYY',
     LL: 'D MMMM YYYY',
@@ -59,37 +69,18 @@ Dayjs.updateLocale('en', {
   },
 });
 
-Dayjs.updateLocale('nl', {
-  calendar: {
-    lastDay: '[gisteren om] LT',
-    lastWeek: '[afgelopen] dddd [om] LT',
-    nextDay: '[morgen om] LT',
-    nextWeek: 'dddd [om] LT',
-    sameDay: '[vandaag om] LT',
-    sameElse: 'L',
-  },
+Dayjs.updateLocale('es', {
+  calendar: calendarFormats.es,
 });
-
-Dayjs.updateLocale('it', {
-  calendar: {
-    lastDay: '[Ieri alle] LT',
-    lastWeek: '[lo scorso] dddd [alle] LT',
-    nextDay: '[Domani alle] LT',
-    nextWeek: 'dddd [alle] LT',
-    sameDay: '[Oggi alle] LT',
-    sameElse: 'L',
-  },
+Dayjs.updateLocale('fr', {
+  calendar: calendarFormats.fr,
+});
+Dayjs.updateLocale('he', {
+  calendar: calendarFormats.he,
 });
 
 Dayjs.updateLocale('hi', {
-  calendar: {
-    lastDay: '[कल] LT',
-    lastWeek: '[पिछले] dddd, LT',
-    nextDay: '[कल] LT',
-    nextWeek: 'dddd, LT',
-    sameDay: '[आज] LT',
-    sameElse: 'L',
-  },
+  calendar: calendarFormats.hi,
 
   /**
    * Hindi notation for meridiems are quite fuzzy in practice. While there exists
@@ -116,35 +107,26 @@ Dayjs.updateLocale('hi', {
 
   meridiemParse: /रात|सुबह|दोपहर|शाम/,
 });
-
-Dayjs.updateLocale('fr', {
-  calendar: {
-    lastDay: '[Hier à] LT',
-    lastWeek: 'dddd [dernier à] LT',
-    nextDay: '[Demain à] LT',
-    nextWeek: 'dddd [à] LT',
-    sameDay: '[Aujourd’hui à] LT',
-    sameElse: 'L',
-  },
+Dayjs.updateLocale('it', {
+  calendar: calendarFormats.it,
 });
-
-Dayjs.updateLocale('tr', {
-  calendar: {
-    lastDay: '[dün] LT',
-    lastWeek: '[geçen] dddd [saat] LT',
-    nextDay: '[yarın saat] LT',
-    nextWeek: '[gelecek] dddd [saat] LT',
-    sameDay: '[bugün saat] LT',
-    sameElse: 'L',
-  },
+Dayjs.updateLocale('ja', {
+  calendar: calendarFormats.ja,
 });
-
+Dayjs.updateLocale('ko', {
+  calendar: calendarFormats.ko,
+});
+Dayjs.updateLocale('nl', {
+  calendar: calendarFormats.nl,
+});
+Dayjs.updateLocale('pt-br', {
+  calendar: calendarFormats['pt-br'],
+});
 Dayjs.updateLocale('ru', {
-  calendar: {
-    lastDay: '[Вчера, в] LT',
-    nextDay: '[Завтра, в] LT',
-    sameDay: '[Сегодня, в] LT',
-  },
+  calendar: calendarFormats.ru,
+});
+Dayjs.updateLocale('tr', {
+  calendar: calendarFormats.tr,
 });
 
 const en_locale = {
@@ -167,24 +149,35 @@ const en_locale = {
   weekdays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
 };
 
+type DateTimeParserModule = typeof Dayjs | typeof momentTimezone;
+
 // Type guards to check DayJs
-const isDayJs = (dateTimeParser: typeof Dayjs | typeof moment): dateTimeParser is typeof Dayjs =>
+const isDayJs = (dateTimeParser: DateTimeParserModule): dateTimeParser is typeof Dayjs =>
   (dateTimeParser as typeof Dayjs).extend !== undefined;
 
-type Options = {
-  DateTimeParser?: typeof Dayjs | typeof moment;
+type TimezoneParser = {
+  tz: momentTimezone.MomentTimezone | Dayjs.Dayjs;
+};
+
+const supportsTz = (dateTimeParser: unknown): dateTimeParser is TimezoneParser =>
+  (dateTimeParser as TimezoneParser).tz !== undefined;
+
+type Streami18nOptions = {
+  DateTimeParser?: DateTimeParserModule;
   dayjsLocaleConfigForLanguage?: Partial<ILocale>;
   debug?: boolean;
   disableDateTimeTranslations?: boolean;
+  formatters?: Partial<PredefinedFormatters> & CustomFormatters;
   language?: string;
   logger?: (msg?: string) => void;
+  timezone?: string;
   translationsForLanguage?: Partial<typeof enTranslations>;
 };
 
 type I18NextConfig = {
   debug: boolean;
   fallbackLng: false | FallbackLng;
-  interpolation: { escapeValue: boolean };
+  interpolation: { escapeValue: boolean; formatSeparator: string };
   keySeparator: false | string;
   lng: string;
   nsSeparator: false | string;
@@ -404,9 +397,14 @@ export class Streami18n {
    */
   logger: (msg?: string) => void;
   currentLanguage: string;
-  DateTimeParser: typeof Dayjs | typeof moment;
+  DateTimeParser: DateTimeParserModule;
+  formatters: PredefinedFormatters & CustomFormatters = predefinedFormatters;
   isCustomDateTimeParser: boolean;
   i18nextConfig: I18NextConfig;
+  /**
+   * A valid TZ identifier string (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+   */
+  timezone?: string;
 
   /**
    * Constructor accepts following options:
@@ -434,7 +432,7 @@ export class Streami18n {
    *
    * @param {*} options
    */
-  constructor(options: Options = {}, i18nextConfig: Partial<I18NextConfig> = {}) {
+  constructor(options: Streami18nOptions = {}, i18nextConfig: Partial<I18NextConfig> = {}) {
     const finalOptions = {
       ...defaultStreami18nOptions,
       ...options,
@@ -445,6 +443,8 @@ export class Streami18n {
 
     this.currentLanguage = finalOptions.language;
     this.DateTimeParser = finalOptions.DateTimeParser;
+    this.timezone = finalOptions.timezone;
+    this.formatters = { ...predefinedFormatters, ...options?.formatters };
 
     try {
       /**
@@ -491,7 +491,7 @@ export class Streami18n {
     this.i18nextConfig = {
       debug: finalOptions.debug,
       fallbackLng: false,
-      interpolation: { escapeValue: false },
+      interpolation: { escapeValue: false, formatSeparator: '|' },
       keySeparator: false,
       lng: this.currentLanguage,
       nsSeparator: false,
@@ -521,19 +521,19 @@ export class Streami18n {
     }
 
     this.tDateTimeParser = (timestamp) => {
-      if (finalOptions.disableDateTimeTranslations || !this.localeExists(this.currentLanguage)) {
-        /**
-         * TS needs to know which is being called to accept the chain call
-         */
-        if (isDayJs(this.DateTimeParser)) {
-          return this.DateTimeParser(timestamp).locale(defaultLng);
-        }
-        return this.DateTimeParser(timestamp).locale(defaultLng);
+      const language =
+        finalOptions.disableDateTimeTranslations || !this.localeExists(this.currentLanguage)
+          ? defaultLng
+          : this.currentLanguage;
+
+      // If the DateTimeParser is not a Dayjs instance, we assume it is a Moment instance.
+      if (!isDayJs(this.DateTimeParser)) {
+        return supportsTz(this.DateTimeParser) && this.timezone
+          ? this.DateTimeParser(timestamp).tz(this.timezone).locale(language)
+          : this.DateTimeParser(timestamp).locale(language);
       }
-      if (isDayJs(this.DateTimeParser)) {
-        return this.DateTimeParser(timestamp).locale(this.currentLanguage);
-      }
-      return this.DateTimeParser(timestamp).locale(this.currentLanguage);
+
+      return this.DateTimeParser(timestamp).locale(language);
     };
   }
 
@@ -556,6 +556,12 @@ export class Streami18n {
         this.onTFunctionOverrideListeners.forEach((listener) => listener(this.t));
       }
       this.initialized = true;
+      if (this.formatters) {
+        Object.entries(this.formatters).forEach(([name, formatterFactory]) => {
+          if (!formatterFactory) return;
+          this.i18nInstance.services.formatter?.add(name, formatterFactory(this));
+        });
+      }
     } catch (error) {
       this.logger(`Something went wrong with init: ${JSON.stringify(error)}`);
     }

@@ -58,7 +58,7 @@ var AnimatedGalleryVideo = _react["default"].memo(function (props) {
   };
   var onLoad = function onLoad(payload) {
     setOpacity(0);
-    handleLoad(attachmentId, payload.duration);
+    handleLoad(attachmentId, payload.duration * 1000);
   };
   var onEnd = function onEnd() {
     handleEnd();
@@ -78,9 +78,9 @@ var AnimatedGalleryVideo = _react["default"].memo(function (props) {
       }
     } else {
       setOpacity(0);
-      handleLoad(attachmentId, playbackStatus.durationMillis / 1000);
+      handleLoad(attachmentId, playbackStatus.durationMillis);
       if (playbackStatus.isPlaying) {
-        handleProgress(attachmentId, playbackStatus.positionMillis / 1000 / (playbackStatus.durationMillis / 1000));
+        handleProgress(attachmentId, playbackStatus.positionMillis / playbackStatus.durationMillis);
       }
       if (playbackStatus.isBuffering) {
         setOpacity(1);
@@ -117,7 +117,7 @@ var AnimatedGalleryVideo = _react["default"].memo(function (props) {
   }
   return (0, _jsxRuntime.jsxs)(_reactNativeReanimated["default"].View, {
     accessibilityLabel: "Image Gallery Video",
-    style: [style, animatedViewStyles, {
+    style: [animatedViewStyles, {
       transform: [{
         scaleX: -1
       }, {
@@ -127,7 +127,7 @@ var AnimatedGalleryVideo = _react["default"].memo(function (props) {
       }, {
         scale: oneEighth
       }]
-    }],
+    }, style],
     children: [(0, _native.isVideoPackageAvailable)() && (0, _jsxRuntime.jsx)(_native.Video, {
       onBuffer: onBuffer,
       onEnd: onEnd,

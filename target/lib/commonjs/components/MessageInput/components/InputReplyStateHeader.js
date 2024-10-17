@@ -2,7 +2,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.InputReplyStateHeaderWithContext = exports.InputReplyStateHeader = void 0;
+exports.InputReplyStateHeader = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _reactNative = require("react-native");
 var _MessageInputContext = require("../../../contexts/messageInputContext/MessageInputContext");
@@ -24,12 +24,14 @@ var styles = _reactNative.StyleSheet.create({
     fontWeight: 'bold'
   }
 });
-var InputReplyStateHeaderWithContext = function InputReplyStateHeaderWithContext(_ref) {
-  var clearQuotedMessageState = _ref.clearQuotedMessageState,
-    disabled = _ref.disabled,
-    resetInput = _ref.resetInput;
+var InputReplyStateHeader = function InputReplyStateHeader(_ref) {
+  var propClearQuotedMessageState = _ref.clearQuotedMessageState,
+    propResetInput = _ref.resetInput;
   var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
     t = _useTranslationContex.t;
+  var _useMessageInputConte = (0, _MessageInputContext.useMessageInputContext)(),
+    contextClearQuotedMessageState = _useMessageInputConte.clearQuotedMessageState,
+    contextResetInput = _useMessageInputConte.resetInput;
   var _useTheme = (0, _ThemeContext.useTheme)(),
     _useTheme$theme = _useTheme.theme,
     _useTheme$theme$color = _useTheme$theme.colors,
@@ -39,6 +41,8 @@ var InputReplyStateHeaderWithContext = function InputReplyStateHeaderWithContext
     _useTheme$theme$messa = _useTheme$theme.messageInput.editingStateHeader,
     editingBoxHeader = _useTheme$theme$messa.editingBoxHeader,
     editingBoxHeaderTitle = _useTheme$theme$messa.editingBoxHeaderTitle;
+  var clearQuotedMessageState = propClearQuotedMessageState || contextClearQuotedMessageState;
+  var resetInput = propResetInput || contextResetInput;
   return (0, _jsxRuntime.jsxs)(_reactNative.View, {
     style: [styles.replyBoxHeader, editingBoxHeader],
     children: [(0, _jsxRuntime.jsx)(_icons.CurveLineLeftUp, {
@@ -49,10 +53,13 @@ var InputReplyStateHeaderWithContext = function InputReplyStateHeaderWithContext
       }, editingBoxHeaderTitle],
       children: t('Reply to Message')
     }), (0, _jsxRuntime.jsx)(_reactNative.TouchableOpacity, {
-      disabled: disabled,
       onPress: function onPress() {
-        resetInput();
-        clearQuotedMessageState();
+        if (resetInput) {
+          resetInput();
+        }
+        if (clearQuotedMessageState) {
+          clearQuotedMessageState();
+        }
       },
       testID: "close-button",
       children: (0, _jsxRuntime.jsx)(_icons.CircleClose, {
@@ -60,24 +67,6 @@ var InputReplyStateHeaderWithContext = function InputReplyStateHeaderWithContext
       })
     })]
   });
-};
-exports.InputReplyStateHeaderWithContext = InputReplyStateHeaderWithContext;
-var areEqual = function areEqual(prevProps, nextProps) {
-  var prevDisabled = prevProps.disabled;
-  var nextDisabled = nextProps.disabled;
-  var disabledEqual = prevDisabled === nextDisabled;
-  if (!disabledEqual) return false;
-  return true;
-};
-var MemoizedInputReplyStateHeader = _react["default"].memo(InputReplyStateHeaderWithContext, areEqual);
-var InputReplyStateHeader = function InputReplyStateHeader(props) {
-  var _useMessageInputConte = (0, _MessageInputContext.useMessageInputContext)(),
-    clearQuotedMessageState = _useMessageInputConte.clearQuotedMessageState,
-    resetInput = _useMessageInputConte.resetInput;
-  return (0, _jsxRuntime.jsx)(MemoizedInputReplyStateHeader, Object.assign({
-    clearQuotedMessageState: clearQuotedMessageState,
-    resetInput: resetInput
-  }, props));
 };
 exports.InputReplyStateHeader = InputReplyStateHeader;
 InputReplyStateHeader.displayName = 'ReplyStateHeader{messageInput}';

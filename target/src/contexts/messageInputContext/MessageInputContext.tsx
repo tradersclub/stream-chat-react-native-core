@@ -1,7 +1,6 @@
 import type { LegacyRef } from 'react';
 import React, { PropsWithChildren, useContext, useEffect, useRef, useState } from 'react';
-import type { TextInput, TextInputProps } from 'react-native';
-import { Alert, Keyboard } from 'react-native';
+import { Alert, Keyboard, Linking, TextInput, TextInputProps } from 'react-native';
 
 import uniq from 'lodash/uniq';
 import { lookup } from 'mime-types';
@@ -20,6 +19,8 @@ import {
 
 import { useCreateMessageInputContext } from './hooks/useCreateMessageInputContext';
 import { useMessageDetailsForState } from './hooks/useMessageDetailsForState';
+
+import { isUploadAllowed, MAX_FILE_SIZE_TO_UPLOAD, prettifyFileSize } from './utils/utils';
 
 import { AudioAttachmentProps } from '../../components/Attachment/AudioAttachment';
 import { parseLinksFromText } from '../../components/Message/MessageSimple/utils/parseLinks';
@@ -45,11 +46,12 @@ import type { SendButtonProps } from '../../components/MessageInput/SendButton';
 import type { UploadProgressIndicatorProps } from '../../components/MessageInput/UploadProgressIndicator';
 import type { MessageType } from '../../components/MessageList/hooks/useMessageList';
 import type { Emoji } from '../../emoji-data';
-import { pickDocument } from '../../native';
-import type {
+import { pickDocument, pickImage, takePhoto } from '../../native';
+import {
   Asset,
   DefaultStreamChatGenerics,
   File,
+  FileTypes,
   FileUpload,
   ImageUpload,
   UnknownType,
@@ -62,6 +64,7 @@ import {
   FileState,
   FileStateValue,
   generateRandomId,
+  getFileNameFromPath,
   isBouncedMessage,
   TriggerSettings,
 } from '../../utils/utils';
@@ -156,6 +159,10 @@ export type LocalMessageInputContext<
   openCommandsPicker: () => void;
   openFilePicker: () => void;
   openMentionsPicker: () => void;
+  /**
+   * Function for picking a photo from native image picker and uploading it.
+   */
+  pickAndUploadImageFromNativePicker: () => Promise<void>;
   pickFile: () => Promise<void>;
   /**
    * Function for removing a file from the upload preview
@@ -199,6 +206,10 @@ export type LocalMessageInputContext<
   setShowMoreOptions: React.Dispatch<React.SetStateAction<boolean>>;
   setText: React.Dispatch<React.SetStateAction<string>>;
   showMoreOptions: boolean;
+  /**
+   * Function for taking a photo and uploading it
+   */
+  takeAndUploadImage: () => Promise<void>;
   text: string;
   toggleAttachmentPicker: () => void;
   /**
@@ -216,7 +227,7 @@ export type LocalMessageInputContext<
 
 export type InputMessageInputContextValue<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
-> = Pick<ChannelContextValue<StreamChatGenerics>, 'disabled'> & {
+> = {
   /**
    * Controls how many pixels to the top side the user has to scroll in order to lock the recording view and allow the user to lift their finger from the screen without stopping the recording.
    */
@@ -238,7 +249,7 @@ export type InputMessageInputContextValue<
    *
    * Defaults to and accepts same props as: [AttachButton](https://getstream.io/chat/docs/sdk/reactnative/ui-components/attach-button/)
    */
-  AttachButton: React.ComponentType<AttachButtonProps<StreamChatGenerics>>;
+  AttachButton: React.ComponentType<AttachButtonProps>;
   /**
    * Custom UI component for audio attachment upload preview.
    *
@@ -304,6 +315,8 @@ export type InputMessageInputContextValue<
    */
   FileUploadPreview: React.ComponentType<FileUploadPreviewProps<StreamChatGenerics>>;
 
+  /** When false, CameraSelectorIcon will be hidden */
+  hasCameraPicker: boolean;
   /** When false, CommandsButton will be hidden */
   hasCommands: boolean;
   /** When false, FileSelectorIcon will be hidden */
@@ -326,7 +339,7 @@ export type InputMessageInputContextValue<
    *
    * Defaults to and accepts same props as: [MoreOptionsButton](https://getstream.io/chat/docs/sdk/reactnative/ui-components/more-options-button/)
    */
-  MoreOptionsButton: React.ComponentType<MoreOptionsButtonProps<StreamChatGenerics>>;
+  MoreOptionsButton: React.ComponentType<MoreOptionsButtonProps>;
   /** Limit on the number of lines in the text input before scrolling */
   numberOfLines: number;
   quotedMessage: boolean | MessageType<StreamChatGenerics>;
@@ -419,6 +432,11 @@ export type InputMessageInputContextValue<
    */
   emojiSearchIndex?: EmojiSearchIndex;
 
+  /**
+   * Handler for when the attach button is pressed.
+   */
+  handleAttachButtonPress?: () => void;
+
   /** Initial value to set on input */
   initialValue?: string;
   /**
@@ -483,33 +501,35 @@ export const MessageInputProvider = <
 }: PropsWithChildren<{
   value: InputMessageInputContextValue<StreamChatGenerics>;
 }>) => {
-  const { closePicker, openPicker, selectedPicker, setSelectedPicker } =
-    useAttachmentPickerContext();
+  const {
+    closePicker,
+    openPicker,
+    selectedFiles,
+    selectedImages,
+    selectedPicker,
+    setSelectedFiles,
+    setSelectedImages,
+    setSelectedPicker,
+  } = useAttachmentPickerContext();
   const { appSettings, client, enableOfflineSupport } = useChatContext<StreamChatGenerics>();
   const { removeMessage } = useMessagesContext();
 
   const getFileUploadConfig = () => {
     const fileConfig = appSettings?.app?.file_upload_config;
-    if (fileConfig !== null || fileConfig !== undefined) {
+    if (fileConfig !== undefined) {
       return fileConfig;
     } else {
       return {};
     }
   };
 
-  const blockedFileExtensionTypes = getFileUploadConfig()?.blocked_file_extensions;
-  const blockedFileMimeTypes = getFileUploadConfig()?.blocked_mime_types;
-
   const getImageUploadConfig = () => {
     const imageConfig = appSettings?.app?.image_upload_config;
-    if (imageConfig !== null || imageConfig !== undefined) {
+    if (imageConfig !== undefined) {
       return imageConfig;
     }
     return {};
   };
-
-  const blockedImageExtensionTypes = getImageUploadConfig()?.blocked_file_extensions;
-  const blockedImageMimeTypes = getImageUploadConfig()?.blocked_mime_types;
 
   const channelCapabities = useOwnCapabilitiesContext();
 
@@ -529,7 +549,7 @@ export const MessageInputProvider = <
   }>({});
   const [giphyActive, setGiphyActive] = useState(false);
   const [sendThreadMessageInChannel, setSendThreadMessageInChannel] = useState(false);
-  const { editing, hasFilePicker, hasImagePicker, initialValue } = value;
+  const { editing, initialValue } = value;
   const {
     fileUploads,
     imageUploads,
@@ -619,21 +639,77 @@ export const MessageInputProvider = <
     }
   };
 
-  const openAttachmentPicker = () => {
-    if (hasImagePicker) {
-      Keyboard.dismiss();
-      setSelectedPicker('images');
-      openPicker();
-    } else if (hasFilePicker) {
-      pickFile();
+  /**
+   * Function for capturing a photo and uploading it
+   */
+  const takeAndUploadImage = async () => {
+    setSelectedPicker(undefined);
+    closePicker();
+    const photo = await takePhoto({ compressImageQuality: value.compressImageQuality });
+    if (photo.askToOpenSettings) {
+      Alert.alert(
+        t('Allow camera access in device settings'),
+        t('Device camera is used to take photos or videos.'),
+        [
+          { style: 'cancel', text: t('Cancel') },
+          { onPress: () => Linking.openSettings(), style: 'default', text: t('Open Settings') },
+        ],
+      );
+    }
+    if (!photo.cancelled) {
+      setSelectedImages((images) => [...images, photo]);
     }
   };
 
+  /**
+   * Function for picking a photo from native image picker and uploading it
+   */
+  const pickAndUploadImageFromNativePicker = async () => {
+    const result = await pickImage();
+    if (result.askToOpenSettings) {
+      Alert.alert(
+        t('Allow access to your Gallery'),
+        t('Device gallery permissions is used to take photos or videos.'),
+        [
+          { style: 'cancel', text: t('Cancel') },
+          { onPress: () => Linking.openSettings(), style: 'default', text: t('Open Settings') },
+        ],
+      );
+    }
+    if (result.assets && result.assets.length > 0) {
+      result.assets.forEach((asset) => {
+        if (asset.type.includes('image')) {
+          setSelectedImages((prevImages) => [...prevImages, asset]);
+        } else {
+          setSelectedFiles((prevFiles) => [
+            ...prevFiles,
+            { ...asset, mimeType: asset.type, type: FileTypes.Video },
+          ]);
+        }
+      });
+    }
+  };
+
+  /**
+   * Function to open the attachment picker if the MediaLibary is installed.
+   */
+  const openAttachmentPicker = () => {
+    Keyboard.dismiss();
+    setSelectedPicker('images');
+    openPicker();
+  };
+
+  /**
+   * Function to close the attachment picker if the MediaLibrary is installed.
+   */
   const closeAttachmentPicker = () => {
     setSelectedPicker(undefined);
     closePicker();
   };
 
+  /**
+   * Function to toggle the attachment picker if the MediaLibrary is installed.
+   */
   const toggleAttachmentPicker = () => {
     if (selectedPicker) {
       closeAttachmentPicker();
@@ -663,30 +739,17 @@ export const MessageInputProvider = <
       maxNumberOfFiles: value.maxNumberOfFiles - numberOfUploads,
     });
 
-    const MEGA_BYTES_TO_BYTES = 1024 * 1024;
-    const MAX_FILE_SIZE_TO_UPLOAD_IN_MB = 100;
-
     if (!result.cancelled && result.assets) {
-      const totalFileSize = result.assets.reduce((acc, asset) => acc + Number(asset.size), 0);
-      if (totalFileSize / MEGA_BYTES_TO_BYTES > MAX_FILE_SIZE_TO_UPLOAD_IN_MB) {
-        Alert.alert(
-          t(
-            `Maximum file size upload limit reached. Please upload a file below {{MAX_FILE_SIZE_TO_UPLOAD_IN_MB}} MB.`,
-            { MAX_FILE_SIZE_TO_UPLOAD_IN_MB },
-          ),
-        );
-      } else {
-        result.assets.forEach((asset) => {
-          /**
-           * TODO: The current tight coupling of images to the image
-           * picker does not allow images picked from the file picker
-           * to be rendered in a preview via the uploadNewImage call.
-           * This should be updated alongside allowing image a file
-           * uploads together.
-           */
-          uploadNewFile(asset);
-        });
-      }
+      result.assets.forEach((asset) => {
+        /**
+         * TODO: The current tight coupling of images to the image
+         * picker does not allow images picked from the file picker
+         * to be rendered in a preview via the uploadNewImage call.
+         * This should be updated alongside allowing image a file
+         * uploads together.
+         */
+        uploadNewFile(asset);
+      });
     }
   };
 
@@ -729,20 +792,20 @@ export const MessageInputProvider = <
       original_height: image.height,
       original_width: image.width,
       originalImage: image.file,
-      type: 'image',
+      type: FileTypes.Image,
     };
   };
 
   const mapFileUploadToAttachment = (file: FileUpload): Attachment<StreamChatGenerics> => {
-    if (file.type === 'image') {
+    if (file.type === FileTypes.Image) {
       return {
         fallback: file.file.name,
         image_url: file.url,
         mime_type: file.file.mimeType,
         originalFile: file.file,
-        type: 'image',
+        type: FileTypes.Image,
       };
-    } else if (file.type === 'audio') {
+    } else if (file.type === FileTypes.Audio) {
       return {
         asset_url: file.url || file.file.uri,
         duration: file.file.duration,
@@ -750,9 +813,9 @@ export const MessageInputProvider = <
         mime_type: file.file.mimeType,
         originalFile: file.file,
         title: file.file.name,
-        type: 'audio',
+        type: FileTypes.Audio,
       };
-    } else if (file.type === 'video') {
+    } else if (file.type === FileTypes.Video) {
       return {
         asset_url: file.url || file.file.uri,
         duration: file.file.duration,
@@ -761,9 +824,9 @@ export const MessageInputProvider = <
         originalFile: file.file,
         thumb_url: file.thumb_url,
         title: file.file.name,
-        type: 'video',
+        type: FileTypes.Video,
       };
-    } else if (file.type === 'voiceRecording') {
+    } else if (file.type === FileTypes.VoiceRecording) {
       return {
         asset_url: file.url || file.file.uri,
         duration: file.file.duration,
@@ -771,7 +834,7 @@ export const MessageInputProvider = <
         mime_type: file.file.mimeType,
         originalFile: file.file,
         title: file.file.name,
-        type: 'voiceRecording',
+        type: FileTypes.VoiceRecording,
         waveform_data: file.file.waveform_data,
       };
     } else {
@@ -781,7 +844,7 @@ export const MessageInputProvider = <
         mime_type: file.file.mimeType,
         originalFile: file.file,
         title: file.file.name,
-        type: 'file',
+        type: FileTypes.File,
       };
     }
   };
@@ -946,7 +1009,7 @@ export const MessageInputProvider = <
       const attachments = [
         {
           image_url: image.url,
-          type: 'image',
+          type: FileTypes.Image,
         },
       ] as StreamMessage<StreamChatGenerics>['attachments'];
 
@@ -1117,7 +1180,7 @@ export const MessageInputProvider = <
     let response = {} as SendFileAPIResponse;
 
     const uri = file.uri || '';
-    const filename = file.name ?? uri.replace(/^(file:\/\/|content:\/\/)/, '');
+    const filename = file.name ?? getFileNameFromPath(uri);
 
     try {
       const compressedUri = await compressedImageURI(file, value.compressImageQuality);
@@ -1191,18 +1254,25 @@ export const MessageInputProvider = <
 
   const uploadNewFile = async (file: File) => {
     const id: string = generateRandomId();
+    const fileConfig = getFileUploadConfig();
+    const { size_limit } = fileConfig;
 
-    const isBlockedFileExtension: boolean | undefined = blockedFileExtensionTypes?.some(
-      (fileExtensionType: string) => file.name?.includes(fileExtensionType),
-    );
-    const isBlockedFileMimeType: boolean | undefined = blockedFileMimeTypes?.some(
-      (mimeType: string) => file.name?.includes(mimeType),
-    );
+    const isAllowed = isUploadAllowed({ config: fileConfig, file });
 
-    const fileState =
-      isBlockedFileExtension || isBlockedFileMimeType
-        ? FileState.NOT_SUPPORTED
-        : FileState.UPLOADING;
+    const sizeLimit = size_limit || MAX_FILE_SIZE_TO_UPLOAD;
+
+    if (file.size && file.size > sizeLimit) {
+      Alert.alert(
+        t('File is too large: {{ size }}, maximum upload size is {{ limit }}', {
+          limit: prettifyFileSize(sizeLimit),
+          size: prettifyFileSize(file.size),
+        }),
+      );
+      setSelectedFiles(selectedFiles.filter((selectedFile) => selectedFile.uri !== file.uri));
+      return;
+    }
+
+    const fileState = isAllowed ? FileState.UPLOADING : FileState.NOT_SUPPORTED;
 
     // If file type is explicitly provided while upload we use it, else we derive the file type.
     const fileType = file.type || file.mimeType?.split('/')[0];
@@ -1220,26 +1290,33 @@ export const MessageInputProvider = <
       setNumberOfUploads((prevNumberOfUploads) => prevNumberOfUploads + 1),
     ]);
 
-    if (!isBlockedFileExtension) {
+    if (isAllowed) {
       uploadFile({ newFile });
     }
   };
 
   const uploadNewImage = async (image: Partial<Asset>) => {
     const id = generateRandomId();
+    const imageUploadConfig = getImageUploadConfig();
 
-    const isBlockedImageMimeType = blockedImageMimeTypes?.some((mimeType: string) =>
-      image.uri?.includes(mimeType),
-    );
+    const { size_limit } = imageUploadConfig;
 
-    const isBlockedImageExtension = blockedImageExtensionTypes?.some((imageExtensionType: string) =>
-      image.uri?.includes(imageExtensionType),
-    );
+    const isAllowed = isUploadAllowed({ config: imageUploadConfig, file: image });
 
-    const imageState =
-      isBlockedImageExtension || isBlockedImageMimeType
-        ? FileState.NOT_SUPPORTED
-        : FileState.UPLOADING;
+    const sizeLimit = size_limit || MAX_FILE_SIZE_TO_UPLOAD;
+
+    if (image.size && image?.size > sizeLimit) {
+      Alert.alert(
+        t('File is too large: {{ size }}, maximum upload size is {{ limit }}', {
+          limit: prettifyFileSize(sizeLimit),
+          size: prettifyFileSize(image.size),
+        }),
+      );
+      setSelectedImages(selectedImages.filter((selectedImage) => selectedImage.uri !== image.uri));
+      return;
+    }
+
+    const imageState = isAllowed ? FileState.UPLOADING : FileState.NOT_SUPPORTED;
 
     const newImage: ImageUpload = {
       file: image,
@@ -1255,7 +1332,7 @@ export const MessageInputProvider = <
       setNumberOfUploads((prevNumberOfUploads) => prevNumberOfUploads + 1),
     ]);
 
-    if (!isBlockedImageExtension) {
+    if (isAllowed) {
       uploadImage({ newImage });
     }
   };
@@ -1279,6 +1356,7 @@ export const MessageInputProvider = <
     openCommandsPicker,
     openFilePicker: pickFile,
     openMentionsPicker,
+    pickAndUploadImageFromNativePicker,
     pickFile,
     removeFile,
     removeImage,
@@ -1299,6 +1377,7 @@ export const MessageInputProvider = <
     setShowMoreOptions,
     setText,
     showMoreOptions,
+    takeAndUploadImage,
     text,
     thread,
     toggleAttachmentPicker,

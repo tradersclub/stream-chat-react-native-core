@@ -12,6 +12,7 @@ var generateMessage = function generateMessage() {
     created_at: timestamp,
     html: '<p>regular</p>',
     id: (0, _uuid.v4)(),
+    message_text_updated_at: timestamp,
     text: (0, _uuid.v4)(),
     type: 'regular',
     updated_at: timestamp.toString(),
@@ -24,6 +25,7 @@ var generateStaticMessage = function generateStaticMessage(seed, options, date) 
   return generateMessage(Object.assign({
     created_at: date || '2020-04-27T13:39:49.331742Z',
     id: (0, _uuid.v5)(seed, StreamReactNativeNamespace),
+    message_text_updated_at: date || '2020-04-27T13:39:49.331742Z',
     text: seed,
     updated_at: date || '2020-04-27T13:39:49.331742Z'
   }, options));

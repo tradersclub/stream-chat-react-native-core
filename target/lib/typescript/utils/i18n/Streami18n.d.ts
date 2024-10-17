@@ -1,8 +1,9 @@
 import Dayjs from 'dayjs';
 import { FallbackLng, TFunction } from 'i18next';
-import type moment from 'moment';
-import type { TDateTimeParser } from '../contexts/translationContext/TranslationContext';
-import enTranslations from '../i18n/en.json';
+import type momentTimezone from 'moment-timezone';
+import { CustomFormatters, PredefinedFormatters } from './predefinedFormatters';
+import type { TDateTimeParser } from '../../contexts/translationContext/TranslationContext';
+import enTranslations from '../../i18n/en.json';
 import 'dayjs/locale/es';
 import 'dayjs/locale/fr';
 import 'dayjs/locale/he';
@@ -20,14 +21,17 @@ import 'dayjs/locale/tr';
  * sure we don't mess up languages in other places in the app.
  */
 import 'dayjs/locale/en';
-import type { DefaultStreamChatGenerics } from '../types/types';
-type Options = {
-    DateTimeParser?: typeof Dayjs | typeof moment;
+import type { DefaultStreamChatGenerics } from '../../types/types';
+type DateTimeParserModule = typeof Dayjs | typeof momentTimezone;
+type Streami18nOptions = {
+    DateTimeParser?: DateTimeParserModule;
     dayjsLocaleConfigForLanguage?: Partial<ILocale>;
     debug?: boolean;
     disableDateTimeTranslations?: boolean;
+    formatters?: Partial<PredefinedFormatters> & CustomFormatters;
     language?: string;
     logger?: (msg?: string) => void;
+    timezone?: string;
     translationsForLanguage?: Partial<typeof enTranslations>;
 };
 type I18NextConfig = {
@@ -35,6 +39,7 @@ type I18NextConfig = {
     fallbackLng: false | FallbackLng;
     interpolation: {
         escapeValue: boolean;
+        formatSeparator: string;
     };
     keySeparator: false | string;
     lng: string;
@@ -70,9 +75,14 @@ export declare class Streami18n {
      */
     logger: (msg?: string) => void;
     currentLanguage: string;
-    DateTimeParser: typeof Dayjs | typeof moment;
+    DateTimeParser: DateTimeParserModule;
+    formatters: PredefinedFormatters & CustomFormatters;
     isCustomDateTimeParser: boolean;
     i18nextConfig: I18NextConfig;
+    /**
+     * A valid TZ identifier string (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
+     */
+    timezone?: string;
     /**
      * Constructor accepts following options:
      *  - language (String) default: 'en'
@@ -99,7 +109,7 @@ export declare class Streami18n {
      *
      * @param {*} options
      */
-    constructor(options?: Options, i18nextConfig?: Partial<I18NextConfig>);
+    constructor(options?: Streami18nOptions, i18nextConfig?: Partial<I18NextConfig>);
     /**
      * Initializes the i18next instance with configuration (which enables natural language as default keys)
      */
@@ -129,8 +139,10 @@ export declare class Streami18n {
                 Delete: string;
                 "Delete Message": string;
                 "Device camera is used to take photos or videos.": string;
+                "Device gallery permissions is used to take photos or videos.": string;
                 "Do you want to send a copy of this message to a moderator for further investigation?": string;
                 "Edit Message": string;
+                Edited: string;
                 "Editing Message": string;
                 "Emoji matching": string;
                 "Empty message...": string;
@@ -138,6 +150,7 @@ export declare class Streami18n {
                 "Error loading channel list...": string;
                 "Error loading messages for this channel...": string;
                 "Error while loading, please reload/refresh": string;
+                "File is too large: {{ size }}, maximum upload size is {{ limit }}": string;
                 "File type not supported": string;
                 Flag: string;
                 "Flag Message": string;
@@ -150,11 +163,11 @@ export declare class Streami18n {
                 "Loading channels...": string;
                 "Loading messages...": string;
                 "Loading...": string;
-                "Maximum file size upload limit reached. Please upload a file below {{MAX_FILE_SIZE_TO_UPLOAD_IN_MB}} MB.": string;
                 "Message Reactions": string;
                 "Message deleted": string;
                 "Message flagged": string;
                 "Mute User": string;
+                "No chats here yet\u2026": string;
                 "Not supported": string;
                 "Nothing yet...": string;
                 Ok: string;
@@ -187,6 +200,13 @@ export declare class Streami18n {
                 Video: string;
                 You: string;
                 "You can't send messages in this channel": string;
+                "timestamp/ChannelPreviewStatus": string;
+                "timestamp/ImageGalleryHeader": string;
+                "timestamp/InlineDateSeparator": string;
+                "timestamp/MessageEditedTimestamp": string;
+                "timestamp/MessageSystem": string;
+                "timestamp/MessageTimestamp": string;
+                "timestamp/StickyHeader": string;
                 "{{ firstUser }} and {{ nonSelfUserLength }} more are typing": string;
                 "{{ index }} of {{ photoLength }}": string;
                 "{{ replyCount }} Replies": string;

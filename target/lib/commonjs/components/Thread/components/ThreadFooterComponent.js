@@ -42,6 +42,7 @@ var styles = _reactNative.StyleSheet.create({
 });
 var ThreadFooterComponentWithContext = function ThreadFooterComponentWithContext(props) {
   var Message = props.Message,
+    parentMessagePreventPress = props.parentMessagePreventPress,
     thread = props.thread;
   var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
     t = _useTranslationContex.t;
@@ -69,7 +70,7 @@ var ThreadFooterComponentWithContext = function ThreadFooterComponentWithContext
       children: (0, _jsxRuntime.jsx)(Message, {
         groupStyles: ['single'],
         message: thread,
-        preventPress: true,
+        preventPress: parentMessagePreventPress,
         threadList: true
       })
     }), (0, _jsxRuntime.jsxs)(_reactNative.View, {
@@ -115,8 +116,11 @@ var ThreadFooterComponentWithContext = function ThreadFooterComponentWithContext
   });
 };
 var areEqual = function areEqual(prevProps, nextProps) {
-  var prevThread = prevProps.thread;
-  var nextThread = nextProps.thread;
+  var prevParentMessagePreventPress = prevProps.parentMessagePreventPress,
+    prevThread = prevProps.thread;
+  var nextParentMessagePreventPress = nextProps.parentMessagePreventPress,
+    nextThread = nextProps.thread;
+  if (prevParentMessagePreventPress !== nextParentMessagePreventPress) return false;
   var threadEqual = (prevThread == null ? void 0 : prevThread.id) === (nextThread == null ? void 0 : nextThread.id) && (prevThread == null ? void 0 : prevThread.text) === (nextThread == null ? void 0 : nextThread.text) && (prevThread == null ? void 0 : prevThread.reply_count) === (nextThread == null ? void 0 : nextThread.reply_count);
   if (!threadEqual) return false;
   var latestReactionsEqual = prevThread && nextThread && Array.isArray(prevThread.latest_reactions) && Array.isArray(nextThread.latest_reactions) ? prevThread.latest_reactions.length === nextThread.latest_reactions.length && prevThread.latest_reactions.every(function (_ref, index) {
@@ -128,15 +132,17 @@ var areEqual = function areEqual(prevProps, nextProps) {
   return true;
 };
 var MemoizedThreadFooter = _react["default"].memo(ThreadFooterComponentWithContext, areEqual);
-var ThreadFooterComponent = function ThreadFooterComponent() {
+var ThreadFooterComponent = function ThreadFooterComponent(props) {
   var _useMessagesContext = (0, _MessagesContext.useMessagesContext)(),
     Message = _useMessagesContext.Message;
   var _useThreadContext = (0, _ThreadContext.useThreadContext)(),
+    parentMessagePreventPress = _useThreadContext.parentMessagePreventPress,
     thread = _useThreadContext.thread;
-  return (0, _jsxRuntime.jsx)(MemoizedThreadFooter, {
+  return (0, _jsxRuntime.jsx)(MemoizedThreadFooter, Object.assign({
     Message: Message,
+    parentMessagePreventPress: parentMessagePreventPress,
     thread: thread
-  });
+  }, props));
 };
 exports.ThreadFooterComponent = ThreadFooterComponent;
 //# sourceMappingURL=ThreadFooterComponent.js.map

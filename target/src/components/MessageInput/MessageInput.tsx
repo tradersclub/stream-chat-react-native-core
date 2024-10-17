@@ -1,11 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Alert,
-  NativeSyntheticEvent,
-  StyleSheet,
-  TextInputFocusEventData,
-  View,
-} from 'react-native';
+import { NativeSyntheticEvent, StyleSheet, TextInputFocusEventData, View } from 'react-native';
 
 import {
   GestureEvent,
@@ -27,7 +21,7 @@ import type { UserResponse } from 'stream-chat';
 import { useAudioController } from './hooks/useAudioController';
 import { useCountdown } from './hooks/useCountdown';
 
-import { ChatContextValue, useChatContext } from '../../contexts';
+import { ChatContextValue, useChatContext, useOwnCapabilitiesContext } from '../../contexts';
 import {
   AttachmentPickerContextValue,
   useAttachmentPickerContext,
@@ -44,7 +38,6 @@ import {
   MessagesContextValue,
   useMessagesContext,
 } from '../../contexts/messagesContext/MessagesContext';
-import { useOwnCapabilitiesContext } from '../../contexts/ownCapabilitiesContext/OwnCapabilitiesContext';
 import {
   SuggestionsContextValue,
   useSuggestionsContext,
@@ -102,10 +95,7 @@ type MessageInputPropsWithContext<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 > = Pick<AttachmentPickerContextValue, 'AttachmentPickerSelectionBar'> &
   Pick<ChatContextValue<StreamChatGenerics>, 'isOnline'> &
-  Pick<
-    ChannelContextValue<StreamChatGenerics>,
-    'disabled' | 'members' | 'threadList' | 'watchers'
-  > &
+  Pick<ChannelContextValue<StreamChatGenerics>, 'members' | 'threadList' | 'watchers'> &
   Pick<
     MessageInputContextValue<StreamChatGenerics>,
     | 'additionalTextInputProps'
@@ -128,6 +118,7 @@ type MessageInputPropsWithContext<
     | 'FileUploadPreview'
     | 'fileUploads'
     | 'giphyActive'
+    | 'hasImagePicker'
     | 'ImageUploadPreview'
     | 'imageUploads'
     | 'Input'
@@ -190,11 +181,11 @@ const MessageInputWithContext = <
     closeAttachmentPicker,
     cooldownEndsAt,
     CooldownTimer,
-    disabled,
     editing,
     FileUploadPreview,
     fileUploads,
     giphyActive,
+    hasImagePicker,
     ImageUploadPreview,
     imageUploads,
     Input,
@@ -231,7 +222,6 @@ const MessageInputWithContext = <
   } = props;
 
   const [height, setHeight] = useState(0);
-  const { t } = useTranslationContext();
 
   const {
     theme: {
@@ -289,6 +279,9 @@ const MessageInputWithContext = <
   const fileUploadsLength = hasResetFiles ? fileUploads.length : 0;
   const imagesForInput = (!!thread && !!threadList) || (!thread && !threadList);
 
+  /**
+   * Reset the selected images when the component is unmounted.
+   */
   useEffect(() => {
     setSelectedImages([]);
     if (imageUploads.length) {
@@ -297,11 +290,15 @@ const MessageInputWithContext = <
     return () => setSelectedImages([]);
   }, []);
 
+  /**
+   * Reset the selected files when the component is unmounted.
+   */
   useEffect(() => {
     setSelectedFiles([]);
     if (fileUploads.length) {
       fileUploads.forEach((file) => removeFile(file.id));
     }
+
     return () => setSelectedFiles([]);
   }, []);
 
@@ -318,13 +315,10 @@ const MessageInputWithContext = <
   }, [fileUploadsLength, selectedFilesLength]);
 
   useEffect(() => {
-    if (imagesForInput === false && imageUploads.length) {
+    if (imagesForInput === false && imageUploadsLength) {
       imageUploads.forEach((image) => removeImage(image.id));
     }
-  }, [imagesForInput]);
-
-  const MEGA_BYTES_TO_BYTES = 1024 * 1024;
-  const MAX_FILE_SIZE_TO_UPLOAD_IN_MB = 100;
+  }, [imagesForInput, imageUploadsLength]);
 
   const uploadImagesHandler = () => {
     const imageToUpload = selectedImages.find((selectedImage) => {
@@ -334,23 +328,8 @@ const MessageInputWithContext = <
       );
       return !uploadedImage;
     });
-    // Check if the file size of the image exceeds the threshold of 100MB
-    if (
-      imageToUpload &&
-      Number(imageToUpload.size) / MEGA_BYTES_TO_BYTES > MAX_FILE_SIZE_TO_UPLOAD_IN_MB
-    ) {
-      Alert.alert(
-        t(
-          `Maximum file size upload limit reached. Please upload a file below {{MAX_FILE_SIZE_TO_UPLOAD_IN_MB}} MB.`,
-          { MAX_FILE_SIZE_TO_UPLOAD_IN_MB },
-        ),
-      );
-      setSelectedImages(
-        selectedImages.filter((selectedImage) => selectedImage.uri !== imageToUpload.uri),
-      );
-    } else {
-      if (imageToUpload) uploadNewImage(imageToUpload);
-    }
+
+    if (imageToUpload) uploadNewImage(imageToUpload);
   };
 
   const removeImagesHandler = () => {
@@ -386,23 +365,7 @@ const MessageInputWithContext = <
         );
         return !uploadedFile;
       });
-      // Check if the file size exceeds the threshold of 100MB
-      if (
-        fileToUpload &&
-        Number(fileToUpload.size) / MEGA_BYTES_TO_BYTES > MAX_FILE_SIZE_TO_UPLOAD_IN_MB
-      ) {
-        Alert.alert(
-          t(
-            `Maximum file size upload limit reached. Please upload a file below {{MAX_FILE_SIZE_TO_UPLOAD_IN_MB}} MB.`,
-            { MAX_FILE_SIZE_TO_UPLOAD_IN_MB },
-          ),
-        );
-        setSelectedFiles(
-          selectedFiles.filter((selectedFile) => selectedFile.uri !== fileToUpload.uri),
-        );
-      } else {
-        if (fileToUpload) uploadNewFile(fileToUpload);
-      }
+      if (fileToUpload) uploadNewFile(fileToUpload);
     } else {
       /** User de-selected a video in bottom sheet attachment picker */
       const filesToRemove = fileUploads.filter(
@@ -417,9 +380,9 @@ const MessageInputWithContext = <
   }, [selectedFilesLength]);
 
   useEffect(() => {
-    if (imagesForInput) {
+    if (imagesForInput && hasImagePicker) {
       if (imageUploadsLength < selectedImagesLength) {
-        /** User removed some image from seleted images within ImageUploadPreview. */
+        // /** User removed some image from seleted images within ImageUploadPreview. */
         const updatedSelectedImages = selectedImages.filter((selectedImage) => {
           const uploadedImage = imageUploads.find(
             (imageUpload) =>
@@ -446,36 +409,38 @@ const MessageInputWithContext = <
         );
       }
     }
-  }, [imageUploadsLength]);
+  }, [imageUploadsLength, hasImagePicker]);
 
   useEffect(() => {
-    if (fileUploadsLength < selectedFilesLength) {
-      /** User removed some video from seleted files within ImageUploadPreview. */
-      const updatedSelectedFiles = selectedFiles.filter((selectedFile) => {
-        const uploadedFile = fileUploads.find(
-          (fileUpload) =>
-            fileUpload.file.uri === selectedFile.uri || fileUpload.url === selectedFile.uri,
+    if (hasImagePicker) {
+      if (fileUploadsLength < selectedFilesLength) {
+        /** User removed some video from seleted files within ImageUploadPreview. */
+        const updatedSelectedFiles = selectedFiles.filter((selectedFile) => {
+          const uploadedFile = fileUploads.find(
+            (fileUpload) =>
+              fileUpload.file.uri === selectedFile.uri || fileUpload.url === selectedFile.uri,
+          );
+          return uploadedFile;
+        });
+        setSelectedFiles(updatedSelectedFiles);
+      } else if (fileUploadsLength > selectedFilesLength) {
+        /**
+         * User is editing some message which contains video attachments OR
+         * video attachment is added from custom image picker (other than the default bottom-sheet image picker)
+         * using `uploadNewFile` function from `MessageInputContext`.
+         **/
+        setSelectedFiles(
+          fileUploads.map((fileUpload) => ({
+            duration: fileUpload.file.duration,
+            mimeType: fileUpload.file.mimeType,
+            name: fileUpload.file.name,
+            size: fileUpload.file.size,
+            uri: fileUpload.file.uri,
+          })),
         );
-        return uploadedFile;
-      });
-      setSelectedFiles(updatedSelectedFiles);
-    } else if (fileUploadsLength > selectedFilesLength) {
-      /**
-       * User is editing some message which contains video attachments OR
-       * video attachment is added from custom image picker (other than the default bottom-sheet image picker)
-       * using `uploadNewFile` function from `MessageInputContext`.
-       **/
-      setSelectedFiles(
-        fileUploads.map((fileUpload) => ({
-          duration: fileUpload.file.duration,
-          mimeType: fileUpload.file.mimeType,
-          name: fileUpload.file.name,
-          size: fileUpload.file.size,
-          uri: fileUpload.file.uri,
-        })),
-      );
+      }
     }
-  }, [fileUploadsLength]);
+  }, [fileUploadsLength, hasImagePicker]);
 
   const editingExists = !!editing;
   useEffect(() => {
@@ -498,7 +463,8 @@ const MessageInputWithContext = <
         fileUploads.length > 0 ||
         mentionedUsers.length > 0 ||
         imageUploads.length > 0 ||
-        numberOfUploads > 0)
+        numberOfUploads > 0) &&
+      resetInput
     ) {
       resetInput();
     }
@@ -558,7 +524,6 @@ const MessageInputWithContext = <
   };
 
   const additionalTextInputContainerProps = {
-    editable: disabled ? false : undefined,
     ...additionalTextInputProps,
   };
 
@@ -812,12 +777,7 @@ const MessageInputWithContext = <
                 ) : (
                   <View style={[styles.sendButtonContainer, sendButtonContainer]}>
                     <SendButton
-                      disabled={
-                        disabled ||
-                        sending.current ||
-                        !isValidMessage() ||
-                        (giphyActive && !isOnline)
-                      }
+                      disabled={sending.current || !isValidMessage() || (giphyActive && !isOnline)}
                     />
                   </View>
                 ))}
@@ -890,7 +850,6 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
     asyncMessagesSlideToCancelDistance: prevAsyncMessagesSlideToCancelDistance,
     asyncUploads: prevAsyncUploads,
     audioRecordingEnabled: prevAsyncMessagesEnabled,
-    disabled: prevDisabled,
     editing: prevEditing,
     fileUploads: prevFileUploads,
     giphyActive: prevGiphyActive,
@@ -913,7 +872,6 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
     asyncMessagesSlideToCancelDistance: nextAsyncMessagesSlideToCancelDistance,
     asyncUploads: nextAsyncUploads,
     audioRecordingEnabled: nextAsyncMessagesEnabled,
-    disabled: nextDisabled,
     editing: nextEditing,
     fileUploads: nextFileUploads,
     giphyActive: nextGiphyActive,
@@ -951,9 +909,6 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
   const asyncMessagesSlideToCancelDistanceEqual =
     prevAsyncMessagesSlideToCancelDistance === nextAsyncMessagesSlideToCancelDistance;
   if (!asyncMessagesSlideToCancelDistanceEqual) return false;
-
-  const disabledEqual = prevDisabled === nextDisabled;
-  if (!disabledEqual) return false;
 
   const editingEqual = !!prevEditing === !!nextEditing;
   if (!editingEqual) return false;
@@ -1068,6 +1023,7 @@ export const MessageInput = <
     FileUploadPreview,
     fileUploads,
     giphyActive,
+    hasImagePicker,
     ImageUploadPreview,
     imageUploads,
     Input,
@@ -1112,7 +1068,11 @@ export const MessageInput = <
 
   const { t } = useTranslationContext();
 
-  if ((disabled || !ownCapabilities.sendMessage) && SendMessageDisallowedIndicator) {
+  /**
+   * Disable the message input if the channel is frozen, or the user doesn't have the capability to send a message.
+   * Enable it in frozen mode, if it the input has editing state.
+   */
+  if (!editing && disabled && !ownCapabilities.sendMessage && SendMessageDisallowedIndicator) {
     return <SendMessageDisallowedIndicator />;
   }
 
@@ -1140,11 +1100,11 @@ export const MessageInput = <
         closeAttachmentPicker,
         cooldownEndsAt,
         CooldownTimer,
-        disabled,
         editing,
         FileUploadPreview,
         fileUploads,
         giphyActive,
+        hasImagePicker,
         ImageUploadPreview,
         imageUploads,
         Input,

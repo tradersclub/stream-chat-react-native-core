@@ -1,4 +1,8 @@
 import React from 'react';
 import { IconProps } from './utils/base';
-export declare const Lightning: (props: IconProps) => React.JSX.Element;
+type Props = IconProps & {
+    size: number;
+};
+export declare const Lightning: ({ size, ...rest }: Props) => React.JSX.Element;
+export {};
 //# sourceMappingURL=Lightning.d.ts.map

@@ -12,6 +12,7 @@ var _MessageContext = require("../../contexts/messageContext/MessageContext");
 var _MessagesContext = require("../../contexts/messagesContext/MessagesContext");
 var _ThemeContext = require("../../contexts/themeContext/ThemeContext");
 var _native = require("../../native");
+var _types = require("../../types/types");
 var _jsxRuntime = require("react/jsx-runtime");
 var _this = this,
   _jsxFileName = "/home/runner/work/stream-chat-react-native/stream-chat-react-native/package/src/components/Attachment/FileAttachmentGroup.tsx";
@@ -85,7 +86,7 @@ var FileAttachmentGroupWithContext = function FileAttachmentGroupWithContext(pro
         style: [{
           paddingBottom: index !== files.length - 1 ? 4 : 0
         }, stylesProp.attachmentContainer, attachmentContainer],
-        children: (file.type === 'audio' || file.type === 'voiceRecording') && (0, _native.isAudioPackageAvailable)() ? (0, _jsxRuntime.jsx)(AudioAttachment, {
+        children: (file.type === _types.FileTypes.Audio || file.type === _types.FileTypes.VoiceRecording) && (0, _native.isAudioPackageAvailable)() ? (0, _jsxRuntime.jsx)(AudioAttachment, {
           item: {
             duration: file.duration,
             file: {

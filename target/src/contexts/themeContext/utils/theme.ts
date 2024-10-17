@@ -318,6 +318,11 @@ export type Theme = {
     inputBoxContainer: ViewStyle;
     micButtonContainer: ViewStyle;
     moreOptionsButton: ViewStyle;
+    nativeAttachmentPicker: {
+      buttonContainer: ViewStyle;
+      buttonDimmerStyle: ViewStyle;
+      container: ViewStyle;
+    };
     optionsContainer: ViewStyle;
     replyContainer: ViewStyle;
     searchIcon: IconProps;
@@ -450,6 +455,8 @@ export type Theme = {
       deletedContainerInner: ViewStyle;
       deletedMetaText: TextStyle;
       deletedText: MarkdownStyle;
+      editedLabel: TextStyle;
+      editedTimestampContainer: ViewStyle;
       errorContainer: ViewStyle;
       errorIcon: IconProps;
       errorIconContainer: ViewStyle;
@@ -470,6 +477,7 @@ export type Theme = {
       wrapper: ViewStyle;
       receiverMessageBackgroundColor?: ColorValue;
       senderMessageBackgroundColor?: ColorValue;
+      timestampText?: TextStyle;
     };
     file: {
       container: ViewStyle;
@@ -496,6 +504,12 @@ export type Theme = {
       moreImagesContainer: ViewStyle;
       moreImagesText: TextStyle;
       thumbnail: ViewStyle;
+      imageBorderRadius?: {
+        borderBottomLeftRadius: number;
+        borderBottomRightRadius: number;
+        borderTopLeftRadius: number;
+        borderTopRightRadius: number;
+      };
     };
     giphy: {
       buttonContainer: ViewStyle;
@@ -530,7 +544,8 @@ export type Theme = {
       middleIcon: ViewStyle;
       radius: number;
       reactionBubble: ViewStyle;
-      reactionBubbleBackground: ViewStyle;
+      reactionContainer: ViewStyle;
+      reactionCount: TextStyle;
       reactionSize: number;
       strokeSize: number;
     };
@@ -875,6 +890,11 @@ export const defaultTheme: Theme = {
     inputBoxContainer: {},
     micButtonContainer: {},
     moreOptionsButton: {},
+    nativeAttachmentPicker: {
+      buttonContainer: {},
+      buttonDimmerStyle: {},
+      container: {},
+    },
     optionsContainer: {},
     replyContainer: {},
     searchIcon: {},
@@ -998,8 +1018,8 @@ export const defaultTheme: Theme = {
         videoContainer: {},
       },
       playIcon: {
-        height: 24,
-        width: 24,
+        height: 32,
+        width: 32,
       },
     },
     container: {},
@@ -1021,6 +1041,8 @@ export const defaultTheme: Theme = {
           fontWeight: '400',
         },
       },
+      editedLabel: {},
+      editedTimestampContainer: {},
       errorContainer: {
         paddingRight: 12,
         paddingTop: 0,
@@ -1053,6 +1075,7 @@ export const defaultTheme: Theme = {
       textContainer: {
         onlyEmojiMarkdown: { text: { fontSize: 50 } },
       },
+      timestampText: {},
       wrapper: {},
     },
     file: {
@@ -1072,6 +1095,7 @@ export const defaultTheme: Theme = {
       gridHeight: 195,
       gridWidth: 256,
       image: {},
+      imageBorderRadius: undefined,
       imageContainer: {},
       maxHeight: 300,
       maxWidth: 256,
@@ -1114,7 +1138,8 @@ export const defaultTheme: Theme = {
       middleIcon: {},
       radius: 2, // not recommended to change this
       reactionBubble: {},
-      reactionBubbleBackground: {},
+      reactionContainer: {},
+      reactionCount: {},
       reactionSize: 24,
       strokeSize: 1, // not recommended to change this
     },

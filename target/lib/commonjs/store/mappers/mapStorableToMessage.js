@@ -6,7 +6,7 @@ exports.mapStorableToMessage = void 0;
 var _objectWithoutProperties2 = _interopRequireDefault(require("@babel/runtime/helpers/objectWithoutProperties"));
 var _mapStorableToReaction = require("./mapStorableToReaction");
 var _mapStorableToUser = require("./mapStorableToUser");
-var _excluded = ["createdAt", "deletedAt", "extraData", "reactionCounts", "updatedAt", "user"];
+var _excluded = ["createdAt", "deletedAt", "extraData", "messageTextUpdatedAt", "reactionGroups", "updatedAt", "user"];
 var mapStorableToMessage = function mapStorableToMessage(_ref) {
   var currentUserId = _ref.currentUserId,
     messageRow = _ref.messageRow,
@@ -14,7 +14,8 @@ var mapStorableToMessage = function mapStorableToMessage(_ref) {
   var createdAt = messageRow.createdAt,
     deletedAt = messageRow.deletedAt,
     extraData = messageRow.extraData,
-    reactionCounts = messageRow.reactionCounts,
+    messageTextUpdatedAt = messageRow.messageTextUpdatedAt,
+    reactionGroups = messageRow.reactionGroups,
     updatedAt = messageRow.updatedAt,
     user = messageRow.user,
     rest = (0, _objectWithoutProperties2["default"])(messageRow, _excluded);
@@ -30,8 +31,9 @@ var mapStorableToMessage = function mapStorableToMessage(_ref) {
     created_at: createdAt,
     deleted_at: deletedAt,
     latest_reactions: latestReactions,
+    message_text_updated_at: messageTextUpdatedAt,
     own_reactions: ownReactions,
-    reaction_counts: reactionCounts ? JSON.parse(reactionCounts) : {},
+    reaction_groups: reactionGroups ? JSON.parse(reactionGroups) : {},
     updated_at: updatedAt,
     user: (0, _mapStorableToUser.mapStorableToUser)(user)
   }, extraData ? JSON.parse(extraData) : {});

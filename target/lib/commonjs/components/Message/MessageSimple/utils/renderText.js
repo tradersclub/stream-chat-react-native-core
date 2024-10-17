@@ -154,16 +154,18 @@ var renderText = function renderText(params) {
       children: output(node.content, state)
     }, state.key);
   };
+  function escapeRegExp(text) {
+    return text.replace(/[-[\]{}()*+?.,/\\^$|#]/g, '\\$&');
+  }
   var mentioned_users = message.mentioned_users;
-  var mentionedUsers = Array.isArray(mentioned_users) ? mentioned_users.reduce(function (acc, cur) {
-    var userName = cur.name || cur.id || '';
-    if (userName) {
-      acc += "".concat(acc.length ? '|' : '', "@").concat(userName.replace(/[.*+?^${}()|[\]\\]/g, function (match) {
-        return '\\' + match;
-      }));
-    }
-    return acc;
-  }, '') : '';
+  var mentionedUsernames = (mentioned_users || []).map(function (user) {
+    return user.name || user.id;
+  }).filter(Boolean).sort(function (a, b) {
+    return b.length - a.length;
+  }).map(escapeRegExp);
+  var mentionedUsers = mentionedUsernames.map(function (username) {
+    return "@".concat(username);
+  }).join('|');
   var regEx = new RegExp("^\\B(".concat(mentionedUsers, ")"), 'g');
   var mentionsMatchFunction = function mentionsMatchFunction(source) {
     return regEx.exec(source);

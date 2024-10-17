@@ -17,6 +17,7 @@ var useCreateThreadContext = function useCreateThreadContext(_ref) {
     threadMessages = _ref.threadMessages;
   var threadId = thread == null ? void 0 : thread.id;
   var threadReplyCount = thread == null ? void 0 : thread.reply_count;
+  var threadLatestReactions = thread == null ? void 0 : thread.latest_reactions;
   var threadMessagesStr = (0, _utils.reduceMessagesToString)(threadMessages);
   var threadContext = (0, _react.useMemo)(function () {
     return {
@@ -31,7 +32,7 @@ var useCreateThreadContext = function useCreateThreadContext(_ref) {
       threadLoadingMore: threadLoadingMore,
       threadMessages: threadMessages
     };
-  }, [allowThreadMessagesInChannel, threadHasMore, threadId, threadLoadingMore, threadMessagesStr, threadReplyCount]);
+  }, [allowThreadMessagesInChannel, threadHasMore, threadId, threadLoadingMore, threadMessagesStr, threadReplyCount, threadLatestReactions]);
   return threadContext;
 };
 exports.useCreateThreadContext = useCreateThreadContext;

@@ -2,12 +2,14 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.reduceMessagesToString = exports.queryUsersDebounced = exports.queryMembersDebounced = exports.makeImageCompatibleUrl = exports.isMentionTrigger = exports.isLocalUrl = exports.isEmojiTrigger = exports.isCommandTrigger = exports.isBouncedMessage = exports.isBlockedMessage = exports.hasOnlyEmojis = exports.getUrlWithoutParams = exports.getIndicatorTypeForFileState = exports.generateRandomId = exports.defaultEmojiSearchIndex = exports.ProgressIndicatorTypes = exports.MessageStatusTypes = exports.FileState = exports.ACITriggerSettings = void 0;
+exports.stringifyMessage = exports.reduceMessagesToString = exports.queryUsersDebounced = exports.queryMembersDebounced = exports.makeImageCompatibleUrl = exports.isMentionTrigger = exports.isLocalUrl = exports.isEmojiTrigger = exports.isEditedMessage = exports.isCommandTrigger = exports.isBouncedMessage = exports.isBlockedMessage = exports.hasOnlyEmojis = exports.getUrlWithoutParams = exports.getIndicatorTypeForFileState = exports.getFileNameFromPath = exports.getDurationLabelFromDuration = exports.generateRandomId = exports.defaultEmojiSearchIndex = exports.ProgressIndicatorTypes = exports.MessageStatusTypes = exports.FileState = exports.ACITriggerSettings = void 0;
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
+var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
 var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
 var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+var _dayjs = _interopRequireDefault(require("dayjs"));
 var _emojiRegex = _interopRequireDefault(require("emoji-regex"));
 var _debounce = _interopRequireDefault(require("lodash/debounce"));
 var _emojiData = require("../emoji-data");
@@ -50,6 +52,10 @@ var isBouncedMessage = function isBouncedMessage(message) {
   return message.type === 'error' && message.moderation_details !== undefined;
 };
 exports.isBouncedMessage = isBouncedMessage;
+var isEditedMessage = function isEditedMessage(message) {
+  return !!message.message_text_updated_at;
+};
+exports.isEditedMessage = isEditedMessage;
 var defaultAutoCompleteSuggestionsLimit = 10;
 var defaultMentionAllAppUsersQuery = {
   filters: {},
@@ -444,18 +450,49 @@ var hasOnlyEmojis = function hasOnlyEmojis(text) {
 exports.hasOnlyEmojis = hasOnlyEmojis;
 var stringifyMessage = function stringifyMessage(_ref4) {
   var deleted_at = _ref4.deleted_at,
+    i18n = _ref4.i18n,
     latest_reactions = _ref4.latest_reactions,
+    reaction_groups = _ref4.reaction_groups,
+    readBy = _ref4.readBy,
     reply_count = _ref4.reply_count,
     status = _ref4.status,
+    text = _ref4.text,
     type = _ref4.type,
     updated_at = _ref4.updated_at;
-  return "".concat(type).concat(deleted_at).concat(latest_reactions ? latest_reactions.map(function (_ref5) {
-    var type = _ref5.type;
-    return type;
-  }).join() : '').concat(reply_count).concat(status).concat((updated_at == null ? void 0 : updated_at.toISOString == null ? void 0 : updated_at.toISOString()) || updated_at);
+  return "".concat(latest_reactions ? latest_reactions.map(function (_ref5) {
+    var type = _ref5.type,
+      user = _ref5.user;
+    return "".concat(type).concat(user == null ? void 0 : user.id);
+  }).join() : '').concat(reaction_groups ? Object.entries(reaction_groups).flatMap(function (_ref6) {
+    var _ref7 = (0, _slicedToArray2["default"])(_ref6, 2),
+      type = _ref7[0],
+      _ref7$ = _ref7[1],
+      count = _ref7$.count,
+      first_reaction_at = _ref7$.first_reaction_at,
+      last_reaction_at = _ref7$.last_reaction_at;
+    return "".concat(type).concat(count).concat(first_reaction_at).concat(last_reaction_at);
+  }).join() : '').concat(type).concat(deleted_at).concat(text).concat(readBy).concat(reply_count).concat(status).concat(updated_at).concat(JSON.stringify(i18n));
 };
+exports.stringifyMessage = stringifyMessage;
 var reduceMessagesToString = function reduceMessagesToString(messages) {
   return messages.map(stringifyMessage).join();
 };
 exports.reduceMessagesToString = reduceMessagesToString;
+var getFileNameFromPath = function getFileNameFromPath(path) {
+  var pattern = /[^/]+\.[^/]+$/;
+  var match = path.match(pattern);
+  return match ? match[0] : '';
+};
+exports.getFileNameFromPath = getFileNameFromPath;
+var getDurationLabelFromDuration = function getDurationLabelFromDuration(duration) {
+  var ONE_HOUR_IN_SECONDS = 3600;
+  var ONE_HOUR_IN_MILLISECONDS = ONE_HOUR_IN_SECONDS * 1000;
+  var durationLabel = '00:00';
+  var isDurationLongerThanHour = duration / ONE_HOUR_IN_MILLISECONDS >= 1;
+  var formattedDurationParam = isDurationLongerThanHour ? 'HH:mm:ss' : 'mm:ss';
+  var formattedVideoDuration = _dayjs["default"].duration(duration, 'milliseconds').format(formattedDurationParam);
+  durationLabel = formattedVideoDuration;
+  return durationLabel;
+};
+exports.getDurationLabelFromDuration = getDurationLabelFromDuration;
 //# sourceMappingURL=utils.js.map

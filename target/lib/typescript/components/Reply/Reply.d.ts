@@ -3,7 +3,7 @@ import { ImageStyle, ViewStyle } from 'react-native';
 import { MessageInputContextValue } from '../../contexts/messageInputContext/MessageInputContext';
 import { MessagesContextValue } from '../../contexts/messagesContext/MessagesContext';
 import { TranslationContextValue } from '../../contexts/translationContext/TranslationContext';
-import type { DefaultStreamChatGenerics } from '../../types/types';
+import { DefaultStreamChatGenerics } from '../../types/types';
 type ReplyPropsWithContext<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<MessageInputContextValue<StreamChatGenerics>, 'quotedMessage'> & Pick<MessagesContextValue<StreamChatGenerics>, 'FileAttachmentIcon' | 'MessageAvatar'> & Pick<TranslationContextValue, 't'> & {
     attachmentSize?: number;
     styles?: Partial<{

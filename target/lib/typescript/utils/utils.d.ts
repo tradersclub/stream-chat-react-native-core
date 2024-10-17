@@ -1,11 +1,11 @@
 import type React from 'react';
 import type { DebouncedFunc } from 'lodash';
-import type { Channel, CommandResponse, FormatMessageResponse, StreamChat } from 'stream-chat';
-import type { MessageType } from '../components/MessageList/hooks/useMessageList';
+import type { Channel, CommandResponse, FormatMessageResponse, MessageResponse, StreamChat } from 'stream-chat';
+import { IconProps } from '../../src/icons/utils/base';
+import { MessageType } from '../components/MessageList/hooks/useMessageList';
 import type { EmojiSearchIndex, MentionAllAppUsersQuery } from '../contexts/messageInputContext/MessageInputContext';
 import type { SuggestionCommand, SuggestionComponentType, SuggestionUser } from '../contexts/suggestionsContext/SuggestionsContext';
 import { Emoji } from '../emoji-data';
-import type { IconProps } from '../icons/utils/base';
 import type { TableRowJoinedUser } from '../store/types';
 import type { DefaultStreamChatGenerics, ValueOf } from '../types/types';
 export type ReactionData = {
@@ -38,13 +38,19 @@ export declare const getIndicatorTypeForFileState: (fileState: FileStateValue, e
  * @param message
  * @returns boolean
  */
-export declare const isBlockedMessage: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(message: TableRowJoinedUser<"messages"> | MessageType<StreamChatGenerics>) => boolean | "" | undefined;
+export declare const isBlockedMessage: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(message: MessageType<StreamChatGenerics> | TableRowJoinedUser<"messages">) => boolean | "" | undefined;
 /**
  *  Utility to check if the message is a Bounced message.
  * @param message
  * @returns boolean
  */
 export declare const isBouncedMessage: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(message: MessageType<StreamChatGenerics>) => boolean;
+/**
+ * Utility to check if the message is a edited message.
+ * @param message
+ * @returns boolean
+ */
+export declare const isEditedMessage: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(message: MessageType<StreamChatGenerics>) => boolean;
 export declare const queryMembersDebounced: DebouncedFunc<(<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(channel: Channel<StreamChatGenerics>, query: SuggestionUser<StreamChatGenerics>["name"], onReady?: ((users: SuggestionUser<StreamChatGenerics>[]) => void) | undefined, options?: {
     limit?: number;
 }) => Promise<void>)>;
@@ -127,10 +133,31 @@ export declare const isLocalUrl: (url: string) => boolean;
 export declare const generateRandomId: (a?: string) => string;
 export declare const hasOnlyEmojis: (text: string) => boolean;
 /**
+ * Stringifies a message object
+ * @param {FormatMessageResponse<StreamChatGenerics>} message - the message object to be stringified
+ * @returns {string} The stringified message
+ */
+export declare const stringifyMessage: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>({ deleted_at, i18n, latest_reactions, reaction_groups, readBy, reply_count, status, text, type, updated_at, }: MessageResponse<StreamChatGenerics> | MessageType<StreamChatGenerics>) => string;
+/**
  * Reduces a list of messages to strings that are used in useEffect & useMemo
  * @param {messages} messages - the array of messages to be compared
  * @returns {string} The mapped message string
  */
 export declare const reduceMessagesToString: <StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(messages: FormatMessageResponse<StreamChatGenerics>[]) => string;
+/**
+ * Utility to get the file name from the path using regex.
+ * `[^/]+` matches one or more characters that are not a slash (/), ensuring we capture the filename part.
+ * `\.` matches the period before the file extension.
+ * `[^/]+$` matches one or more characters that are not a slash (/) until the end of the string, capturing the file extension.
+ * @param path string
+ * @returns string
+ */
+export declare const getFileNameFromPath: (path: string) => string;
+/**
+ * Utility to get the duration label from the duration in seconds.
+ * @param duration number
+ * @returns string
+ */
+export declare const getDurationLabelFromDuration: (duration: number) => string;
 export {};
 //# sourceMappingURL=utils.d.ts.map

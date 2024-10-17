@@ -52,9 +52,7 @@ var MessageContentWithContext = function MessageContentWithContext(props) {
   var additionalTouchableProps = props.additionalTouchableProps,
     alignment = props.alignment,
     Attachment = props.Attachment,
-    disabled = props.disabled,
     FileAttachmentGroup = props.FileAttachmentGroup,
-    formatDate = props.formatDate,
     Gallery = props.Gallery,
     groupStyles = props.groupStyles,
     hasReactions = props.hasReactions,
@@ -79,7 +77,6 @@ var MessageContentWithContext = function MessageContentWithContext(props) {
     Reply = props.Reply,
     setMessageContentWidth = props.setMessageContentWidth,
     showMessageStatus = props.showMessageStatus,
-    tDateTimeParser = props.tDateTimeParser,
     threadList = props.threadList;
   var _useTheme = (0, _ThemeContext.useTheme)(),
     _useTheme$theme = _useTheme.theme,
@@ -112,17 +109,6 @@ var MessageContentWithContext = function MessageContentWithContext(props) {
     reactionSize = _useTheme$theme$messa4.reactionSize;
   var _useViewport = (0, _useViewport2.useViewport)(),
     vw = _useViewport.vw;
-  var getDateText = function getDateText(formatter) {
-    if (!message.created_at) return '';
-    if (formatter) {
-      return formatter(message.created_at);
-    }
-    var parserOutput = tDateTimeParser(message.created_at);
-    if ((0, _TranslationContext.isDayOrMoment)(parserOutput)) {
-      return parserOutput.format('LT');
-    }
-    return message.created_at;
-  };
   var onLayout = function onLayout(_ref) {
     var width = _ref.nativeEvent.layout.width;
     setMessageContentWidth(width);
@@ -141,7 +127,7 @@ var MessageContentWithContext = function MessageContentWithContext(props) {
   var isMessageTypeDeleted = message.type === 'deleted';
   if (isMessageTypeDeleted) {
     return (0, _jsxRuntime.jsx)(MessageDeleted, {
-      formattedDate: getDateText(formatDate),
+      date: message.created_at,
       groupStyle: groupStyle,
       noBorder: noBorder,
       onLayout: onLayout
@@ -195,7 +181,7 @@ var MessageContentWithContext = function MessageContentWithContext(props) {
   };
   return (0, _jsxRuntime.jsxs)(_reactNative.TouchableOpacity, Object.assign({
     activeOpacity: 0.7,
-    disabled: disabled || preventPress,
+    disabled: preventPress,
     onLongPress: function onLongPress(event) {
       if (_onLongPress) {
         _onLongPress({
@@ -227,7 +213,7 @@ var MessageContentWithContext = function MessageContentWithContext(props) {
     }, error ? errorContainer : {}, container],
     children: [MessageHeader && (0, _jsxRuntime.jsx)(MessageHeader, {
       alignment: alignment,
-      formattedDate: getDateText(formatDate),
+      date: message.created_at,
       isDeleted: isMessageTypeDeleted,
       lastGroupMessage: lastGroupMessage,
       members: members,
@@ -288,18 +274,18 @@ var MessageContentWithContext = function MessageContentWithContext(props) {
       noBorder: noBorder,
       repliesCurveColor: repliesCurveColor
     }), (0, _jsxRuntime.jsx)(MessageFooter, {
-      formattedDate: getDateText(formatDate),
+      date: message.created_at,
       isDeleted: !!isMessageTypeDeleted
     })]
   }));
 };
 var areEqual = function areEqual(prevProps, nextProps) {
   var _prevOtherAttachments, _prevOtherAttachments2, _nextOtherAttachments, _nextOtherAttachments2, _prevMessage$quoted_m, _nextMessage$quoted_m, _prevMessage$quoted_m2, _nextMessage$quoted_m2;
-  var prevDisabled = prevProps.disabled,
-    prevGoToMessage = prevProps.goToMessage,
+  var prevGoToMessage = prevProps.goToMessage,
     prevGroupStyles = prevProps.groupStyles,
     prevHasReactions = prevProps.hasReactions,
     isAttachmentEqual = prevProps.isAttachmentEqual,
+    prevIsEditedMessageOpen = prevProps.isEditedMessageOpen,
     prevLastGroupMessage = prevProps.lastGroupMessage,
     prevMembers = prevProps.members,
     prevMessage = prevProps.message,
@@ -307,12 +293,11 @@ var areEqual = function areEqual(prevProps, nextProps) {
     prevMyMessageTheme = prevProps.myMessageTheme,
     prevOnlyEmojis = prevProps.onlyEmojis,
     prevOtherAttachments = prevProps.otherAttachments,
-    prevT = prevProps.t,
-    prevTDateTimeParser = prevProps.tDateTimeParser;
-  var nextDisabled = nextProps.disabled,
-    nextGoToMessage = nextProps.goToMessage,
+    prevT = prevProps.t;
+  var nextGoToMessage = nextProps.goToMessage,
     nextGroupStyles = nextProps.groupStyles,
     nextHasReactions = nextProps.hasReactions,
+    nextIsEditedMessageOpen = nextProps.isEditedMessageOpen,
     nextLastGroupMessage = nextProps.lastGroupMessage,
     nextMembers = nextProps.members,
     nextMessage = nextProps.message,
@@ -320,16 +305,15 @@ var areEqual = function areEqual(prevProps, nextProps) {
     nextMyMessageTheme = nextProps.myMessageTheme,
     nextOnlyEmojis = nextProps.onlyEmojis,
     nextOtherAttachments = nextProps.otherAttachments,
-    nextT = nextProps.t,
-    nextTDateTimeParser = nextProps.tDateTimeParser;
-  var disabledEqual = prevDisabled === nextDisabled;
-  if (!disabledEqual) return false;
+    nextT = nextProps.t;
   var hasReactionsEqual = prevHasReactions === nextHasReactions;
   if (!hasReactionsEqual) return false;
   var lastGroupMessageEqual = prevLastGroupMessage === nextLastGroupMessage;
   if (!lastGroupMessageEqual) return false;
   var goToMessageChangedAndMatters = nextMessage.quoted_message_id && prevGoToMessage !== nextGoToMessage;
   if (goToMessageChangedAndMatters) return false;
+  var isEditedMessageOpenEqual = prevIsEditedMessageOpen === nextIsEditedMessageOpen;
+  if (!isEditedMessageOpenEqual) return false;
   var onlyEmojisEqual = prevOnlyEmojis === nextOnlyEmojis;
   if (!onlyEmojisEqual) return false;
   var otherAttachmentsEqual = prevOtherAttachments.length === nextOtherAttachments.length && (prevOtherAttachments == null ? void 0 : (_prevOtherAttachments = prevOtherAttachments[0]) == null ? void 0 : (_prevOtherAttachments2 = _prevOtherAttachments.actions) == null ? void 0 : _prevOtherAttachments2.length) === (nextOtherAttachments == null ? void 0 : (_nextOtherAttachments = nextOtherAttachments[0]) == null ? void 0 : (_nextOtherAttachments2 = _nextOtherAttachments.actions) == null ? void 0 : _nextOtherAttachments2.length);
@@ -340,7 +324,7 @@ var areEqual = function areEqual(prevProps, nextProps) {
   if (!groupStylesEqual) return false;
   var isPrevMessageTypeDeleted = prevMessage.type === 'deleted';
   var isNextMessageTypeDeleted = nextMessage.type === 'deleted';
-  var messageEqual = isPrevMessageTypeDeleted === isNextMessageTypeDeleted && prevMessage.reply_count === nextMessage.reply_count && prevMessage.status === nextMessage.status && prevMessage.type === nextMessage.type && prevMessage.text === nextMessage.text && prevMessage.pinned === nextMessage.pinned;
+  var messageEqual = isPrevMessageTypeDeleted === isNextMessageTypeDeleted && prevMessage.reply_count === nextMessage.reply_count && prevMessage.status === nextMessage.status && prevMessage.type === nextMessage.type && prevMessage.text === nextMessage.text && prevMessage.pinned === nextMessage.pinned && prevMessage.i18n === nextMessage.i18n;
   if (!messageEqual) return false;
   var isPrevQuotedMessageTypeDeleted = ((_prevMessage$quoted_m = prevMessage.quoted_message) == null ? void 0 : _prevMessage$quoted_m.type) === 'deleted';
   var isNextQuotedMessageTypeDeleted = ((_nextMessage$quoted_m = nextMessage.quoted_message) == null ? void 0 : _nextMessage$quoted_m.type) === 'deleted';
@@ -366,8 +350,6 @@ var areEqual = function areEqual(prevProps, nextProps) {
   if (!messageContentOrderEqual) return false;
   var tEqual = prevT === nextT;
   if (!tEqual) return false;
-  var tDateTimeParserEqual = prevTDateTimeParser === nextTDateTimeParser;
-  if (!tDateTimeParserEqual) return false;
   var messageThemeEqual = JSON.stringify(prevMyMessageTheme) === JSON.stringify(nextMyMessageTheme);
   if (!messageThemeEqual) return false;
   return true;
@@ -376,10 +358,10 @@ var MemoizedMessageContent = _react["default"].memo(MessageContentWithContext, a
 var MessageContent = function MessageContent(props) {
   var _useMessageContext = (0, _MessageContext.useMessageContext)(),
     alignment = _useMessageContext.alignment,
-    disabled = _useMessageContext.disabled,
     goToMessage = _useMessageContext.goToMessage,
     groupStyles = _useMessageContext.groupStyles,
     hasReactions = _useMessageContext.hasReactions,
+    isEditedMessageOpen = _useMessageContext.isEditedMessageOpen,
     isMyMessage = _useMessageContext.isMyMessage,
     lastGroupMessage = _useMessageContext.lastGroupMessage,
     lastReceivedId = _useMessageContext.lastReceivedId,
@@ -398,7 +380,6 @@ var MessageContent = function MessageContent(props) {
     additionalTouchableProps = _useMessagesContext.additionalTouchableProps,
     Attachment = _useMessagesContext.Attachment,
     FileAttachmentGroup = _useMessagesContext.FileAttachmentGroup,
-    formatDate = _useMessagesContext.formatDate,
     Gallery = _useMessagesContext.Gallery,
     isAttachmentEqual = _useMessagesContext.isAttachmentEqual,
     MessageDeleted = _useMessagesContext.MessageDeleted,
@@ -411,20 +392,18 @@ var MessageContent = function MessageContent(props) {
     myMessageTheme = _useMessagesContext.myMessageTheme,
     Reply = _useMessagesContext.Reply;
   var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
-    t = _useTranslationContex.t,
-    tDateTimeParser = _useTranslationContex.tDateTimeParser;
+    t = _useTranslationContex.t;
   return (0, _jsxRuntime.jsx)(MemoizedMessageContent, Object.assign({
     additionalTouchableProps: additionalTouchableProps,
     alignment: alignment,
     Attachment: Attachment,
-    disabled: disabled,
     FileAttachmentGroup: FileAttachmentGroup,
-    formatDate: formatDate,
     Gallery: Gallery,
     goToMessage: goToMessage,
     groupStyles: groupStyles,
     hasReactions: hasReactions,
     isAttachmentEqual: isAttachmentEqual,
+    isEditedMessageOpen: isEditedMessageOpen,
     isMyMessage: isMyMessage,
     lastGroupMessage: lastGroupMessage,
     lastReceivedId: lastReceivedId,
@@ -448,7 +427,6 @@ var MessageContent = function MessageContent(props) {
     Reply: Reply,
     showMessageStatus: showMessageStatus,
     t: t,
-    tDateTimeParser: tDateTimeParser,
     threadList: threadList
   }, props));
 };

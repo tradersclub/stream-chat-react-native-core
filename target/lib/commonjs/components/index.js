@@ -991,6 +991,17 @@ Object.keys(_MessageDeleted).forEach(function (key) {
     }
   });
 });
+var _MessageEditedTimestamp = require("./Message/MessageSimple/MessageEditedTimestamp");
+Object.keys(_MessageEditedTimestamp).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _MessageEditedTimestamp[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _MessageEditedTimestamp[key];
+    }
+  });
+});
 var _MessageError = require("./Message/MessageSimple/MessageError");
 Object.keys(_MessageError).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
@@ -1076,6 +1087,17 @@ Object.keys(_MessageTextContainer).forEach(function (key) {
     enumerable: true,
     get: function get() {
       return _MessageTextContainer[key];
+    }
+  });
+});
+var _MessageTimestamp = require("./Message/MessageSimple/MessageTimestamp");
+Object.keys(_MessageTimestamp).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _MessageTimestamp[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _MessageTimestamp[key];
     }
   });
 });

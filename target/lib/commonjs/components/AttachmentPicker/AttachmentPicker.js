@@ -87,19 +87,23 @@ var AttachmentPicker = _react["default"].forwardRef(function (props, ref) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
           if (!(hasNextPageRef.current && !loadingPhotos && currentIndex > -1 && selectedPicker === 'images')) {
-            _context.next = 18;
+            _context.next = 19;
             break;
           }
           setPhotoError(false);
           setLoadingPhotos(true);
           endCursor = endCursorRef.current;
           _context.prev = 4;
-          _context.next = 7;
+          if (!_native.getPhotos) {
+            setPhotos([]);
+            setIosLimited(false);
+          }
+          _context.next = 8;
           return (0, _native.getPhotos)({
             after: endCursor,
             first: numberOfAttachmentImagesToLoadPerCall != null ? numberOfAttachmentImagesToLoadPerCall : 60
           });
-        case 7:
+        case 8:
           results = _context.sent;
           endCursorRef.current = results.endCursor;
           setPhotos(function (prevPhotos) {
@@ -107,24 +111,25 @@ var AttachmentPicker = _react["default"].forwardRef(function (props, ref) {
           });
           setIosLimited(results.iOSLimited);
           hasNextPageRef.current = !!results.hasNextPage;
-          _context.next = 17;
+          _context.next = 18;
           break;
-        case 14:
-          _context.prev = 14;
+        case 15:
+          _context.prev = 15;
           _context.t0 = _context["catch"](4);
           setPhotoError(true);
-        case 17:
-          setLoadingPhotos(false);
         case 18:
+          setLoadingPhotos(false);
+        case 19:
         case "end":
           return _context.stop();
       }
-    }, _callee, null, [[4, 14]]);
+    }, _callee, null, [[4, 15]]);
   })), [currentIndex, selectedPicker, loadingPhotos]);
   var getMorePhotosRef = (0, _react.useRef)(getMorePhotos);
   getMorePhotosRef.current = getMorePhotos;
   (0, _react.useEffect)(function () {
     if (selectedPicker !== 'images') return;
+    if (!_native.oniOS14GalleryLibrarySelectionChange) return;
     var _oniOS14GalleryLibrar = (0, _native.oniOS14GalleryLibrarySelectionChange)(function () {
         hasNextPageRef.current = true;
         endCursorRef.current = undefined;

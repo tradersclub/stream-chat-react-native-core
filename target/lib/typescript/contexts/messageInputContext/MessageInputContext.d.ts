@@ -1,6 +1,6 @@
 import type { LegacyRef } from 'react';
 import React, { PropsWithChildren } from 'react';
-import type { TextInput, TextInputProps } from 'react-native';
+import { TextInput, TextInputProps } from 'react-native';
 import { Attachment, Message, SendFileAPIResponse, StreamChat, Message as StreamMessage, UserFilters, UserOptions, UserResponse, UserSort } from 'stream-chat';
 import { AudioAttachmentProps } from '../../components/Attachment/AudioAttachment';
 import type { AttachButtonProps } from '../../components/MessageInput/AttachButton';
@@ -24,7 +24,7 @@ import type { SendButtonProps } from '../../components/MessageInput/SendButton';
 import type { UploadProgressIndicatorProps } from '../../components/MessageInput/UploadProgressIndicator';
 import type { MessageType } from '../../components/MessageList/hooks/useMessageList';
 import type { Emoji } from '../../emoji-data';
-import type { Asset, DefaultStreamChatGenerics, File, FileUpload, ImageUpload, UnknownType } from '../../types/types';
+import { Asset, DefaultStreamChatGenerics, File, FileUpload, ImageUpload, UnknownType } from '../../types/types';
 import { ACITriggerSettingsParams, TriggerSettings } from '../../utils/utils';
 import { ChannelContextValue } from '../channelContext/ChannelContext';
 export type EmojiSearchIndex = {
@@ -100,6 +100,10 @@ export type LocalMessageInputContext<StreamChatGenerics extends DefaultStreamCha
     openCommandsPicker: () => void;
     openFilePicker: () => void;
     openMentionsPicker: () => void;
+    /**
+     * Function for picking a photo from native image picker and uploading it.
+     */
+    pickAndUploadImageFromNativePicker: () => Promise<void>;
     pickFile: () => Promise<void>;
     /**
      * Function for removing a file from the upload preview
@@ -141,6 +145,10 @@ export type LocalMessageInputContext<StreamChatGenerics extends DefaultStreamCha
     setShowMoreOptions: React.Dispatch<React.SetStateAction<boolean>>;
     setText: React.Dispatch<React.SetStateAction<string>>;
     showMoreOptions: boolean;
+    /**
+     * Function for taking a photo and uploading it
+     */
+    takeAndUploadImage: () => Promise<void>;
     text: string;
     toggleAttachmentPicker: () => void;
     /**
@@ -159,7 +167,7 @@ export type LocalMessageInputContext<StreamChatGenerics extends DefaultStreamCha
     uploadNewFile: (file: File) => Promise<void>;
     uploadNewImage: (image: Partial<Asset>) => Promise<void>;
 };
-export type InputMessageInputContextValue<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Pick<ChannelContextValue<StreamChatGenerics>, 'disabled'> & {
+export type InputMessageInputContextValue<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = {
     /**
      * Controls how many pixels to the top side the user has to scroll in order to lock the recording view and allow the user to lift their finger from the screen without stopping the recording.
      */
@@ -181,7 +189,7 @@ export type InputMessageInputContextValue<StreamChatGenerics extends DefaultStre
      *
      * Defaults to and accepts same props as: [AttachButton](https://getstream.io/chat/docs/sdk/reactnative/ui-components/attach-button/)
      */
-    AttachButton: React.ComponentType<AttachButtonProps<StreamChatGenerics>>;
+    AttachButton: React.ComponentType<AttachButtonProps>;
     /**
      * Custom UI component for audio attachment upload preview.
      *
@@ -244,6 +252,8 @@ export type InputMessageInputContextValue<StreamChatGenerics extends DefaultStre
      * Defaults to and accepts same props as: https://github.com/GetStream/stream-chat-react-native/blob/main/package/src/components/MessageInput/FileUploadPreview.tsx
      */
     FileUploadPreview: React.ComponentType<FileUploadPreviewProps<StreamChatGenerics>>;
+    /** When false, CameraSelectorIcon will be hidden */
+    hasCameraPicker: boolean;
     /** When false, CommandsButton will be hidden */
     hasCommands: boolean;
     /** When false, FileSelectorIcon will be hidden */
@@ -265,7 +275,7 @@ export type InputMessageInputContextValue<StreamChatGenerics extends DefaultStre
      *
      * Defaults to and accepts same props as: [MoreOptionsButton](https://getstream.io/chat/docs/sdk/reactnative/ui-components/more-options-button/)
      */
-    MoreOptionsButton: React.ComponentType<MoreOptionsButtonProps<StreamChatGenerics>>;
+    MoreOptionsButton: React.ComponentType<MoreOptionsButtonProps>;
     /** Limit on the number of lines in the text input before scrolling */
     numberOfLines: number;
     quotedMessage: boolean | MessageType<StreamChatGenerics>;
@@ -346,6 +356,10 @@ export type InputMessageInputContextValue<StreamChatGenerics extends DefaultStre
      * Prop to override the default emoji search index in auto complete suggestion list.
      */
     emojiSearchIndex?: EmojiSearchIndex;
+    /**
+     * Handler for when the attach button is pressed.
+     */
+    handleAttachButtonPress?: () => void;
     /** Initial value to set on input */
     initialValue?: string;
     /**
@@ -404,5 +418,5 @@ export declare const useMessageInputContext: <StreamChatGenerics extends Default
  * typing is desired while using the HOC withMessageInputContext the Props for the
  * wrapped component must be provided as the first generic.
  */
-export declare const withMessageInputContext: <P extends UnknownType, StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(Component: React.ComponentType<P>) => React.ComponentType<Omit<P, "disabled" | "numberOfLines" | "maxNumberOfFiles" | "compressImageQuality" | "setQuotedMessageState" | "asyncMessagesLockDistance" | "asyncMessagesMinimumPressDuration" | "asyncMessagesMultiSendEnabled" | "asyncMessagesSlideToCancelDistance" | "AttachButton" | "AudioAttachmentUploadPreview" | "AudioRecorder" | "audioRecordingEnabled" | "AudioRecordingInProgress" | "AudioRecordingLockIndicator" | "AudioRecordingPreview" | "AudioRecordingWaveform" | "clearEditingState" | "clearQuotedMessageState" | "CommandsButton" | "CooldownTimer" | "editMessage" | "FileUploadPreview" | "hasCommands" | "hasFilePicker" | "hasImagePicker" | "ImageUploadPreview" | "InputEditingStateHeader" | "InputGiphySearch" | "InputReplyStateHeader" | "MoreOptionsButton" | "quotedMessage" | "SendButton" | "sendImageAsync" | "ShowThreadMessageInChannelButton" | "StartAudioRecordingButton" | "UploadProgressIndicator" | "additionalTextInputProps" | "autoCompleteSuggestionsLimit" | "autoCompleteTriggerSettings" | "doDocUploadRequest" | "doImageUploadRequest" | "editing" | "emojiSearchIndex" | "initialValue" | "Input" | "InputButtons" | "maxMessageLength" | "mentionAllAppUsersEnabled" | "mentionAllAppUsersQuery" | "onChangeText" | "SendMessageDisallowedIndicator" | "setInputRef" | keyof LocalMessageInputContext<StreamChatGenerics>>>;
+export declare const withMessageInputContext: <P extends UnknownType, StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics>(Component: React.ComponentType<P>) => React.ComponentType<Omit<P, "numberOfLines" | "setQuotedMessageState" | "asyncMessagesLockDistance" | "asyncMessagesMinimumPressDuration" | "asyncMessagesMultiSendEnabled" | "asyncMessagesSlideToCancelDistance" | "AttachButton" | "AudioAttachmentUploadPreview" | "AudioRecorder" | "audioRecordingEnabled" | "AudioRecordingInProgress" | "AudioRecordingLockIndicator" | "AudioRecordingPreview" | "AudioRecordingWaveform" | "clearEditingState" | "clearQuotedMessageState" | "CommandsButton" | "CooldownTimer" | "editMessage" | "FileUploadPreview" | "hasCameraPicker" | "hasCommands" | "hasFilePicker" | "hasImagePicker" | "ImageUploadPreview" | "InputEditingStateHeader" | "InputGiphySearch" | "InputReplyStateHeader" | "maxNumberOfFiles" | "MoreOptionsButton" | "quotedMessage" | "SendButton" | "sendImageAsync" | "ShowThreadMessageInChannelButton" | "StartAudioRecordingButton" | "UploadProgressIndicator" | "additionalTextInputProps" | "autoCompleteSuggestionsLimit" | "autoCompleteTriggerSettings" | "compressImageQuality" | "doDocUploadRequest" | "doImageUploadRequest" | "editing" | "emojiSearchIndex" | "handleAttachButtonPress" | "initialValue" | "Input" | "InputButtons" | "maxMessageLength" | "mentionAllAppUsersEnabled" | "mentionAllAppUsersQuery" | "onChangeText" | "SendMessageDisallowedIndicator" | "setInputRef" | keyof LocalMessageInputContext<StreamChatGenerics>>>;
 //# sourceMappingURL=MessageInputContext.d.ts.map

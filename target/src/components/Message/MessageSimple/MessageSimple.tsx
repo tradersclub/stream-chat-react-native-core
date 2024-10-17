@@ -31,7 +31,7 @@ export type MessageSimplePropsWithContext<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 > = Pick<
   MessageContextValue<StreamChatGenerics>,
-  'alignment' | 'channel' | 'disabled' | 'groupStyles' | 'hasReactions' | 'message'
+  'alignment' | 'channel' | 'isEditedMessageOpen' | 'groupStyles' | 'hasReactions' | 'message'
 > &
   Pick<
     MessagesContextValue<StreamChatGenerics>,
@@ -78,7 +78,7 @@ const MessageSimpleWithContext = <
   const messageGroupedSingleOrBottom =
     groupStyles.includes('single') || groupStyles.includes('bottom');
 
-  const showReactions = hasReactions && ReactionList;
+  const showReactions = message.type !== 'deleted' && hasReactions && ReactionList;
 
   const lastMessageInMessageListStyles = [styles.lastMessageContainer, lastMessageContainer];
   const messageGroupedSingleOrBottomStyles = [
@@ -119,23 +119,20 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
 ) => {
   const {
     channel: prevChannel,
-    disabled: prevDisabled,
     groupStyles: prevGroupStyles,
     hasReactions: prevHasReactions,
+    isEditedMessageOpen: prevIsEditedMessageOpen,
     message: prevMessage,
     myMessageTheme: prevMyMessageTheme,
   } = prevProps;
   const {
     channel: nextChannel,
-    disabled: nextDisabled,
     groupStyles: nextGroupStyles,
     hasReactions: nextHasReactions,
+    isEditedMessageOpen: nextIsEditedMessageOpen,
     message: nextMessage,
     myMessageTheme: nextMyMessageTheme,
   } = nextProps;
-
-  const disabledEqual = prevDisabled === nextDisabled;
-  if (!disabledEqual) return false;
 
   const hasReactionsEqual = prevHasReactions === nextHasReactions;
   if (!hasReactionsEqual) return false;
@@ -146,6 +143,9 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
   const groupStylesEqual = JSON.stringify(prevGroupStyles) === JSON.stringify(nextGroupStyles);
   if (!groupStylesEqual) return false;
 
+  const isEditedMessageOpenEqual = prevIsEditedMessageOpen === nextIsEditedMessageOpen;
+  if (!isEditedMessageOpenEqual) return false;
+
   const isPrevMessageTypeDeleted = prevMessage.type === 'deleted';
   const isNextMessageTypeDeleted = nextMessage.type === 'deleted';
 
@@ -153,7 +153,8 @@ const areEqual = <StreamChatGenerics extends DefaultStreamChatGenerics = Default
     isPrevMessageTypeDeleted === isNextMessageTypeDeleted &&
     prevMessage.status === nextMessage.status &&
     prevMessage.type === nextMessage.type &&
-    prevMessage.text === nextMessage.text;
+    prevMessage.text === nextMessage.text &&
+    prevMessage.i18n === nextMessage.i18n;
   if (!messageEqual) return false;
 
   const isPrevQuotedMessageTypeDeleted = prevMessage.quoted_message?.type === 'deleted';
@@ -219,7 +220,7 @@ export const MessageSimple = <
 >(
   props: MessageSimpleProps<StreamChatGenerics>,
 ) => {
-  const { alignment, channel, disabled, groupStyles, hasReactions, message } =
+  const { alignment, channel, groupStyles, hasReactions, isEditedMessageOpen, message } =
     useMessageContext<StreamChatGenerics>();
   const {
     enableMessageGroupingByUser,
@@ -234,10 +235,10 @@ export const MessageSimple = <
       {...{
         alignment,
         channel,
-        disabled,
         enableMessageGroupingByUser,
         groupStyles,
         hasReactions,
+        isEditedMessageOpen,
         message,
         MessageAvatar,
         MessageContent,

@@ -2,6 +2,7 @@ import React, { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useS
 import { KeyboardAvoidingViewProps, StyleSheet, Text, View } from 'react-native';
 
 import debounce from 'lodash/debounce';
+import omit from 'lodash/omit';
 import throttle from 'lodash/throttle';
 
 import { lookup } from 'mime-types';
@@ -74,9 +75,9 @@ import {
   ThumbsUpReaction,
   WutReaction,
 } from '../../icons';
-import { FlatList as FlatListDefault, pickDocument } from '../../native';
+import { FlatList as FlatListDefault, isImagePickerAvailable, pickDocument } from '../../native';
 import * as dbApi from '../../store/apis';
-import type { DefaultStreamChatGenerics } from '../../types/types';
+import { DefaultStreamChatGenerics, FileTypes } from '../../types/types';
 import { addReactionToLocalState } from '../../utils/addReactionToLocalState';
 import { compressedImageURI } from '../../utils/compressImage';
 import { DBSyncManager } from '../../utils/DBSyncManager';
@@ -86,6 +87,7 @@ import { removeReservedFields } from '../../utils/removeReservedFields';
 import {
   defaultEmojiSearchIndex,
   generateRandomId,
+  getFileNameFromPath,
   isBouncedMessage,
   isLocalUrl,
   MessageStatusTypes,
@@ -118,6 +120,7 @@ import { MessageAvatar as MessageAvatarDefault } from '../Message/MessageSimple/
 import { MessageBounce as MessageBounceDefault } from '../Message/MessageSimple/MessageBounce';
 import { MessageContent as MessageContentDefault } from '../Message/MessageSimple/MessageContent';
 import { MessageDeleted as MessageDeletedDefault } from '../Message/MessageSimple/MessageDeleted';
+import { MessageEditedTimestamp as MessageEditedTimestampDefault } from '../Message/MessageSimple/MessageEditedTimestamp';
 import { MessageError as MessageErrorDefault } from '../Message/MessageSimple/MessageError';
 import { MessageFooter as MessageFooterDefault } from '../Message/MessageSimple/MessageFooter';
 import { MessagePinnedHeader as MessagePinnedHeaderDefault } from '../Message/MessageSimple/MessagePinnedHeader';
@@ -125,6 +128,7 @@ import { MessageReplies as MessageRepliesDefault } from '../Message/MessageSimpl
 import { MessageRepliesAvatars as MessageRepliesAvatarsDefault } from '../Message/MessageSimple/MessageRepliesAvatars';
 import { MessageSimple as MessageSimpleDefault } from '../Message/MessageSimple/MessageSimple';
 import { MessageStatus as MessageStatusDefault } from '../Message/MessageSimple/MessageStatus';
+import { MessageTimestamp as MessageTimestampDefault } from '../Message/MessageSimple/MessageTimestamp';
 import { ReactionList as ReactionListDefault } from '../Message/MessageSimple/ReactionList';
 import { AttachButton as AttachButtonDefault } from '../MessageInput/AttachButton';
 import { CommandsButton as CommandsButtonDefault } from '../MessageInput/CommandsButton';
@@ -154,6 +158,7 @@ import { MessageList as MessageListDefault } from '../MessageList/MessageList';
 import { MessageSystem as MessageSystemDefault } from '../MessageList/MessageSystem';
 import { NetworkDownIndicator as NetworkDownIndicatorDefault } from '../MessageList/NetworkDownIndicator';
 import { ScrollToBottomButton as ScrollToBottomButtonDefault } from '../MessageList/ScrollToBottomButton';
+import { StickyHeader as StickyHeaderDefault } from '../MessageList/StickyHeader';
 import { TypingIndicator as TypingIndicatorDefault } from '../MessageList/TypingIndicator';
 import { TypingIndicatorContainer as TypingIndicatorContainerDefault } from '../MessageList/TypingIndicatorContainer';
 import { OverlayReactionList as OverlayReactionListDefault } from '../MessageOverlay/OverlayReactionList';
@@ -262,7 +267,6 @@ export type ChannelPropsWithContext<
       | 'FileAttachmentGroup'
       | 'FlatList'
       | 'forceAlignMessages'
-      | 'formatDate'
       | 'Gallery'
       | 'getMessagesGroupStyles'
       | 'Giphy'
@@ -292,6 +296,7 @@ export type ChannelPropsWithContext<
       | 'MessageContent'
       | 'messageContentOrder'
       | 'MessageDeleted'
+      | 'MessageEditedTimestamp'
       | 'MessageError'
       | 'MessageFooter'
       | 'MessageHeader'
@@ -303,6 +308,7 @@ export type ChannelPropsWithContext<
       | 'MessageStatus'
       | 'MessageSystem'
       | 'MessageText'
+      | 'MessageTimestamp'
       | 'myMessageTheme'
       | 'onLongPressMessage'
       | 'onPressInMessage'
@@ -469,12 +475,12 @@ const ChannelWithContext = <
     FileUploadPreview = FileUploadPreviewDefault,
     FlatList = FlatListDefault,
     forceAlignMessages,
-    formatDate,
     Gallery = GalleryDefault,
     getMessagesGroupStyles,
     Giphy = GiphyDefault,
     giphyEnabled,
     giphyVersion = 'fixed_height',
+    handleAttachButtonPress,
     handleBlock,
     handleCopy,
     handleDelete,
@@ -486,6 +492,7 @@ const ChannelWithContext = <
     handleReaction,
     handleRetry,
     handleThreadReply,
+    hasCameraPicker = isImagePickerAvailable(),
     hasCommands = true,
     // If pickDocument isn't available, default to hiding the file picker
     hasFilePicker = pickDocument !== null,
@@ -527,6 +534,7 @@ const ChannelWithContext = <
     MessageContent = MessageContentDefault,
     messageContentOrder = ['quoted_reply', 'gallery', 'files', 'text', 'attachments'],
     MessageDeleted = MessageDeletedDefault,
+    MessageEditedTimestamp = MessageEditedTimestampDefault,
     MessageError = MessageErrorDefault,
     MessageFooter = MessageFooterDefault,
     MessageHeader,
@@ -540,6 +548,7 @@ const ChannelWithContext = <
     MessageStatus = MessageStatusDefault,
     MessageSystem = MessageSystemDefault,
     MessageText,
+    MessageTimestamp = MessageTimestampDefault,
     MoreOptionsButton = MoreOptionsButtonDefault,
     myMessageTheme,
     NetworkDownIndicator = NetworkDownIndicatorDefault,
@@ -571,7 +580,7 @@ const ChannelWithContext = <
     ShowThreadMessageInChannelButton = ShowThreadMessageInChannelButtonDefault,
     StartAudioRecordingButton = AudioRecordingButtonDefault,
     stateUpdateThrottleInterval = defaultThrottleInterval,
-    StickyHeader,
+    StickyHeader = StickyHeaderDefault,
     supportedReactions = reactionData,
     t,
     thread: threadProps,
@@ -598,7 +607,7 @@ const ChannelWithContext = <
   const [error, setError] = useState<Error | boolean>(false);
   const [hasMore, setHasMore] = useState(true);
   const [lastRead, setLastRead] = useState<ChannelContextValue<StreamChatGenerics>['lastRead']>();
-  const [loading, setLoading] = useState(!channel?.state.messages.length);
+  const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
 
   const [loadingMoreRecent, setLoadingMoreRecent] = useState(false);
@@ -645,10 +654,8 @@ const ChannelWithContext = <
        * Also there is no use case from UX perspective, why one would need loading uninitialized channel at particular message.
        * If the channel is not initiated, then we need to do channel.watch, which is more expensive for backend than channel.query.
        */
-      let channelLoaded = false;
       if (!channel.initialized) {
         await loadChannel();
-        channelLoaded = true;
       }
 
       if (messageId) {
@@ -658,8 +665,6 @@ const ChannelWithContext = <
         channel.countUnread() > scrollToFirstUnreadThreshold
       ) {
         loadChannelAtFirstUnreadMessage();
-      } else if (!channelLoaded) {
-        loadChannel();
       }
     };
 
@@ -1167,15 +1172,19 @@ const ChannelWithContext = <
   });
 
   const loadChannel = () =>
-    channelQueryCallRef.current(async () => {
-      if (!channel?.initialized || !channel.state.isUpToDate) {
-        await channel?.watch();
+    channelQueryCallRef.current(
+      async () => {
+        if (!channel?.initialized || !channel.state.isUpToDate) {
+          await channel?.watch();
+        } else {
+          await channel.state.loadMessageIntoState('latest');
+        }
+      },
+      () => {
         channel?.state.setIsUpToDate(true);
         setHasNoMoreRecentMessagesToLoad(true);
-      } else {
-        await channel.state.loadMessageIntoState('latest');
-      }
-    });
+      },
+    );
 
   const reloadThread = async () => {
     if (!channel || !thread?.id) return;
@@ -1563,12 +1572,12 @@ const ChannelWithContext = <
         const file = attachment.originalFile;
         // check if image_url is not a remote url
         if (
-          attachment.type === 'image' &&
+          attachment.type === FileTypes.Image &&
           image?.uri &&
           attachment.image_url &&
           isLocalUrl(attachment.image_url)
         ) {
-          const filename = image.name ?? image.uri.replace(/^(file:\/\/|content:\/\/)/, '');
+          const filename = image.name ?? getFileNameFromPath(image.uri);
           // if any upload is in progress, cancel it
           const controller = uploadAbortControllerRef.current.get(filename);
           if (controller) {
@@ -1591,10 +1600,10 @@ const ChannelWithContext = <
         }
 
         if (
-          (attachment.type === 'file' ||
-            attachment.type === 'audio' ||
-            attachment.type === 'voiceRecording' ||
-            attachment.type === 'video') &&
+          (attachment.type === FileTypes.File ||
+            attachment.type === FileTypes.Audio ||
+            attachment.type === FileTypes.VoiceRecording ||
+            attachment.type === FileTypes.Video) &&
           attachment.asset_url &&
           isLocalUrl(attachment.asset_url) &&
           file?.uri
@@ -1630,40 +1639,28 @@ const ChannelWithContext = <
   ) => {
     try {
       const updatedMessage = await uploadPendingAttachments(message);
-      const {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        __html,
-        attachments,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        created_at,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        deleted_at,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        html,
-        id,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        latest_reactions,
-        mentioned_users,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        own_reactions,
-        parent_id,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        quoted_message,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        reaction_counts,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        reactions,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        status,
-        text,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        type,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        updated_at,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        user,
-        ...extraFields
-      } = updatedMessage;
+      const extraFields = omit(updatedMessage, [
+        '__html',
+        'attachments',
+        'created_at',
+        'deleted_at',
+        'html',
+        'id',
+        'latest_reactions',
+        'mentioned_users',
+        'own_reactions',
+        'parent_id',
+        'quoted_message',
+        'reaction_counts',
+        'reaction_groups',
+        'reactions',
+        'status',
+        'text',
+        'type',
+        'updated_at',
+        'user',
+      ]);
+      const { attachments, id, mentioned_users, parent_id, text } = updatedMessage;
       if (!channel.id) return;
 
       const mentionedUserIds = mentioned_users?.map((user) => user.id) || [];
@@ -1999,6 +1996,7 @@ const ChannelWithContext = <
       },
     });
   };
+
   const deleteMessage: MessagesContextValue<StreamChatGenerics>['deleteMessage'] = async (
     message,
   ) => {
@@ -2223,13 +2221,14 @@ const ChannelWithContext = <
     CommandsButton,
     compressImageQuality,
     CooldownTimer,
-    disabled: disabledValue,
     doDocUploadRequest,
     doImageUploadRequest,
     editing,
     editMessage,
     emojiSearchIndex,
     FileUploadPreview,
+    handleAttachButtonPress,
+    hasCameraPicker,
     hasCommands,
     hasFilePicker,
     hasImagePicker,
@@ -2295,7 +2294,6 @@ const ChannelWithContext = <
     FileAttachmentIcon,
     FlatList,
     forceAlignMessages,
-    formatDate,
     Gallery,
     getMessagesGroupStyles,
     Giphy,
@@ -2326,6 +2324,7 @@ const ChannelWithContext = <
     MessageContent,
     messageContentOrder,
     MessageDeleted,
+    MessageEditedTimestamp,
     MessageError,
     MessageFooter,
     MessageHeader,
@@ -2337,6 +2336,7 @@ const ChannelWithContext = <
     MessageStatus,
     MessageSystem,
     MessageText,
+    MessageTimestamp,
     myMessageTheme,
     onLongPressMessage,
     onPressInMessage,

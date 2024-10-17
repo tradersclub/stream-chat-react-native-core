@@ -2,7 +2,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.InputEditingStateHeaderWithContext = exports.InputEditingStateHeader = void 0;
+exports.InputEditingStateHeader = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _reactNative = require("react-native");
 var _MessageInputContext = require("../../../contexts/messageInputContext/MessageInputContext");
@@ -24,12 +24,16 @@ var styles = _reactNative.StyleSheet.create({
     fontWeight: 'bold'
   }
 });
-var InputEditingStateHeaderWithContext = function InputEditingStateHeaderWithContext(_ref) {
-  var clearEditingState = _ref.clearEditingState,
-    disabled = _ref.disabled,
-    resetInput = _ref.resetInput;
+var InputEditingStateHeader = function InputEditingStateHeader(_ref) {
+  var propClearEditingState = _ref.clearEditingState,
+    propResetInput = _ref.resetInput;
   var _useTranslationContex = (0, _TranslationContext.useTranslationContext)(),
     t = _useTranslationContex.t;
+  var _useMessageInputConte = (0, _MessageInputContext.useMessageInputContext)(),
+    contextClearEditingState = _useMessageInputConte.clearEditingState,
+    contextResetInput = _useMessageInputConte.resetInput;
+  var clearEditingState = propClearEditingState || contextClearEditingState;
+  var resetInput = propResetInput || contextResetInput;
   var _useTheme = (0, _ThemeContext.useTheme)(),
     _useTheme$theme = _useTheme.theme,
     _useTheme$theme$color = _useTheme$theme.colors,
@@ -49,10 +53,13 @@ var InputEditingStateHeaderWithContext = function InputEditingStateHeaderWithCon
       }, editingBoxHeaderTitle],
       children: t('Editing Message')
     }), (0, _jsxRuntime.jsx)(_reactNative.TouchableOpacity, {
-      disabled: disabled,
       onPress: function onPress() {
-        resetInput();
-        clearEditingState();
+        if (resetInput) {
+          resetInput();
+        }
+        if (clearEditingState) {
+          clearEditingState();
+        }
       },
       testID: "close-button",
       children: (0, _jsxRuntime.jsx)(_icons.CircleClose, {
@@ -60,24 +67,6 @@ var InputEditingStateHeaderWithContext = function InputEditingStateHeaderWithCon
       })
     })]
   });
-};
-exports.InputEditingStateHeaderWithContext = InputEditingStateHeaderWithContext;
-var areEqual = function areEqual(prevProps, nextProps) {
-  var prevDisabled = prevProps.disabled;
-  var nextDisabled = nextProps.disabled;
-  var disabledEqual = prevDisabled === nextDisabled;
-  if (!disabledEqual) return false;
-  return true;
-};
-var MemoizedInputEditingStateHeader = _react["default"].memo(InputEditingStateHeaderWithContext, areEqual);
-var InputEditingStateHeader = function InputEditingStateHeader(props) {
-  var _useMessageInputConte = (0, _MessageInputContext.useMessageInputContext)(),
-    clearEditingState = _useMessageInputConte.clearEditingState,
-    resetInput = _useMessageInputConte.resetInput;
-  return (0, _jsxRuntime.jsx)(MemoizedInputEditingStateHeader, Object.assign({
-    clearEditingState: clearEditingState,
-    resetInput: resetInput
-  }, props));
 };
 exports.InputEditingStateHeader = InputEditingStateHeader;
 InputEditingStateHeader.displayName = 'EditingStateHeader{messageInput}';

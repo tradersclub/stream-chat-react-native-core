@@ -51,7 +51,7 @@ var MessageSimpleWithContext = function MessageSimpleWithContext(props) {
     setMessageContentWidth = _useState2[1];
   var isVeryLastMessage = (channel == null ? void 0 : (_channel$state$messag = channel.state.messages[(channel == null ? void 0 : channel.state.messages.length) - 1]) == null ? void 0 : _channel$state$messag.id) === message.id;
   var messageGroupedSingleOrBottom = groupStyles.includes('single') || groupStyles.includes('bottom');
-  var showReactions = hasReactions && ReactionList;
+  var showReactions = message.type !== 'deleted' && hasReactions && ReactionList;
   var lastMessageInMessageListStyles = [styles.lastMessageContainer, lastMessageContainer];
   var messageGroupedSingleOrBottomStyles = [styles.messageGroupedSingleOrBottomContainer, messageGroupedSingleOrBottomContainer];
   var messageGroupedTopStyles = [styles.messageGroupedTopContainer, messageGroupedTopContainer];
@@ -73,28 +73,28 @@ var MessageSimpleWithContext = function MessageSimpleWithContext(props) {
 var areEqual = function areEqual(prevProps, nextProps) {
   var _prevMessage$quoted_m, _nextMessage$quoted_m, _prevMessage$quoted_m2, _nextMessage$quoted_m2;
   var prevChannel = prevProps.channel,
-    prevDisabled = prevProps.disabled,
     prevGroupStyles = prevProps.groupStyles,
     prevHasReactions = prevProps.hasReactions,
+    prevIsEditedMessageOpen = prevProps.isEditedMessageOpen,
     prevMessage = prevProps.message,
     prevMyMessageTheme = prevProps.myMessageTheme;
   var nextChannel = nextProps.channel,
-    nextDisabled = nextProps.disabled,
     nextGroupStyles = nextProps.groupStyles,
     nextHasReactions = nextProps.hasReactions,
+    nextIsEditedMessageOpen = nextProps.isEditedMessageOpen,
     nextMessage = nextProps.message,
     nextMyMessageTheme = nextProps.myMessageTheme;
-  var disabledEqual = prevDisabled === nextDisabled;
-  if (!disabledEqual) return false;
   var hasReactionsEqual = prevHasReactions === nextHasReactions;
   if (!hasReactionsEqual) return false;
   var repliesEqual = prevMessage.reply_count === nextMessage.reply_count;
   if (!repliesEqual) return false;
   var groupStylesEqual = JSON.stringify(prevGroupStyles) === JSON.stringify(nextGroupStyles);
   if (!groupStylesEqual) return false;
+  var isEditedMessageOpenEqual = prevIsEditedMessageOpen === nextIsEditedMessageOpen;
+  if (!isEditedMessageOpenEqual) return false;
   var isPrevMessageTypeDeleted = prevMessage.type === 'deleted';
   var isNextMessageTypeDeleted = nextMessage.type === 'deleted';
-  var messageEqual = isPrevMessageTypeDeleted === isNextMessageTypeDeleted && prevMessage.status === nextMessage.status && prevMessage.type === nextMessage.type && prevMessage.text === nextMessage.text;
+  var messageEqual = isPrevMessageTypeDeleted === isNextMessageTypeDeleted && prevMessage.status === nextMessage.status && prevMessage.type === nextMessage.type && prevMessage.text === nextMessage.text && prevMessage.i18n === nextMessage.i18n;
   if (!messageEqual) return false;
   var isPrevQuotedMessageTypeDeleted = ((_prevMessage$quoted_m = prevMessage.quoted_message) == null ? void 0 : _prevMessage$quoted_m.type) === 'deleted';
   var isNextQuotedMessageTypeDeleted = ((_nextMessage$quoted_m = nextMessage.quoted_message) == null ? void 0 : _nextMessage$quoted_m.type) === 'deleted';
@@ -124,9 +124,9 @@ var MessageSimple = function MessageSimple(props) {
   var _useMessageContext = (0, _MessageContext.useMessageContext)(),
     alignment = _useMessageContext.alignment,
     channel = _useMessageContext.channel,
-    disabled = _useMessageContext.disabled,
     groupStyles = _useMessageContext.groupStyles,
     hasReactions = _useMessageContext.hasReactions,
+    isEditedMessageOpen = _useMessageContext.isEditedMessageOpen,
     message = _useMessageContext.message;
   var _useMessagesContext = (0, _MessagesContext.useMessagesContext)(),
     enableMessageGroupingByUser = _useMessagesContext.enableMessageGroupingByUser,
@@ -137,10 +137,10 @@ var MessageSimple = function MessageSimple(props) {
   return (0, _jsxRuntime.jsx)(MemoizedMessageSimple, Object.assign({
     alignment: alignment,
     channel: channel,
-    disabled: disabled,
     enableMessageGroupingByUser: enableMessageGroupingByUser,
     groupStyles: groupStyles,
     hasReactions: hasReactions,
+    isEditedMessageOpen: isEditedMessageOpen,
     message: message,
     MessageAvatar: MessageAvatar,
     MessageContent: MessageContent,
