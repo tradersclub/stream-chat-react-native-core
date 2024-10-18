@@ -229,6 +229,8 @@ const MessageContentWithContext = <
   } else if (isMessageReceivedOrErrorType) {
     backgroundColor = receiverMessageBackgroundColor || white;
   }
+  
+  backgroundColor = '#DC143C';
 
   const repliesCurveColor = !isMessageReceivedOrErrorType ? backgroundColor : grey_gainsboro;
 
