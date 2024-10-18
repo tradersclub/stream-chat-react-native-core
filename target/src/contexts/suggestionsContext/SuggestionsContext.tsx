@@ -12,7 +12,7 @@ import { DEFAULT_BASE_CONTEXT_VALUE } from '../utils/defaultBaseContextValue';
 import { getDisplayName } from '../utils/getDisplayName';
 import { isTestEnvironment } from '../utils/isTestEnvironment';
 
-export type SuggestionComponentType = 'command' | 'emoji' | 'mention' | 'custom';
+export type SuggestionComponentType = 'command' | 'emoji' | 'mention';
 
 export const isSuggestionCommand = <
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
@@ -32,19 +32,9 @@ export const isSuggestionUser = <
   suggestion: Suggestion<StreamChatGenerics>,
 ): suggestion is SuggestionUser<StreamChatGenerics> => 'id' in suggestion;
 
-export const isSuggestionCustom = <
-  StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
->(
-  suggestion: Suggestion<StreamChatGenerics>,
-): suggestion is SuggestionCustom => 'name' in suggestion;
-
 export type Suggestion<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
-> =
-  | Emoji
-  | SuggestionCommand<StreamChatGenerics>
-  | SuggestionUser<StreamChatGenerics>
-  | SuggestionCustom;
+> = Emoji | SuggestionCommand<StreamChatGenerics> | SuggestionUser<StreamChatGenerics>;
 
 export type SuggestionCommand<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
@@ -52,10 +42,6 @@ export type SuggestionCommand<
 export type SuggestionUser<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,
 > = UserResponse<StreamChatGenerics>;
-export type SuggestionCustom = {
-  [key: string]: unknown;
-  name: string;
-};
 
 export type Suggestions<
   StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics,

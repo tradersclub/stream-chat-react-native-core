@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useEffect, useState } from 'react';
-import { Image, Platform, View } from 'react-native';
+import { Image, Platform } from 'react-native';
 
 import type { Channel, StreamChat } from 'stream-chat';
 

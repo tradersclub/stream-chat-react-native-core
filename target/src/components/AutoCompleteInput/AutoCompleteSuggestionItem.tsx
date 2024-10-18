@@ -75,16 +75,16 @@ const AutoCompleteSuggestionItemWithContext = <
   } = useTheme();
 
   if (triggerType === 'mention') {
-    const { id, image, name, username, online } = itemProps as SuggestionUser<StreamChatGenerics>;
+    const { id, image, name, online } = itemProps as SuggestionUser<StreamChatGenerics>;
     return (
       <View style={[styles.container, mentionContainer]}>
         <Avatar image={image} name={name} online={online} size={avatarSize} />
         <View style={[styles.column, column]}>
           <Text style={[styles.name, { color: black }, nameStyle]} testID='mentions-item-name'>
-            {username || name || id}
+            {name || id}
           </Text>
         </View>
-        <AtMentions pathFill={'#99ff00'} />
+        <AtMentions pathFill={accent_blue} />
       </View>
     );
   } else if (triggerType === 'emoji') {

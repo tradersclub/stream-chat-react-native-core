@@ -23,7 +23,6 @@ export type ReactionListPropsWithContext<StreamChatGenerics extends DefaultStrea
     reactionSize?: number;
     stroke?: string;
     strokeSize?: number;
-    reactionCounterColor?: string;
 };
 export type ReactionListProps<StreamChatGenerics extends DefaultStreamChatGenerics = DefaultStreamChatGenerics> = Partial<ReactionListPropsWithContext<StreamChatGenerics>> & Pick<ReactionListPropsWithContext<StreamChatGenerics>, 'messageContentWidth'>;
 /**

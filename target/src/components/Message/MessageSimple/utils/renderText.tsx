@@ -26,8 +26,6 @@ import type { DefaultStreamChatGenerics } from '../../../../types/types';
 import { escapeRegExp } from '../../../../utils/utils';
 import type { MessageType } from '../../../MessageList/hooks/useMessageList';
 
-import openLink from '@utils/openLink';
-
 const defaultMarkdownStyles: MarkdownStyle = {
   inlineCode: {
     fontSize: 13,
@@ -67,13 +65,6 @@ const defaultMarkdownStyles: MarkdownStyle = {
 const mentionsParseFunction: ParseFunction = (capture, parse, state) => ({
   content: parseInline(parse, capture[0], state),
 });
-
-const tickerParse: ParseFunction = (capture, parse, state) => {
-  return {
-    type: 'ticker',
-    content: capture[0],
-  };
-};
 
 export type MarkdownRules = Partial<DefaultRules>;
 
@@ -157,9 +148,16 @@ export const renderText = <
       url = node.target;
       previousLink = node.target;
     }
-    const onPress = () => {
+    const onPress = (event: GestureResponderEvent) => {
       if (!preventPress && onPressParam) {
-        openLink(url);
+        onPressParam({
+          additionalInfo: { url },
+          defaultHandler: () => {
+            onLink(url);
+          },
+          emitter: 'textLink',
+          event,
+        });
       }
     };
 
@@ -182,36 +180,6 @@ export const renderText = <
         suppressHighlighting={true}
       >
         {output(node.content, { ...state, withinLink: true })}
-      </Text>
-    );
-  };
-
-  const tickerReact: ReactNodeOutput = (node, output, { ...state }) => {
-    const tickerName = node.content;
-    const onPress = (event: GestureResponderEvent) => {
-      if (!preventPress && onPressParam) {
-        onPressParam({
-          additionalInfo: {
-            ticker: tickerName,
-          },
-          emitter: 'textLink',
-          event,
-        });
-      }
-    };
-
-    const onLongPress = (event: GestureResponderEvent) => {
-      if (!preventPress && onLongPressParam) {
-        onLongPressParam({
-          emitter: 'textLink',
-          event,
-        });
-      }
-    };
-
-    return (
-      <Text key={state.key} onLongPress={onLongPress} onPress={onPress} style={styles.mentions}>
-        {tickerName}
       </Text>
     );
   };
@@ -242,7 +210,7 @@ export const renderText = <
   // translate links
   const { mentioned_users } = message;
   const mentionedUsernames = (mentioned_users || [])
-    .map((user) => user.username || '')
+    .map((user) => user.name || user.id)
     .filter(Boolean)
     .sort((a, b) => b.length - a.length)
     .map(escapeRegExp);
@@ -250,13 +218,6 @@ export const renderText = <
   const regEx = new RegExp(`^\\B(${mentionedUsers})`, 'g');
   const mentionsMatchFunction: MatchFunction = (source) => regEx.exec(source);
 
-  const tickerMatch: MatchFunction = (source, state, lookBehind) => {
-    if (!state.inLink && lookBehind !== '(') {
-      return /^\$[a-zA-Z][\w]*/.exec(source);
-    }
-    return null;
-  };
- 
   const mentionsReact: ReactNodeOutput = (node, output, { ...state }) => {
     /**removes the @ prefix of username */
     const userName = node.content[0]?.content?.substring(1);
@@ -265,7 +226,7 @@ export const renderText = <
         onPressParam({
           additionalInfo: {
             user: mentioned_users?.find(
-              (user: UserResponse<StreamChatGenerics>) => userName === user.username || userName === user.name,
+              (user: UserResponse<StreamChatGenerics>) => userName === user.name,
             ),
           },
           emitter: 'textMention',
@@ -312,12 +273,6 @@ export const renderText = <
     // we have no react rendering support for reflinks
     reflink: { match: () => null },
     sublist: { react: listReact },
-    ticker: {
-      order: defaultRules.text.order - 0.5,
-      match: tickerMatch,
-      parse: tickerParse,
-      react: tickerReact,
-    },
     ...(mentionedUsers
       ? {
           mentions: {
