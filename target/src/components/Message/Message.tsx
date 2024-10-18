@@ -73,7 +73,7 @@ export type TextMentionTouchableHandlerPayload<
 
 export type UrlTouchableHandlerPayload = {
   emitter: 'textLink' | 'card';
-  additionalInfo?: { url?: string };
+  additionalInfo?: { url?: string, ticker?: string };
 };
 
 export type FileAttachmentTouchableHandlerPayload<

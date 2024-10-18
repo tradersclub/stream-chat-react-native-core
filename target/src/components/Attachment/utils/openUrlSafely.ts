@@ -1,4 +1,4 @@
-import { Linking } from 'react-native';
+import openLink from '@utils/openLink';
 
 export const openUrlSafely = async (url?: string) => {
   let finalUrl = url as string;
@@ -7,11 +7,5 @@ export const openUrlSafely = async (url?: string) => {
   if (!pattern.test(finalUrl)) {
     finalUrl = 'http://' + url;
   }
-  const supported = await Linking.canOpenURL(finalUrl);
-
-  if (supported) {
-    Linking.openURL(finalUrl);
-  } else {
-    console.warn(`Don't know how to open URI: ${finalUrl}`);
-  }
+  openLink(finalUrl);
 };

@@ -14,6 +14,7 @@ import type { AutoCompleteSuggestionItemProps } from './AutoCompleteSuggestionIt
 
 import {
   isSuggestionUser,
+  isSuggestionCustom,
   Suggestion,
   SuggestionsContextValue,
   useSuggestionsContext,
@@ -116,6 +117,22 @@ export const AutoCompleteSuggestionListWithContext = <
             )}
           </SuggestionsItem>
         );
+      case 'custom':
+        if (isSuggestionCustom(item)) {
+          return (
+            <SuggestionsItem
+              onPress={() => {
+                onSelect(item);
+              }}
+              style={[itemStyle]}
+            >
+              {AutoCompleteSuggestionItem && (
+                <AutoCompleteSuggestionItem itemProps={item} triggerType={triggerType} />
+              )}
+            </SuggestionsItem>
+          );
+        }
+        return null;
       default:
         return null;
     }

@@ -243,7 +243,7 @@ const ReplyWithContext = <
             />
           ) : null
         ) : null}
-        {messageType === FileTypes.Video && !lastAttachment.og_scrape_url ? (
+        {messageType === FileTypes.Video && !lastAttachment.og_scrape_url && lastAttachment.thumb_url ? (
           <VideoThumbnail
             imageStyle={[styles.videoThumbnailImageStyle, videoThumbnailImageStyle]}
             style={[styles.videoThumbnailContainerStyle, videoThumbnailContainerStyle]}
